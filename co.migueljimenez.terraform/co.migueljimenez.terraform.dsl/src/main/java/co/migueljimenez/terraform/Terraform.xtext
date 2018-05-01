@@ -69,7 +69,7 @@ AttributeReference
 	:	references += ValidID ('.' references += ValidID)+
 	;
 
-// Recursive TextExpression are not supported
+// Recursive text expressions are not supported
 FunctionCall
 	:	function = ValidID '(' (parameters += Parameter (',' parameters += Parameter)*)? ')'
 	;
