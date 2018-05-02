@@ -74,7 +74,7 @@ class TerraformParsingTest {
 			}
 			''')
 		Assert.assertNotNull(template)
-		template.assertNoIssues
+		template.assertNoErrors
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class TerraformParsingTest {
 			}
 			''')
 		Assert.assertNotNull(template)
-		template.assertNoIssues
+		template.assertNoErrors
 	}
 
 	@Test
