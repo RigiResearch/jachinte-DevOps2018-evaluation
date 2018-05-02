@@ -21,12 +21,14 @@
  */
 package co.migueljimenez.terraform.scoping
 
-
 /**
  * This class contains custom scoping description.
- * 
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#scoping
  * on how and when to use it.
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-02
+ * @version $Id$
+ * @since 0.0.1
  */
 class TerraformScopeProvider extends AbstractTerraformScopeProvider {
 

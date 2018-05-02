@@ -30,9 +30,12 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
 
 /**
- * This class contains custom validation rules. 
- *
+ * This class contains custom validation rules.
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-02
+ * @version $Id$
+ * @since 0.0.1
  */
 class TerraformValidator extends AbstractTerraformValidator {
 

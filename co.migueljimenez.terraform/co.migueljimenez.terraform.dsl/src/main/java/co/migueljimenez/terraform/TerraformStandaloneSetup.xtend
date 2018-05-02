@@ -21,9 +21,13 @@
  */
 package co.migueljimenez.terraform
 
-
 /**
- * Initialization support for running Xtext languages without Equinox extension registry.
+ * Initialization support for running Xtext languages without Equinox extension
+ * registry.
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-02
+ * @version $Id$
+ * @since 0.0.1
  */
 class TerraformStandaloneSetup extends TerraformStandaloneSetupGenerated {
 

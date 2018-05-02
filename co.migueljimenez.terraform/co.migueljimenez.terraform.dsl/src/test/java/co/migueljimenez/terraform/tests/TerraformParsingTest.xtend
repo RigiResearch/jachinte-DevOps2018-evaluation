@@ -30,8 +30,12 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
+ /**
  * Tests the model parser.
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-02
+ * @version $Id$
+ * @since 0.0.1
  */
 @RunWith(XtextRunner)
 @InjectWith(TerraformInjectorProvider)

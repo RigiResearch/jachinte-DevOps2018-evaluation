@@ -21,9 +21,13 @@
  */
 package co.migueljimenez.terraform
 
-
 /**
- * Use this class to register components to be used at runtime / without the Equinox extension registry.
+ * Use this class to register components to be used at runtime / without
+ * the Equinox extension registry.
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-02
+ * @version $Id$
+ * @since 0.0.1
  */
 class TerraformRuntimeModule extends AbstractTerraformRuntimeModule {
 }
