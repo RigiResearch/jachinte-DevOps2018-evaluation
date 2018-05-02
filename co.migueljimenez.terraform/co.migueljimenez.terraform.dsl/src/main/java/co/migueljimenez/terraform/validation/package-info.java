@@ -19,15 +19,5 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.scoping
-
-
-/**
- * This class contains custom scoping description.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#scoping
- * on how and when to use it.
- */
-class TerraformScopeProvider extends AbstractTerraformScopeProvider {
-
-}
+// Contains classes for semantic validation of Terraform files
+package co.migueljimenez.terraform.validation;
