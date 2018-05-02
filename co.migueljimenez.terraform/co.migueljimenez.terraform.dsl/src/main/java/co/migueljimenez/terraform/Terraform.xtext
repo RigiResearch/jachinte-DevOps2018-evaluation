@@ -9,8 +9,8 @@ Template
 	;
 
 Declaration
-	:	resource = ValidID (type = StringLiteral)?
-		name = StringLiteral
+	:	resource = ValidID (type = TextLiteral)?
+		name = TextLiteral
 		value = DictionaryLiteral
 	;
 
@@ -39,7 +39,7 @@ DictionaryLiteral returns Dictionary
 	;
 
 NamedDictionary returns Dictionary
-	:	{Dictionary} (name = StringLiteral)? '{' elements += KeyValuePair* '}'
+	:	{Dictionary} (name = TextLiteral)? '{' elements += KeyValuePair* '}'
 	;
 
 KeyValuePair
@@ -61,11 +61,11 @@ TextExpression
 	;
 
 Expression
-	:	AttributeReference
+	:	ResourceReference
 	|	FunctionCall
 	;
 
-AttributeReference
+ResourceReference
 	:	references += ValidID ('.' references += ValidID)+
 	;
 
@@ -78,37 +78,47 @@ Parameter
 	:	TextLiteral
 	|	NumberLiteral
 	|	BooleanLiteral
-	|	AttributeReference
+	|	ResourceReference
 	;
 
 ValidID
 	:	ID
 	;
 
-Number hidden():
-	HEX | (INT | DECIMAL) ('.' (INT | DECIMAL))?;
+Number returns ecore::EBigDecimal hidden()
+	:	HEX | (INT | DECIMAL) ('.' (INT | DECIMAL))?
+	;
 
 
 @Override 
-terminal ID: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9'|'-')*;
+terminal ID returns ecore::EString
+	:	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9'|'-')*
+	;
 
 @Override 
-terminal INT returns ecore::EInt: ('0'..'9')+;
+terminal INT returns ecore::EInt
+	:	('0'..'9')+
+	;
 
-terminal HEX:
-	'0' ('x'|'X') ('0'..'9'|'a'..'f'|'A'..'F'|'_')+
-	('#' (('b'|'B')('i'|'I') | ('l'|'L')))?;
+terminal HEX
+	:	'0' ('x'|'X') ('0'..'9'|'a'..'f'|'A'..'F'|'_')+ ('#' (('b'|'B')('i'|'I') | ('l'|'L')))?
+	;
 
-terminal DECIMAL:
-	INT
-	(('e'|'E') ('+'|'-')? INT)?
-	(('b'|'B')('i'|'I'|'d'|'D') | ('l'|'L'|'d'|'D'|'f'|'F'))?;
+terminal DECIMAL
+	:	INT
+		(('e'|'E') ('+'|'-')? INT)?
+		(('b'|'B')('i'|'I'|'d'|'D') | ('l'|'L'|'d'|'D'|'f'|'F'))?
+	;
 
 terminal TEXT_EXP_START: '"' '$' '{';
 terminal TEXT_EXP_END: '}' '"';
 
 @Override
-terminal STRING: '"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"'|'$') )* '"';
+terminal STRING returns ecore::EString
+	:	'"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"'|'$') )* '"'
+	;
 
 @Override
-terminal SL_COMMENT : ('//' | '#') !('\n'|'\r')* ('\r'? '\n')?;
+terminal SL_COMMENT
+	:	('//' | '#') !('\n'|'\r')* ('\r'? '\n')?
+	;
