@@ -121,4 +121,49 @@ class TerraformParsingTest {
 			TerraformValidator.UNKNOWN_RESOURCE_REFERENCE
 		)
 	}
+
+	@Test
+	def void implicitAttributeReference() {
+		val template = parseHelper.parse('''
+			resource "openstack_networking_router_v2" "terraform" {
+				name                = "terraform"
+				admin_state_up      = "true"
+			}
+			resource "openstack_networking_router_interface_v2" "terraform" {
+			  router_id = "${openstack_networking_router_v2.terraform.id}"
+			}
+			''')
+		Assert.assertNotNull(template)
+		template.assertWarning(
+			TerraformPackage.Literals.RESOURCE_REFERENCE,
+			TerraformValidator.IMPLICIT_ATTRIBUTE_REFERENCE
+		)
+	}
+
+	@Test
+	def void knownFunction() {
+		val template = parseHelper.parse('''
+			resource "openstack_compute_keypair_v2" "terraform" {
+				name       = "terraform"
+				public_key = "${file("f.pub")}"
+			}
+			''')
+		Assert.assertNotNull(template)
+		template.assertNoErrors
+	}
+
+	@Test
+	def void unknownFunction() {
+		val template = parseHelper.parse('''
+			resource "openstack_compute_keypair_v2" "terraform" {
+				name       = "terraform"
+				public_key = "${unknown("f.pub")}"
+			}
+			''')
+		Assert.assertNotNull(template)
+		template.assertError(
+			TerraformPackage.Literals.FUNCTION_CALL,
+			TerraformValidator.UNKNOWN_FUNCTION
+		)
+	}
 }
