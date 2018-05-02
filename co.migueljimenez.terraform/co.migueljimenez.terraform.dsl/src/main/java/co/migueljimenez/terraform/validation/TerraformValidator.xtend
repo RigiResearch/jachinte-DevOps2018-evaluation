@@ -8,6 +8,7 @@ import co.migueljimenez.terraform.terraform.FunctionCall
 import co.migueljimenez.terraform.terraform.ResourceReference
 import co.migueljimenez.terraform.terraform.Template
 import co.migueljimenez.terraform.terraform.TerraformPackage
+import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
 
 /**
@@ -16,7 +17,8 @@ import org.eclipse.xtext.validation.Check
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class TerraformValidator extends AbstractTerraformValidator {
-	
+
+	public static val IMPLICIT_ATTRIBUTE_REFERENCE = "implicitAttributeReference"	
 	public static val INVALID_DECLARATION = "invalidResourceName"
 	public static val INVALID_REFERENCE = "invalidReference"
 	public static val UNKNOWN_FUNCTION = "unknownFunctionName"
@@ -50,6 +52,58 @@ class TerraformValidator extends AbstractTerraformValidator {
 				'''Unknown function "«functionCall.function»"''',
 				TerraformPackage.Literals.FUNCTION_CALL__FUNCTION,
 				UNKNOWN_FUNCTION
+			)
+		}
+	}
+
+	@Check
+	def checkResourceRef(ResourceReference resourceRef) {
+		val template = EcoreUtil2.getRootContainer(resourceRef) as Template
+		var resources = newLinkedHashMap()
+		for (declaration : template.declarations) {
+			if (declaration.resource.equals("resource")) {
+				// key is resource type
+				if (!resources.containsKey(declaration.type.value))
+					resources.put(declaration.type.value, newArrayList)
+				resources
+					.get(declaration.type.value)
+					.add(declaration.name.value -> declaration.value.elements.map[p|p.key])
+			} else {
+				// key is resource
+				val resource = if (declaration.resource.equals("variable")) "var" else declaration.resource
+				if (!resources.containsKey(resource))
+					resources.put(resource, newArrayList)
+				resources
+					.get(resource)
+					.add(declaration.name.value -> declaration.value.elements.map[p|p.key])
+			}
+		}
+		val type = resourceRef.references.get(0)
+		val name = resourceRef.references.get(1)
+		if (resources.containsKey(type)) {
+			if (resources.get(type).map[p|p.key].contains(name)) {
+				if (resourceRef.references.size > 2) {
+					val attr = resourceRef.references.get(2)
+					val resource = resources.get(type).findFirst[p|p.key.equals(name)]
+					if (!resource.value.contains(attr))
+						warning(
+							'''Attribute «attr» could not be checked in resource «resource.key»''',
+							TerraformPackage.Literals.RESOURCE_REFERENCE__REFERENCES,
+							IMPLICIT_ATTRIBUTE_REFERENCE
+						)
+				}
+			} else {
+				error(
+				'''Unknown resource «name»''',
+					TerraformPackage.Literals.RESOURCE_REFERENCE__REFERENCES,
+					UNKNOWN_RESOURCE_REFERENCE
+				)
+			}
+		} else {
+			error(
+				'''Unknown resource «type»''',
+				TerraformPackage.Literals.RESOURCE_REFERENCE__REFERENCES,
+				UNKNOWN_RESOURCE_REFERENCE
 			)
 		}
 	}
