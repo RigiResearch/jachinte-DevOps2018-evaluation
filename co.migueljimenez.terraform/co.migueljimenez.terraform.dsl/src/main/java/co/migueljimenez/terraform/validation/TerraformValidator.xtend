@@ -3,9 +3,12 @@
  */
 package co.migueljimenez.terraform.validation
 
-import org.eclipse.xtext.validation.Check
 import co.migueljimenez.terraform.terraform.Declaration
+import co.migueljimenez.terraform.terraform.FunctionCall
+import co.migueljimenez.terraform.terraform.ResourceReference
+import co.migueljimenez.terraform.terraform.Template
 import co.migueljimenez.terraform.terraform.TerraformPackage
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
@@ -14,16 +17,50 @@ import co.migueljimenez.terraform.terraform.TerraformPackage
  */
 class TerraformValidator extends AbstractTerraformValidator {
 	
-	public static val INVALID_DECLARATION = 'invalidName'
+	public static val INVALID_DECLARATION = "invalidResourceName"
+	public static val INVALID_REFERENCE = "invalidReference"
+	public static val UNKNOWN_FUNCTION = "unknownFunctionName"
+	public static val UNKNOWN_RESOURCE_REFERENCE = "unknownResourceReference"
+
+	/**
+	 * List of accepted resources
+	 */
+	static val resources = #["variable", "output", "provider", "resource"]
+
+	/**
+	 * List of supported functions
+	 */
+	static val functions = #["file"]
 
 	@Check
 	def checkDeclaration(Declaration declaration) {
-		val resources = #["variable", "output", "provider", "resource"]
-		if (!resources.contains(declaration.resource)) {
+		if (!TerraformValidator.resources.contains(declaration.resource)) {
 			error(
-				'''Unknown resource «declaration.resource»''',
+				'''Unknown resource "«declaration.resource»"''',
 				TerraformPackage.Literals.DECLARATION__RESOURCE,
 				INVALID_DECLARATION
+			)
+		}
+	}
+
+	@Check
+	def checkFunctionCall(FunctionCall functionCall) {
+		if (!TerraformValidator.functions.contains(functionCall.function)) {
+			error(
+				'''Unknown function "«functionCall.function»"''',
+				TerraformPackage.Literals.FUNCTION_CALL__FUNCTION,
+				UNKNOWN_FUNCTION
+			)
+		}
+	}
+
+	@Check
+	def checkOutputRef(ResourceReference resourceReference) {
+		if (resourceReference.references.get(0).equals("output")) {
+			error(
+				'''Invalid reference to output "«resourceReference.references.join(".")»"''',
+				TerraformPackage.Literals.RESOURCE_REFERENCE__REFERENCES,
+				INVALID_REFERENCE
 			)
 		}
 	}
