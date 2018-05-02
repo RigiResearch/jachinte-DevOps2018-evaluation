@@ -31,8 +31,19 @@ class TerraformValidator extends AbstractTerraformValidator {
 
 	/**
 	 * List of supported functions
+	 * From: https://gist.github.com/davewongillies/251277c068bea5466d1583aafc4096ea
 	 */
-	static val functions = #["file"]
+	static val functions = #[
+		"abs", "basename", "base64decode", "base64encode", "base64gzip",
+		"base64sha256", "base64sha512", "bcrypt", "ceil", "chomp", "cidrhost",
+		"cidrnetmask", "cidrsubnet", "coalesce", "coalescelist", "compact", "concat",
+		"contains", "dirname", "distinct", "element", "chunklist", "file", "floor",
+		"flatten", "format", "formatlist", "indent", "index", "join", "jsonencode",
+		"keys", "length", "list", "log", "lookup", "lower", "map", "matchkeys", "max",
+		"merge", "min", "md5", "pathexpand", "pow", "replace", "sha1", "sha256", "sha512",
+		"signum", "slice", "sort", "split", "timestamp", "title", "transpose", "trimspace",
+		"upper", "urlencode", "uuid", "values", "zipmap"
+	]
 
 	@Check
 	def checkDeclaration(Declaration declaration) {
@@ -47,6 +58,7 @@ class TerraformValidator extends AbstractTerraformValidator {
 
 	@Check
 	def checkFunctionCall(FunctionCall functionCall) {
+		// TODO Validate function parameters
 		if (!TerraformValidator.functions.contains(functionCall.function)) {
 			error(
 				'''Unknown function "«functionCall.function»"''',
