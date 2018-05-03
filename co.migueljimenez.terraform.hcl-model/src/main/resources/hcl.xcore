@@ -1,0 +1,72 @@
+@Ecore(nsPrefix="hcl", nsURI="https:/migueljimenez.co/terraform/hcl")
+@GenModel(
+    bundleManifest="false",
+    modelDirectory="co.migueljimenez.terraform.hcl-model/src/main/java-gen",
+    complianceLevel="8.0"
+)
+package co.migueljimenez.terraform.hcl.model
+
+import java.util.Map
+
+// Data types
+
+class Value {}
+
+class KeyValuePair<K, V> wraps Map$Entry {
+	K key
+	V value
+}
+
+class Dictionary<T> extends Value {
+	String name = ""
+	contains KeyValuePair<String, T>[] elements
+}
+
+class List<T> extends Value {
+	contains T[] elements
+}
+
+class Number extends Value {
+	int value = "0"
+}
+
+class Text extends Value {
+	String value = ""
+}
+
+class Bool extends Value {
+	boolean value = "false"
+}
+
+class Reference extends Value {}
+
+class FunctionCall extends Reference {
+	String name
+	contains Value[] arguments
+}
+
+class ResourceReference extends Reference {
+	contains List<String> fullyQualifiedName
+}
+
+// Entities
+
+class Resource {
+	id String name
+	String ^type = ""
+	contains Dictionary<Value> attributes
+}
+
+class Variable extends Resource {
+    String description = ""
+}
+
+class Input extends Variable {
+	contains Value ^default
+}
+
+class Output extends Variable {
+	contains List<Value> dependsOn
+	contains Value value
+	boolean sensitive
+}
