@@ -13,6 +13,7 @@ bin
 generated
 target
 src-gen
+java-gen
 xtend-gen
 xtext-gen
 
