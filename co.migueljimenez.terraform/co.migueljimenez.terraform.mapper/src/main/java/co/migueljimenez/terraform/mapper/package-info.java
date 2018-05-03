@@ -20,4 +20,4 @@
  * IN THE SOFTWARE.
  */
 // Contains the main class
-package co.migueljimenez.terraform.mapper.notation2mart;
+package co.migueljimenez.terraform.mapper;

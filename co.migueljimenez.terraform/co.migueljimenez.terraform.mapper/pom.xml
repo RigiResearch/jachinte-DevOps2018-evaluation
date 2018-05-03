@@ -28,11 +28,10 @@
 		<artifactId>co.migueljimenez.terraform</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<groupId>co.migueljimenez.terraform.mapper.hcl2mart</groupId>
-	<artifactId>co.migueljimenez.terraform.mapper.notation2mart</artifactId>
+	<artifactId>co.migueljimenez.terraform.mapper</artifactId>
 
-	<name>HCL to MART mapper</name>
-	<description>Maps concepts from the HCL notation to the infrastructure MART</description>
+	<name>Mapper HCL-MART</name>
+	<description>Maps concepts from the HCL notation to the infrastructure MART and vice versa</description>
 
 	<dependencies>
 		<dependency>

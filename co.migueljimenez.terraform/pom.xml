@@ -36,7 +36,7 @@
 
 	<modules>
 		<module>co.migueljimenez.terraform.dsl</module>
-		<module>co.migueljimenez.terraform.mapper.notation2mart</module>
+		<module>co.migueljimenez.terraform.mapper</module>
 	</modules>
 
 	<profiles>
