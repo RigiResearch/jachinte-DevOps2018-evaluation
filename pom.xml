@@ -109,6 +109,14 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<!-- Use the latest version of the dependency plugin to prevent erroneous
+				resolution of version ranges when using "mvn dependency:go-offline".
+				See more at https://issues.apache.org/jira/browse/MDEP-508 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
 				<plugin>
 					<groupId>org.eclipse.xtend</groupId>
 					<artifactId>xtend-maven-plugin</artifactId>
