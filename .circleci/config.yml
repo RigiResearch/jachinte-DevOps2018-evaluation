@@ -30,7 +30,8 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: mvn dependency:go-offline
+      # package the modules before going offline. See more at https://issues.apache.org/jira/browse/MDEP-516
+      - run: mvn package dependency:go-offline -U -DskipTests
 
       - save_cache:
           paths:
