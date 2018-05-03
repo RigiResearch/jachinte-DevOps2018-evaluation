@@ -36,6 +36,8 @@
 
 	<modules>
 		<module>co.migueljimenez.terraform.dsl</module>
+		<module>co.migueljimenez.terraform.infrastructure-model</module>
+		<module>co.migueljimenez.terraform.hcl-model</module>
 		<module>co.migueljimenez.terraform.mapper</module>
 	</modules>
 
