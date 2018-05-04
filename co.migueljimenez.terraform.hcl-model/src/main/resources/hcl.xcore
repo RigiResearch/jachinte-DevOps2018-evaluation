@@ -17,25 +17,29 @@ class KeyValuePair<K, V> wraps Map$Entry {
 	V value
 }
 
-class Dictionary<T> extends Value {
-	String name = ""
+class Dictionary<T extends Value> extends Value {
+	String name
 	contains KeyValuePair<String, T>[] elements
 }
 
-class List<T> extends Value {
-	contains T[] elements
+class List extends Value {
+	contains Value[] elements
 }
 
 class Number extends Value {
-	int value = "0"
+	int value
 }
 
 class Text extends Value {
-	String value = ""
+	String value
 }
 
 class Bool extends Value {
-	boolean value = "false"
+	boolean value
+}
+
+class TextExpression extends Value {
+	contains Reference expression	
 }
 
 class Reference extends Value {}
@@ -46,19 +50,25 @@ class FunctionCall extends Reference {
 }
 
 class ResourceReference extends Reference {
-	contains List<String> fullyQualifiedName
+	String[] fullyQualifiedName
 }
 
 // Entities
 
+class Specification {
+	contains Resource[] resources
+}
+
 class Resource {
+	String resourceType = "resource"
+	String ^type
 	id String name
-	String ^type = ""
+	contains ResourceReference[] dependsOn
 	contains Dictionary<Value> attributes
 }
 
 class Variable extends Resource {
-    String description = ""
+    String description
 }
 
 class Input extends Variable {
@@ -66,7 +76,6 @@ class Input extends Variable {
 }
 
 class Output extends Variable {
-	contains List<Value> dependsOn
-	contains Value value
 	boolean sensitive
+	contains Value value
 }
