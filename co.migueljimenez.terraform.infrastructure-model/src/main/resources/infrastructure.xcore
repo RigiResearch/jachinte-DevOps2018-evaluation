@@ -1,0 +1,7 @@
+@Ecore(nsPrefix="infrastructure", nsURI="https:/migueljimenez.co/terraform/infrastructure")
+@GenModel(
+    bundleManifest="false",
+    modelDirectory="co.migueljimenez.terraform.infrastructure-model/src/main/java-gen",
+    complianceLevel="8.0"
+)
+package co.migueljimenez.terraform.infrastructure.model
