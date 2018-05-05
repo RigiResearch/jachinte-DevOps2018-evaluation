@@ -48,7 +48,17 @@ class TextualHclModelTest {
 					e.list(#[
 						e.text("openstack_networking_router_interface_v2.terraform")
 					])
-				)
+				),
+				e.entry("public_key", e.expression(
+					e.functionCall("file", e.text("~/.ssh/id_rsa.terraform.pub"))
+				)),
+				e.entry("provisioner", e.dictionary(
+					"remote-exec",
+					e.entry("inline", e.list(#[
+						e.text("sudo apt-get -y update"),
+						e.text("sudo apt-get -y install nginx")
+					]))
+				))
 			])
 		)
 		val output = e.output(
@@ -70,6 +80,10 @@ resource "openstack_networking_router_interface_v2" "terraform" {
 	router_id = "ABC"
 	subnet_id = "DEF"
 	depends_on = ["openstack_networking_router_interface_v2.terraform"]
+	public_key = "${file("~/.ssh/id_rsa.terraform.pub")}"
+	provisioner "remote-exec" {
+		inline = ["sudo apt-get -y update", "sudo apt-get -y install nginx"]
+	}
 }
 output "address" {
 	sensitive = false
