@@ -22,7 +22,7 @@
 package co.migueljimenez.terraform.hcl.model
 
 /**
- * Facilitates instantiating the elements from the HCL model.
+ * Facilitates creating elements from the HCL model.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-04
  * @version $Id$
