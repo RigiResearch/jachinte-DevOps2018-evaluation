@@ -61,22 +61,31 @@ class TextualHclModel {
 			}
 			Input: {
 				// Ignore extra attributes
-				'''variable "«object.name»" {
-	default = «object.^default.asText(context)»
-	«IF object.description !== null»description = «object.description»«ENDIF»
-	«IF object.type !== null»type = «object.type»«ENDIF»
-}'''
+				'''
+				variable "«object.name»" {
+					default = «object.^default.asText(context)»
+					«IF object.description !== null»
+						description = «object.description»
+					«ENDIF»
+					«IF object.type !== null»
+						type = «object.type»
+					«ENDIF»
+				}'''
 			}
 			Output: {
 				// Ignore extra attributes
-				'''output "«object.name»" {
-	«IF object.description !== null»description = «object.description»«ENDIF»
-	sensitive = «object.sensitive»
-	value = «object.value.asText(context)»
-}'''
+				'''
+				output "«object.name»" {
+					«IF object.description !== null»
+						description = «object.description»
+					«ENDIF»
+					sensitive = «object.sensitive»
+					value = «object.value.asText(context)»
+				}'''
 			}
 			Resource: {
-				'''«object.resourceType»«IF object.type !== null» "«object.type»"«ENDIF» "«object.name»" «object.attributes.asText(context)»'''
+				val type = if (object.type !== null) '''"«object.type»" '''
+				'''«object.resourceType» «type»"«object.name»" «object.attributes.asText(context)»'''
 			}
 			TextExpression: {
 				'''"${«object.expression.asText(context)»}"'''
@@ -87,13 +96,24 @@ class TextualHclModel {
 				'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
 			}
 			FunctionCall: {
-				'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
+				'''
+				«object.name»(
+				«FOR e : object.arguments SEPARATOR ', '»
+					«e.asText(context)»
+				«ENDFOR»
+				)'''
 			}
 			Dictionary<Value>: {
 				val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
-				'''«IF object.name !== null»"«object.name»" «ENDIF»{
-	«FOR p : object.elements SEPARATOR "\n"»«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»«ENDFOR»
-}'''
+				'''
+				«IF object.name !== null»
+					"«object.name»" 
+				«ENDIF»
+				{
+					«FOR p : object.elements»
+						«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
+					«ENDFOR»
+				}'''
 			}
 			List: {
 				'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
