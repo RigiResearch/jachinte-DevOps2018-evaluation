@@ -6,13 +6,12 @@
 )
 package co.migueljimenez.terraform.hcl.model
 
-import java.util.Map
-
 // Data types
 
 class Value {}
 
-class KeyValuePair<K, V> wraps Map$Entry {
+// Do not use a map, as there may be duplicates
+class KeyValuePair<K, V> {
 	K key
 	V value
 }
@@ -27,7 +26,7 @@ class List extends Value {
 }
 
 class Number extends Value {
-	int value
+	String value
 }
 
 class Text extends Value {
@@ -63,7 +62,6 @@ class Resource {
 	String resourceType = "resource"
 	String ^type
 	id String name
-	contains ResourceReference[] dependsOn
 	contains Dictionary<Value> attributes
 }
 
