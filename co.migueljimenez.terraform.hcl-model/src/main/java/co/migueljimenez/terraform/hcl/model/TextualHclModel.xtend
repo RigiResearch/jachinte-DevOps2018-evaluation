@@ -26,7 +26,7 @@ import java.util.Queue
 import org.eclipse.emf.ecore.EObject
 
 /**
- * Decorates a HCL model instance.
+ * Decorates an HCL model instance.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
