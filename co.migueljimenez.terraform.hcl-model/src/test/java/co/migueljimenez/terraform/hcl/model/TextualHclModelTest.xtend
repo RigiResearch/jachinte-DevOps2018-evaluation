@@ -33,60 +33,49 @@ import org.junit.Test
  */
 class TextualHclModelTest {
 
-	val f = ModelFactory.eINSTANCE
-
 	@Test
 	def void asText() {
-		val variable = f.createInput
-		variable.name = "image"
-		variable.^default = this.text("Ubuntu 14.04")
-
-		val output = f.createOutput
-		val expr = f.createTextExpression
-		expr.expression = this.ref("openstack_compute_floatingip_v2", "terraform", "address")
-		output.name = "address"
-		output.value = expr
-
-		val resource = f.createResource
-		resource.resourceType = "resource"
-		resource.type = "openstack_networking_router_interface_v2"
-		resource.name = "terraform"
-		resource.attributes = f.<Value>createDictionary
-		resource.attributes.elements.put("router_id", this.text("ABC"))
-		resource.attributes.elements.put("subnet_id", this.text("DEF"))
-		resource.dependsOn.add(this.ref("openstack_networking_router_interface_v2", "terraform"))
-
-		val specification = f.createSpecification
-		specification.resources.add(variable)
-		specification.resources.add(resource)
-		specification.resources.add(output)
-		
+		val e = new HclModelElements
+		val variable = e.input("image", e.text("Ubuntu 14.04"))
+		val resource = e.resource(
+			"resource",
+			"openstack_networking_router_interface_v2",
+			"terraform",
+			e.<Value>dictionary(null, #[
+				e.entry("router_id", e.text("ABC")),
+				e.entry("subnet_id", e.text("DEF")),
+				e.entry("depends_on",
+					e.list(#[
+						e.text("openstack_networking_router_interface_v2.terraform")
+					])
+				)
+			])
+		)
+		val output = e.output(
+			"address",
+			e.expression(
+				e.resourceRef(
+					"openstack_compute_floatingip_v2",
+					"terraform",
+					"address"
+				)	
+			)
+		)
+		val specification = e.specification(variable, resource, output)
 		val text = new TextualHclModel(specification).asText
-		val expected = '''var "image" {
+		val expected = '''variable "image" {
 	default = "Ubuntu 14.04"
 }
 resource "openstack_networking_router_interface_v2" "terraform" {
 	router_id = "ABC"
 	subnet_id = "DEF"
+	depends_on = ["openstack_networking_router_interface_v2.terraform"]
 }
 output "address" {
 	sensitive = false
-	value = ${openstack_compute_floatingip_v2.terraform.address}
-}
-'''
-		Assert.assertEquals(text, expected)
+	value = "${openstack_compute_floatingip_v2.terraform.address}"
+}'''
+		Assert.assertEquals(expected, text)
 	}
 
-	def private ref(String... elements) {
-		val reference = f.createResourceReference
-		reference.fullyQualifiedName.addAll(elements)
-		return reference
-	}
-
-	def private text(String contents) {
-		val text = f.createText
-		text.value = contents
-		return text
-	}
-	
 }
