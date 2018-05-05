@@ -96,20 +96,13 @@ class TextualHclModel {
 				'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
 			}
 			FunctionCall: {
-				'''
-				«object.name»(
-				«FOR e : object.arguments SEPARATOR ', '»
-					«e.asText(context)»
-				«ENDFOR»
-				)'''
+				'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
 			}
 			Dictionary<Value>: {
 				val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
 				'''
 				«IF object.name !== null»
-					"«object.name»" 
-				«ENDIF»
-				{
+					"«object.name»" «ENDIF»{
 					«FOR p : object.elements»
 						«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
 					«ENDFOR»
