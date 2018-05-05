@@ -49,6 +49,7 @@ import org.eclipse.xtext.validation.IResourceValidator
 
 /**
  * Maps elements from the Terraform grammar to the HCL model and vice versa.
+ * TODO rename this class
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
