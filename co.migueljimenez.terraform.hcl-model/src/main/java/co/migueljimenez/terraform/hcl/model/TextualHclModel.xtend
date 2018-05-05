@@ -21,6 +21,8 @@
  */
 package co.migueljimenez.terraform.hcl.model
 
+import java.util.PriorityQueue
+import java.util.Queue
 import org.eclipse.emf.ecore.EObject
 
 /**
@@ -46,19 +48,21 @@ class TextualHclModel {
 	}
 
 	def asText() {
-		return this.origin.asText
+		return this.origin.asText(new PriorityQueue)
 	}
 
-	// TODO: sort/format the specification before printing it
-	def private String asText(EObject object) {
-		switch (object) {
+	// TODO sort/format the specification before printing it
+	// TODO improve implementation by registering a procedure to transform each element
+	def private String asText(EObject object, Queue<String> context) {
+		context.add(object.eClass.class.canonicalName)
+		val text = switch (object) {
 			Specification: {
-				'''«FOR r : object.resources SEPARATOR "\n"»«r.asText»«ENDFOR»'''
+				'''«FOR r : object.resources SEPARATOR "\n"»«r.asText(context)»«ENDFOR»'''
 			}
 			Input: {
 				// Ignore extra attributes
-				'''var "«object.name»" {
-	default = «object.^default.asText»
+				'''variable "«object.name»" {
+	default = «object.^default.asText(context)»
 	«IF object.description !== null»description = «object.description»«ENDIF»
 	«IF object.type !== null»type = «object.type»«ENDIF»
 }'''
@@ -68,29 +72,31 @@ class TextualHclModel {
 				'''output "«object.name»" {
 	«IF object.description !== null»description = «object.description»«ENDIF»
 	sensitive = «object.sensitive»
-	value = «object.value.asText»
-}
-				'''
+	value = «object.value.asText(context)»
+}'''
 			}
 			Resource: {
-				'''«object.resourceType»«IF object.type !== null» "«object.type»"«ENDIF» "«object.name»" «object.attributes.asText»'''
+				'''«object.resourceType»«IF object.type !== null» "«object.type»"«ENDIF» "«object.name»" «object.attributes.asText(context)»'''
 			}
 			TextExpression: {
-				'''${«object.expression.asText»}'''
+				'''"${«object.expression.asText(context)»}"'''
 			}
 			ResourceReference: {
-				'''«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»'''
+				val className = ModelPackage.eINSTANCE.functionCall.class.canonicalName
+				val qm = if (context.peek.equals(className)) "" else '"'
+				'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
 			}
 			FunctionCall: {
-				'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText»«ENDFOR»)'''
+				'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
 			}
 			Dictionary<Value>: {
-				'''«IF object.name !== null»«object.name» «ENDIF»{
-	«FOR p : object.elements SEPARATOR "\n"»«p.key» = «p.value.asText»«ENDFOR»
+				val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
+				'''«IF object.name !== null»"«object.name»" «ENDIF»{
+	«FOR p : object.elements SEPARATOR "\n"»«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»«ENDFOR»
 }'''
 			}
 			List: {
-				'''[«FOR v : object.elements SEPARATOR ", "»«v.asText»«ENDFOR»]'''
+				'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
 			}
 			Number: {
 				'''«object.value»'''
@@ -102,6 +108,8 @@ class TextualHclModel {
 				object.value.toString
 			}
 		}
+		context.remove
+		return text
 	}
 	
 }
