@@ -1,3 +1,4 @@
+// Adapted from: Architecture-based integrated management of diverse cloud resources
 @Ecore(nsPrefix="infrastructure", nsURI="https:/migueljimenez.co/terraform/infrastructure")
 @GenModel(
     bundleManifest="false",
@@ -5,3 +6,111 @@
     complianceLevel="8.0"
 )
 package co.migueljimenez.terraform.infrastructure.model
+
+import de.xn__ho_hia.storage_unit.StorageUnit
+
+// Types
+
+type Unit wraps StorageUnit<?>
+type Number wraps Number
+
+enum ContainerFormat {
+	AMI as "ami" = 0
+	ARI as "ari" = 1
+	AKI as "aki" = 2
+	BARE as "bare" = 3
+	OVF as "ovf" = 4
+}
+
+enum DiskFormat {
+	AMI as "ami" = 0
+	ARI as "ari" = 1
+	AKI as "aki" = 2
+	VHD as "vhd" = 3
+	VMDK as "vmdk" = 4
+	RAW as "raw" = 5
+	QCOW2 as "qcow2" = 6
+	VDI as "vdi" = 7
+	ISO as "iso" = 8
+}
+
+class Quantity {
+	Number value
+	Unit unit
+}
+
+// Do not use a map, as there may be duplicates
+class KeyValuePair<K, V> {
+	K key
+	V value
+}
+
+class Dictionary<K, V> {
+	contains KeyValuePair<K, V>[] elements
+}
+
+// Entities
+
+class VirtualInfrastructure {
+	contains Flavor[] flavors
+	contains Image[] images
+	contains UnknownResource<String, Object>[] resources
+	contains Instance[] instances
+}
+
+class Flavor {
+	id String ^id
+	String name
+	int vcpus
+	contains Quantity disk
+	contains Quantity ram
+}
+
+// TODO review difference between arguments and attributes
+// e.g., https://www.terraform.io/docs/providers/openstack/r/images_image_v2.html#file
+// As the model is instantiated from the specification, it should contain all the arguments
+// However, it should also contain the attributes. If there're related, there should be a way
+// to compute arguments from attributes (?)
+class Image {
+	id String ^id
+	String name
+	ContainerFormat containerFormat
+	DiskFormat diskFormat
+	String localFilePath
+	String imageSourceUrl
+	contains Quantity minDisk
+	contains Quantity minRam
+}
+
+// OpenStack KeyPair
+class Credentials {
+	
+}
+
+class Volume {
+	
+}
+
+class Network {
+	
+}
+
+class SecurityGroup {
+	
+}
+
+class Instance {
+	id String ^id
+	String name
+	contains Flavor flavor
+	contains Image image
+}
+
+class UnknownResource<K, V> {
+	// The type of OpenStack resource
+	String resourceType
+	// The specific OpenStack type
+	String ^type
+	String name
+	contains Dictionary<K, V> attributes
+}
