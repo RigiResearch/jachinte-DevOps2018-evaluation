@@ -29,7 +29,7 @@ import org.junit.Assert
 import co.migueljimenez.terraform.hcl.model.TextualHclModel
 
 /**
- * Tests {@link HclMapping}
+ * Tests {@link HclModelMapper}
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-04
  * @version $Id$
