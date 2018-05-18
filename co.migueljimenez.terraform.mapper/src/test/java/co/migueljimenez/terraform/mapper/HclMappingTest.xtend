@@ -26,6 +26,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import org.junit.Test
 import org.junit.Assert
+import co.migueljimenez.terraform.hcl.model.TextualHclModel
 
 /**
  * Tests {@link HclMapping}
@@ -38,13 +39,13 @@ class HclMappingTest {
 
 	@Test
 	def void parse() {
-		val mapping = new HclMapping
 		val url = this.class.classLoader.getResource("openstack-demo.tf")
 		val contents = new String(
 			Files.readAllBytes(Paths.get(url.toURI)),
 			Charset.forName("UTF-8")
 		)
-		val translated = mapping.asText(mapping.model(contents))
+		val mapping = new HclModelMapper(contents)
+		val translated = new TextualHclModel(mapping.model).asText
 		Assert.assertEquals(contents, translated)
 	}
 }
