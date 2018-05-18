@@ -31,7 +31,7 @@
 	<artifactId>co.migueljimenez.terraform.infrastructure-model</artifactId>
 
 	<name>Infrastructure Model</name>
-	<description>Ecore model for a simple OpenStack (Infrastructure) model</description>
+	<description>Ecore model for a simplified OpenStack (Infrastructure) model</description>
 
 	<properties>
 		<storage-units-version>4.0.0-20160812154711</storage-units-version>
