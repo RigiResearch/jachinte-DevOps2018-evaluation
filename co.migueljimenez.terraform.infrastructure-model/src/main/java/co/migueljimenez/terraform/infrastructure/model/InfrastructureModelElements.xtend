@@ -62,7 +62,7 @@ class InfrastructureModelElements {
 		return image
 	}
 
-	def server(String id, String name, String ip, Flavor flavor, Image image) {
+	def instance(String id, String name, String ip, Flavor flavor, Image image) {
 		val server = ModelFactory.eINSTANCE.createInstance
 		server.id = id
 		server.name = name
