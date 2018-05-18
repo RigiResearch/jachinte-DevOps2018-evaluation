@@ -6,7 +6,7 @@
 )
 package co.migueljimenez.terraform.hcl.model
 
-// Data types
+// Type hierarchy
 
 class Value {}
 
