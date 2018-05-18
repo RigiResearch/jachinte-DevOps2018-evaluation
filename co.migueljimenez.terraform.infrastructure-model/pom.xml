@@ -34,6 +34,7 @@
 	<description>Ecore model for a simple OpenStack (Infrastructure) model</description>
 
 	<properties>
+		<storage-units-version>4.0.0-20160812154711</storage-units-version>
 		<emf-version>2.12.0</emf-version>
         <emf-common-version>2.12.0</emf-common-version>
 		<emf-codegen-version>2.12.0</emf-codegen-version>
@@ -43,6 +44,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>de.xn--ho-hia.storage_units</groupId>
+			<artifactId>storage-units</artifactId>
+			<version>${storage-units-version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.eclipse.emf</groupId>
 			<artifactId>org.eclipse.emf.common</artifactId>
