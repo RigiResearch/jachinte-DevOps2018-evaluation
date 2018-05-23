@@ -36,13 +36,13 @@ import org.junit.Assert
 import org.junit.Test
 
 /**
- * Tests {@link InfrastructureModelMapper}
+ * Tests {@link Infrastructure2Hcl}
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-18
  * @version $Id$
  * @since 0.0.1
  */
-class InfrastructureMappingTest {
+class Infrastructure2HclTest {
 
 	/**
 	 * Helper to instantiate the infrastructure model.

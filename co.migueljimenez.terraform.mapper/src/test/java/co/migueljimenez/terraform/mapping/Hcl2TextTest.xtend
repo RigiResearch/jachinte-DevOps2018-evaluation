@@ -27,13 +27,13 @@ import org.junit.Assert
 import org.junit.Test
 
 /**
- * Tests {@link TextualHclModel}
+ * Tests {@link Hcl2Text}
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
  * @since 0.0.1
  */
-class TextualHclModelTest {
+class Hcl2TextTest {
 
 	@Test
 	def void asText() {

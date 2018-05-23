@@ -28,13 +28,13 @@ import org.junit.Test
 import org.junit.Assert
 
 /**
- * Tests {@link HclModelMapper}
+ * Tests {@link Text2Hcl}
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-04
  * @version $Id$
  * @since 0.0.1
  */
-class HclMappingTest {
+class Text2HclTest {
 
 	@Test
 	def void parse() {
