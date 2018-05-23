@@ -29,26 +29,25 @@ import co.migueljimenez.terraform.hcl.model.Value
 import co.migueljimenez.terraform.infrastructure.model.Credential
 import co.migueljimenez.terraform.infrastructure.model.Flavor
 import co.migueljimenez.terraform.infrastructure.model.Image
-import co.migueljimenez.terraform.infrastructure.model.InfrastructureModelElements
 import co.migueljimenez.terraform.infrastructure.model.Instance
 import co.migueljimenez.terraform.infrastructure.model.SecurityGroup
 import co.migueljimenez.terraform.infrastructure.model.UnknownResource
 import co.migueljimenez.terraform.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.terraform.infrastructure.model.Volume
 import de.xn__ho_hia.storage_unit.StorageUnit
+import java.text.DecimalFormat
 import java.util.List
 import org.eclipse.emf.ecore.EObject
-import java.text.DecimalFormat
 
 /**
- * Maps from {@link Specification} to {@link VirtualInfrastructure} and vice
- * versa.
+ * Maps the elements from {@link VirtualInfrastructure} to
+ * {@link Specification}.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-04
  * @version $Id$
  * @since 0.0.1
  */
-class InfrastructureModelMapper {
+class Infrastructure2Hcl {
 
 	/**
 	 * Elements creator for the HCL model.
@@ -56,16 +55,10 @@ class InfrastructureModelMapper {
 	val HclModelElements h
 
 	/**
-	 * Elements creator for the Virtual Infrastructure model.
-	 */
-	val InfrastructureModelElements i
-
-	/**
 	 * Default constructor.
 	 */
 	new() {
 		this.h = new HclModelElements
-		this.i = new InfrastructureModelElements
 	}
 
 	/**
@@ -100,17 +93,6 @@ class InfrastructureModelMapper {
 			Volume: object.resources
 			UnknownResource<String, Object>: object.resources
 		}
-	}
-
-	/**
-	 * Maps the elements from a Terraform (HCL) specification to the
-	 * infrastructure model.
-	 * @param specification the specification
-	 */
-	def VirtualInfrastructure model(Specification specification) {
-		// To consider: volume attachments are special resources because
-		// they affect how the model is instantiated
-		throw new UnsupportedOperationException();
 	}
 
 	/**

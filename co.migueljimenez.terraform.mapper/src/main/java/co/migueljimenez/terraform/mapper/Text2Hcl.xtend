@@ -38,14 +38,13 @@ import org.eclipse.emf.ecore.EObject
 import co.migueljimenez.terraform.terraform.Template
 
 /**
- * Maps elements from the Terraform grammar to the HCL model and vice versa.
- * TODO rename this class
+ * Instantiates an HCL model from a Terraform template.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
  * @since 0.0.1
  */
-class HclModelMapper {
+class Text2Hcl {
 
 	/**
 	 * The source code.

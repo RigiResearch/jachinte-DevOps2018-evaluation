@@ -26,7 +26,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import org.junit.Test
 import org.junit.Assert
-import co.migueljimenez.terraform.hcl.model.TextualHclModel
 
 /**
  * Tests {@link HclModelMapper}
@@ -44,8 +43,8 @@ class HclMappingTest {
 			Files.readAllBytes(Paths.get(url.toURI)),
 			Charset.forName("UTF-8")
 		)
-		val mapping = new HclModelMapper(contents)
-		val translated = new TextualHclModel(mapping.model).asText
+		val mapping = new Text2Hcl(contents)
+		val translated = new Hcl2Text(mapping.model).asText
 		Assert.assertEquals(contents, translated)
 	}
 }

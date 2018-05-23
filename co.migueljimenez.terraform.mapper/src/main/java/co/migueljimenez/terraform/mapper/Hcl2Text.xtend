@@ -19,8 +19,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.hcl.model
+package co.migueljimenez.terraform.mapper
 
+import co.migueljimenez.terraform.hcl.model.Bool
+import co.migueljimenez.terraform.hcl.model.Dictionary
+import co.migueljimenez.terraform.hcl.model.FunctionCall
+import co.migueljimenez.terraform.hcl.model.Input
+import co.migueljimenez.terraform.hcl.model.List
+import co.migueljimenez.terraform.hcl.model.ModelPackage
+import co.migueljimenez.terraform.hcl.model.Number
+import co.migueljimenez.terraform.hcl.model.Output
+import co.migueljimenez.terraform.hcl.model.Resource
+import co.migueljimenez.terraform.hcl.model.ResourceReference
+import co.migueljimenez.terraform.hcl.model.Specification
+import co.migueljimenez.terraform.hcl.model.Text
+import co.migueljimenez.terraform.hcl.model.TextExpression
+import co.migueljimenez.terraform.hcl.model.Value
 import java.util.PriorityQueue
 import java.util.Queue
 import org.eclipse.emf.ecore.EObject
@@ -32,7 +46,7 @@ import org.eclipse.emf.ecore.EObject
  * @version $Id$
  * @since 0.0.1
  */
-class TextualHclModel {
+class Hcl2Text {
 
 	/**
 	 * The decorated model instance.
@@ -43,8 +57,8 @@ class TextualHclModel {
 	 * Default constructor.
 	 * @param origin The decorated model instance.
 	 */
-	new(Specification origin) {
-		this.origin = origin
+	new(Specification model) {
+		this.origin = model
 	}
 
 	/**

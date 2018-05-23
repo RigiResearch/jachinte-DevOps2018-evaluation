@@ -19,8 +19,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.hcl.model
+package co.migueljimenez.terraform.mapper
 
+import co.migueljimenez.terraform.hcl.model.HclModelElements
+import co.migueljimenez.terraform.hcl.model.Value
 import org.junit.Assert
 import org.junit.Test
 
@@ -72,7 +74,7 @@ class TextualHclModelTest {
 			)
 		)
 		val specification = e.specification(variable, resource, output)
-		val text = new TextualHclModel(specification).asText
+		val text = new Hcl2Text(specification).asText
 		val expected = '''
 		variable "image" {
 			default = "Ubuntu 14.04"

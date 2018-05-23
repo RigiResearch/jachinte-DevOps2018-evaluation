@@ -21,7 +21,6 @@
  */
 package co.migueljimenez.terraform.mapper
 
-import co.migueljimenez.terraform.hcl.model.TextualHclModel
 import co.migueljimenez.terraform.infrastructure.model.ContainerFormat
 import co.migueljimenez.terraform.infrastructure.model.DiskFormat
 import co.migueljimenez.terraform.infrastructure.model.Flavor
@@ -53,7 +52,7 @@ class InfrastructureMappingTest {
 	/**
 	 * The mapper instance being tested.
 	 */
-	val InfrastructureModelMapper mapper
+	val Infrastructure2Hcl mapper
 
 	/**
 	 * Dummy flavor for testing purposes.
@@ -82,7 +81,7 @@ class InfrastructureMappingTest {
 
 	new() {
 		this.i = new InfrastructureModelElements
-		this.mapper = new InfrastructureModelMapper
+		this.mapper = new Infrastructure2Hcl
 		this.flavor = this.i.flavor(
 			"small-flavor-id",
 			"small",
@@ -136,7 +135,7 @@ class InfrastructureMappingTest {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.images.add(this.image)
 		val specification = this.mapper.specification(infrastructure)
-		val text = new TextualHclModel(specification).asText
+		val text = new Hcl2Text(specification).asText
 		Assert.assertEquals('''
 		data "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
@@ -153,7 +152,7 @@ class InfrastructureMappingTest {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.flavors.add(this.flavor)
 		val specification = this.mapper.specification(infrastructure)
-		val text = new TextualHclModel(specification).asText
+		val text = new Hcl2Text(specification).asText
 		Assert.assertEquals('''
 		data "openstack_compute_flavor_v2" "small" {
 			ram = 512.00
@@ -167,7 +166,7 @@ class InfrastructureMappingTest {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.instances.add(this.instance)
 		val specification = this.mapper.specification(infrastructure)
-		val text = new TextualHclModel(specification).asText
+		val text = new Hcl2Text(specification).asText
 		Assert.assertEquals('''
 		resource "openstack_compute_instance_v2" "basic" {
 			name = "basic"
@@ -186,7 +185,7 @@ class InfrastructureMappingTest {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.resources.add(this.provider)
 		val specification = this.mapper.specification(infrastructure)
-		val text = new TextualHclModel(specification).asText
+		val text = new Hcl2Text(specification).asText
 		Assert.assertEquals('''
 		provider "openstack" {
 			user_name = "admin"
