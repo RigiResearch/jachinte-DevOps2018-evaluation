@@ -37,7 +37,7 @@ import co.migueljimenez.terraform.hcl.model.Value
  * @version $Id$
  * @since 0.0.1
  */
-class Specification2Infrastructure {
+class Hcl2Infrastructure {
 
 	/**
 	 * Elements creator for the Virtual Infrastructure model.
