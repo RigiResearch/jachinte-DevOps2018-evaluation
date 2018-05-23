@@ -21,8 +21,13 @@
  */
 package co.migueljimenez.terraform.mapping
 
+import co.migueljimenez.terraform.dtos.FkDictionary
+import co.migueljimenez.terraform.dtos.FkFunctionCall
+import co.migueljimenez.terraform.dtos.FkResourceReference
+import co.migueljimenez.terraform.dtos.FkTextExpression
 import co.migueljimenez.terraform.hcl.model.HclModelElements
 import co.migueljimenez.terraform.hcl.model.KeyValuePair
+import co.migueljimenez.terraform.hcl.model.Reference
 import co.migueljimenez.terraform.hcl.model.Resource
 import co.migueljimenez.terraform.hcl.model.Specification
 import co.migueljimenez.terraform.hcl.model.Value
@@ -267,25 +272,9 @@ class Infrastructure2Hcl {
 	 * Translates an {@link UnknownResource} to a generic resource.
 	 */
 	def protected List<Resource> resources(UnknownResource<String, Object> object) {
-		val attributes = newArrayList
-		attributes.addAll(
-			object.attributes.elements.map[ p |
-				val value = p.value
-				h.entry(
-					p.key,
-					switch (value) {
-						String: h.text(value.toString)
-						Number: h.number(value.toString)
-						Boolean: h.bool(value)
-						default:
-							// TODO support complex types: lists and dictionaries
-							throw new UnsupportedOperationException(
-								"Complex types are not supported yet"
-							)
-					}
-				)
-			]
-		)
+		val attributes = object.attributes.elements
+			.filter[p|p.value !== null]
+			.map[p|h.entry(p.key, p.value.wrap)]
 		#[h.resource(
 			object.resourceType,
 			object.type,
@@ -295,6 +284,49 @@ class Infrastructure2Hcl {
 				attributes
 			)
 		)]
+	}
+
+	/**
+	 * Wraps the given object in the corresponding HCL model value.
+	 */
+	def protected Value wrap(Object value) {
+		switch (value) {
+			String:
+				h.text(value.toString)
+			Number:
+				h.number(value.toString)
+			Boolean:
+				h.bool(value)
+			List<?>:
+				h.list(value.map[e|e.wrap])
+			FkDictionary<String, ?>:
+				h.dictionary(
+					value.name,
+					value.keySet.map[k|h.entry(k, value.get(k).wrap)]
+				)
+			FkResourceReference:
+				value.wrapReference
+			FkFunctionCall:
+				value.wrapReference
+			FkTextExpression:
+				h.expression(value.expression.wrapReference)
+			default:
+				throw new UnsupportedOperationException(
+					'''Unsupported type «value.class»'''
+				)
+		}
+	}
+
+	/**
+	 * Wraps a reference object into its corresponding HCL value.
+	 */
+	def private Reference wrapReference(Object value) {
+		switch (value) {
+			FkResourceReference:
+				h.resourceRef(value.segments)
+			FkFunctionCall:
+				h.functionCall(value.name, value.arguments.map[a|a.wrap])
+		}
 	}
 
 	/**
