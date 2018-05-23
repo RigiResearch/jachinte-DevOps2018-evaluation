@@ -47,82 +47,107 @@ class TextualHclModel {
 		this.origin = origin
 	}
 
+	/**
+	 * Returns a text representation of the decorated model instance.
+	 */
 	def asText() {
 		return this.origin.asText(new PriorityQueue)
 	}
 
 	// TODO sort/format the specification before printing it
-	// TODO improve implementation by registering a procedure to transform each element
-	def private String asText(EObject object, Queue<String> context) {
+	def protected String asText(EObject object, Queue<String> context) {
 		context.add(object.eClass.class.canonicalName)
 		val text = switch (object) {
-			Specification: {
-				'''«FOR r : object.resources SEPARATOR "\n"»«r.asText(context)»«ENDFOR»'''
-			}
-			Input: {
-				// Ignore extra attributes
-				'''
-				variable "«object.name»" {
-					default = «object.^default.asText(context)»
-					«IF object.description !== null»
-						description = «object.description»
-					«ENDIF»
-					«IF object.type !== null»
-						type = «object.type»
-					«ENDIF»
-				}'''
-			}
-			Output: {
-				// Ignore extra attributes
-				'''
-				output "«object.name»" {
-					«IF object.description !== null»
-						description = «object.description»
-					«ENDIF»
-					sensitive = «object.sensitive»
-					value = «object.value.asText(context)»
-				}'''
-			}
+			Specification: object.asText(context)
+			Input: object.asText(context)
+			Output: object.asText(context)
+			TextExpression: object.asText(context)
+			ResourceReference: object.asText(context)
+			FunctionCall: object.asText(context)
+			Dictionary<Value>: object.asText(context)
+			List: object.asText(context)
+			Number: object.asText(context)
+			Text: object.asText(context)
+			Bool: object.asText(context)
+			// It's at the end to prevent inputs and outputs from being
+			// processed as simple resources
 			Resource: {
 				val type = if (object.type !== null) '''"«object.type»" '''
 				'''«object.resourceType» «type»"«object.name»" «object.attributes.asText(context)»'''
-			}
-			TextExpression: {
-				'''"${«object.expression.asText(context)»}"'''
-			}
-			ResourceReference: {
-				val className = ModelPackage.eINSTANCE.functionCall.class.canonicalName
-				val qm = if (context.peek.equals(className)) "" else '"'
-				'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
-			}
-			FunctionCall: {
-				'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
-			}
-			Dictionary<Value>: {
-				val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
-				'''
-				«IF object.name !== null»
-					"«object.name»" «ENDIF»{
-					«FOR p : object.elements»
-						«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
-					«ENDFOR»
-				}'''
-			}
-			List: {
-				'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
-			}
-			Number: {
-				'''«object.value»'''
-			}
-			Text: {
-				'''"«object.value.toString»"'''
-			}
-			Bool: {
-				object.value.toString
 			}
 		}
 		context.remove
 		return text
 	}
-	
+
+	def protected String asText(Specification object, Queue<String> context) {
+		'''«FOR r : object.resources SEPARATOR "\n"»«r.asText(context)»«ENDFOR»'''
+	}
+
+	def protected String asText(Input object, Queue<String> context) {
+		// Ignore extra attributes
+		'''
+		variable "«object.name»" {
+			default = «object.^default.asText(context)»
+			«IF object.description !== null»
+				description = «object.description»
+			«ENDIF»
+			«IF object.type !== null»
+				type = «object.type»
+			«ENDIF»
+		}'''
+	}
+
+	def protected String asText(Output object, Queue<String> context) {
+		// Ignore extra attributes
+		'''
+		output "«object.name»" {
+			«IF object.description !== null»
+				description = «object.description»
+			«ENDIF»
+			sensitive = «object.sensitive»
+			value = «object.value.asText(context)»
+		}'''
+	}
+
+	def protected String asText(TextExpression object, Queue<String> context) {
+		'''"${«object.expression.asText(context)»}"'''
+	}
+
+	def protected String asText(ResourceReference object, Queue<String> context) {
+		val className = ModelPackage.eINSTANCE.functionCall.class.canonicalName
+		val qm = if (context.peek.equals(className)) "" else '"'
+		'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
+	}
+
+	def protected String asText(FunctionCall object, Queue<String> context) {
+		'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
+	}
+
+	def protected String asText(Dictionary<Value> object, Queue<String> context) {
+		val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
+		'''
+		«IF object.name !== null»
+			"«object.name»" «ENDIF»{
+			«FOR p : object.elements»
+				«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
+			«ENDFOR»
+		}'''
+	}
+
+	def protected String asText(List object, Queue<String> context) {
+		'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
+	}
+
+	def protected String asText(Number object, Queue<String> context) {
+		'''«object.value»'''
+	}
+
+	def protected String asText(Text object, Queue<String> context) {
+		'''"«object.value.toString»"'''
+	}
+
+	def protected String asText(Bool object, Queue<String> context) {
+		object.value.toString
+	}
 }
