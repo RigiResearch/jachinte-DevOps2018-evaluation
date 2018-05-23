@@ -1,4 +1,3 @@
-// Adapted from: Architecture-based integrated management of diverse cloud resources
 @Ecore(nsPrefix="infrastructure", nsURI="https:/migueljimenez.co/terraform/infrastructure")
 @GenModel(
     bundleManifest="false",
@@ -11,7 +10,7 @@ import de.xn__ho_hia.storage_unit.StorageUnit
 
 // Types
 
-type Unit wraps StorageUnit<?>
+type StorageQuantity wraps StorageUnit<?>
 type Number wraps Number
 
 enum ContainerFormat {
@@ -34,11 +33,6 @@ enum DiskFormat {
 	ISO as "iso" = 8
 }
 
-class Quantity {
-	Number value
-	Unit unit
-}
-
 // Do not use a map, as there may be duplicates
 class KeyValuePair<K, V> {
 	K key
@@ -52,58 +46,81 @@ class Dictionary<K, V> {
 // Entities
 
 class VirtualInfrastructure {
+	contains Credential[] credentials
 	contains Flavor[] flavors
 	contains Image[] images
-	contains UnknownResource<String, Object>[] resources
 	contains Instance[] instances
+	contains Network[] networks
+	contains SecurityGroup[] securityGroups
+	contains Volume[] volumes
+	contains UnknownResource<String, Object>[] resources
 }
 
 class Flavor {
 	id String ^id
 	String name
 	int vcpus
-	contains Quantity disk
-	contains Quantity ram
+	StorageQuantity disk
+	StorageQuantity ram
 }
 
-// TODO review difference between arguments and attributes
-// e.g., https://www.terraform.io/docs/providers/openstack/r/images_image_v2.html#file
-// As the model is instantiated from the specification, it should contain all the arguments
-// However, it should also contain the attributes. If there're related, there should be a way
-// to compute arguments from attributes (?)
 class Image {
 	id String ^id
 	String name
 	ContainerFormat containerFormat
 	DiskFormat diskFormat
-	String localFilePath
 	String imageSourceUrl
-	contains Quantity minDisk
-	contains Quantity minRam
+	StorageQuantity minDisk
+	StorageQuantity minRam
 }
 
-// OpenStack KeyPair
-class Credentials {
-	
+class Credential {
+	id String ^id
+	String name
+	String publicKey
 }
 
 class Volume {
-	
+	id String ^id
+	String name
+	StorageQuantity size
+	contains Image image
+}
+
+class Subnet {
+	id String ^id
+	String name
+	String cidr
+	container Network network opposite subnets
 }
 
 class Network {
-	
+	id String ^id
+	String name
+	contains Subnet[] subnets opposite network
+}
+
+class SecurityRule {
+	int from
+	int to
+	String protocol
+	String cidr
 }
 
 class SecurityGroup {
-	
+	id String ^id
+	String name
+	contains SecurityRule[] rules
 }
 
 class Instance {
 	id String ^id
 	String name
+	contains Credential credential
 	contains Flavor flavor
-	contains Image image
+	contains Network[] networks
+	contains Volume volume
+	contains SecurityGroup[] securityGroups
 }
 
 class UnknownResource<K, V> {
