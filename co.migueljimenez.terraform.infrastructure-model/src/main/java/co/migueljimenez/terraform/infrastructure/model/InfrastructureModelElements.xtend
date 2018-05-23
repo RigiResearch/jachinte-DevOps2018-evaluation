@@ -34,16 +34,20 @@ import de.xn__ho_hia.storage_unit.StorageUnit
 class InfrastructureModelElements {
 
 	def infrastructure(List<Flavor> flavors, List<Image> images,
-		List<Instance> instances, List<UnknownResource<String, Object>> otherResources) {
+		List<Instance> instances, List<Network> networks, List<Volume> volumes,
+			List<UnknownResource<String, Object>> otherResources) {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.flavors.addAll(flavors)
 		infrastructure.images.addAll(images)
 		infrastructure.instances.addAll(instances)
+		infrastructure.networks.addAll(networks)
+		infrastructure.volumes.addAll(volumes)
 		infrastructure.resources.addAll(otherResources)
 		return infrastructure
 	}
 
-	def flavor(String id, String name, int vcpus, Quantity disk, Quantity ram) {
+	def flavor(String id, String name, int vcpus, StorageUnit<?> disk,
+		StorageUnit<?> ram) {
 		val flavor = ModelFactory.eINSTANCE.createFlavor
 		flavor.id = id
 		flavor.name = name
@@ -53,36 +57,98 @@ class InfrastructureModelElements {
 		return flavor
 	}
 
-	def image(String id, String name, Quantity minDisk, Quantity minRam) {
+	def image(String id, String name, ContainerFormat containerFormat,
+		DiskFormat diskFormat, String imageSourceUrl, StorageUnit<?> minDisk,
+			StorageUnit<?> minRam) {
 		val image = ModelFactory.eINSTANCE.createImage
 		image.id = id
 		image.name = name
+		image.containerFormat = containerFormat
+		image.diskFormat = diskFormat
+		image.imageSourceUrl = imageSourceUrl
 		image.minDisk = minDisk
 		image.minRam = minRam
 		return image
 	}
 
-	def instance(String id, String name, String ip, Flavor flavor, Image image) {
+	def credentials(String id, String name, String publicKey) {
+		val credentials = ModelFactory.eINSTANCE.createCredential
+		credentials.id = id
+		credentials.name = name
+		credentials.publicKey = publicKey
+		return credentials
+	}
+
+	def volume(String id, String name, Image image, StorageUnit<?> size) {
+		val volume = ModelFactory.eINSTANCE.createVolume
+		volume.id = id
+		volume.name = name
+		volume.image = image
+		volume.size = size
+		return volume
+	}
+
+	def network(String id, String name) {
+		val network = ModelFactory.eINSTANCE.createNetwork
+		network.id = id
+		network.name = name
+		return network
+	}
+
+	def subnet(String id, String name, String cidr, Network network) {
+		val subnet = ModelFactory.eINSTANCE.createSubnet
+		subnet.id = id
+		subnet.name = name
+		subnet.cidr = cidr
+		subnet.network = network
+		return subnet
+	}
+
+	def securityRule(int portFrom, int portTo, String cidr, String protocol) {
+		val rule = ModelFactory.eINSTANCE.createSecurityRule
+		rule.from = portFrom
+		rule.to = portTo
+		rule.cidr = cidr
+		rule.protocol = protocol
+		return rule
+	}
+
+	def securityGroup(String id, String name, List<SecurityRule> rules) {
+		val group = ModelFactory.eINSTANCE.createSecurityGroup
+		group.id = id
+		group.name = name
+		group.rules.addAll(rules)
+		return group
+	}
+
+	def instance(String id, String name, Credential credential, Flavor flavor,
+		Volume volume, List<SecurityGroup> securityGroups) {
 		val server = ModelFactory.eINSTANCE.createInstance
 		server.id = id
 		server.name = name
+		server.credential = credential
 		server.flavor = flavor
-		server.image = image
+		server.volume = volume
+		server.securityGroups.addAll(securityGroups)
 		return server
 	}
 	
-	def <K, V> unknownResource(List<KeyValuePair<K, V>> data) {
+	def <K, V> unknownResource(String resourceType, String type, String name,
+		List<KeyValuePair<K, V>> data) {
 		val dictionary = ModelFactory.eINSTANCE.createDictionary
 		val resource = ModelFactory.eINSTANCE.createUnknownResource
 		dictionary.elements.addAll(data)
+		resource.resourceType = resourceType
+		resource.type = type
+		resource.name = name
 		resource.attributes = dictionary
 		return resource
 	}
 
-	def quantity(Number value, StorageUnit<?> unit) {
-		val quantity = ModelFactory.eINSTANCE.createQuantity
-		quantity.value = value
-		quantity.unit = unit
-		return quantity
+	def <K, V> KeyValuePair<K, V> entry(K key, V value) {
+		val pair = ModelFactory.eINSTANCE.createKeyValuePair
+		pair.key = key
+		pair.value = value
+		return pair
 	}
 }
