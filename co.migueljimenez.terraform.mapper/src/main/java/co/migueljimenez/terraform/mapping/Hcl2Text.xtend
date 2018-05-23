@@ -50,23 +50,10 @@ import org.eclipse.emf.ecore.EObject
 class Hcl2Text {
 
 	/**
-	 * The decorated model instance.
+	 * Returns a text representation of the given model instance.
 	 */
-	val Specification origin
-
-	/**
-	 * Default constructor.
-	 * @param origin The decorated model instance.
-	 */
-	new(Specification model) {
-		this.origin = model
-	}
-
-	/**
-	 * Returns a text representation of the decorated model instance.
-	 */
-	def asText() {
-		return this.origin.asText(new PriorityQueue)
+	def source(Specification model) {
+		return model.asText(new PriorityQueue)
 	}
 
 	/**

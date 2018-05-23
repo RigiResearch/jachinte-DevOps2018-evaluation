@@ -44,7 +44,7 @@ class Text2HclTest {
 			Charset.forName("UTF-8")
 		)
 		val mapping = new Text2Hcl(contents)
-		val translated = new Hcl2Text(mapping.model).asText
+		val translated = new Hcl2Text().source(mapping.model)
 		Assert.assertEquals(contents, translated)
 	}
 }

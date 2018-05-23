@@ -50,9 +50,14 @@ class Infrastructure2HclTest {
 	val InfrastructureModelElements i
 
 	/**
-	 * The mapper instance being tested.
+	 * The translator instance being tested.
 	 */
-	val Infrastructure2Hcl mapper
+	val Infrastructure2Hcl translator
+
+	/**
+	 * The HCL-to-text translator.
+	 */
+	val Hcl2Text textTranslator
 
 	/**
 	 * Dummy flavor for testing purposes.
@@ -81,7 +86,8 @@ class Infrastructure2HclTest {
 
 	new() {
 		this.i = new InfrastructureModelElements
-		this.mapper = new Infrastructure2Hcl
+		this.translator = new Infrastructure2Hcl
+		this.textTranslator = new Hcl2Text
 		this.flavor = this.i.flavor(
 			"small-flavor-id",
 			"small",
@@ -134,16 +140,16 @@ class Infrastructure2HclTest {
 	def void image() {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.images.add(this.image)
-		val specification = this.mapper.specification(infrastructure)
-		val text = new Hcl2Text(specification).asText
+		val specification = this.translator.specification(infrastructure)
+		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
 		data "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
 			container_format = "bare"
 			disk_format = "ari"
 			image_source_url = "https://image"
-			min_disk_gb = 1.00
-			min_ram_mb = 1024.00
+			min_disk_gb = 1
+			min_ram_mb = 1024
 		}'''.toString, text)
 	}
 
@@ -151,13 +157,13 @@ class Infrastructure2HclTest {
 	def void flavor() {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.flavors.add(this.flavor)
-		val specification = this.mapper.specification(infrastructure)
-		val text = new Hcl2Text(specification).asText
+		val specification = this.translator.specification(infrastructure)
+		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
 		data "openstack_compute_flavor_v2" "small" {
-			ram = 512.00
+			ram = 512
 			vcpus = 1
-			disk = 4.00
+			disk = 4
 		}'''.toString, text)
 	}
 
@@ -165,8 +171,8 @@ class Infrastructure2HclTest {
 	def void instance() {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.instances.add(this.instance)
-		val specification = this.mapper.specification(infrastructure)
-		val text = new Hcl2Text(specification).asText
+		val specification = this.translator.specification(infrastructure)
+		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
 		resource "openstack_compute_instance_v2" "basic" {
 			name = "basic"
@@ -184,8 +190,8 @@ class Infrastructure2HclTest {
 	def void unknownResource() {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.resources.add(this.provider)
-		val specification = this.mapper.specification(infrastructure)
-		val text = new Hcl2Text(specification).asText
+		val specification = this.translator.specification(infrastructure)
+		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
 		provider "openstack" {
 			user_name = "admin"

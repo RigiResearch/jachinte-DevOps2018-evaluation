@@ -74,7 +74,7 @@ class Hcl2TextTest {
 			)
 		)
 		val specification = e.specification(variable, resource, output)
-		val text = new Hcl2Text(specification).asText
+		val text = new Hcl2Text().source(specification)
 		val expected = '''
 		variable "image" {
 			default = "Ubuntu 14.04"
