@@ -40,8 +40,7 @@ import java.util.List
 import org.eclipse.emf.ecore.EObject
 
 /**
- * Maps the elements from {@link VirtualInfrastructure} to
- * {@link Specification}.
+ * Translates a {@link VirtualInfrastructure} to a {@link Specification}.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-04
  * @version $Id$
@@ -62,7 +61,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps the elements from an infrastructure model to HCL.
+	 * Translates the elements from an infrastructure model to HCL.
 	 * @param model the infrastructure model
 	 * @return the code representation of the model in HCL
 	 */
@@ -80,7 +79,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps an object from {@link VirtualInfrastructure} to a list of
+	 * Translates an object from {@link VirtualInfrastructure} to a list of
 	 * {@link Specification} resources.
 	 */
 	def protected List<Resource> resources(EObject object) {
@@ -96,7 +95,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps a {@link Credential} to an OpenStack Compute KeyPair.
+	 * Translates a {@link Credential} to an OpenStack Compute KeyPair.
 	 */
 	def protected List<Resource> resources(Credential object) {
 		#[h.resource(
@@ -112,7 +111,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps a {@link Flavor} to an OpenStack Compute Flavor.
+	 * Translates a {@link Flavor} to an OpenStack Compute Flavor.
 	 */
 	def protected List<Resource> resources(Flavor object) {
 		#[h.resource(
@@ -131,7 +130,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps a {@link Volume} to an OpenStack BlockStorage Volume.
+	 * Translates a {@link Volume} to an OpenStack BlockStorage Volume.
 	 */
 	def protected List<Resource> resources(Volume object) {
 		#[h.resource(
@@ -148,7 +147,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps a {@link SecurityGroup} to an OpenStack Compute Security Group.
+	 * Translates a {@link SecurityGroup} to an OpenStack Compute Security Group.
 	 */
 	def protected List<Resource> resources(SecurityGroup object) {
 		val List<KeyValuePair<String, Value>> entries = object.rules.map[ rule |
@@ -176,7 +175,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps an {@link Image} to an OpenStack Image.
+	 * Translates an {@link Image} to an OpenStack Image.
 	 */
 	def protected List<Resource> resources(Image object) {
 		#[h.resource(
@@ -198,7 +197,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps an {@link Instance} to an OpenStack Compute Instance and its
+	 * Translates an {@link Instance} to an OpenStack Compute Instance and its
 	 * corresponding volume.
 	 */
 	def protected List<Resource> resources(Instance object) {
@@ -265,7 +264,7 @@ class Infrastructure2Hcl {
 	}
 
 	/**
-	 * Maps an {@link UnknownResource} to a generic resource.
+	 * Translates an {@link UnknownResource} to a generic resource.
 	 */
 	def protected List<Resource> resources(UnknownResource<String, Object> object) {
 		val attributes = newArrayList
