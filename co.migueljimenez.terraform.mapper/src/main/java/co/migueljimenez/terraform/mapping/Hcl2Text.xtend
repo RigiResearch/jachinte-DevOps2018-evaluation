@@ -76,17 +76,28 @@ class Hcl2Text {
 	def protected String asText(EObject object, Queue<String> context) {
 		context.add(object.eClass.class.canonicalName)
 		val text = switch (object) {
-			Bool: object.asText(context)
-			Dictionary<Value>: object.asText(context)
-			FunctionCall: object.asText(context)
-			Input: object.asText(context)
-			Output: object.asText(context)
-			List: object.asText(context)
-			Number: object.asText(context)
-			ResourceReference: object.asText(context)
-			Specification: object.asText(context)
-			Text: object.asText(context)
-			TextExpression: object.asText(context)
+			Bool:
+				object.asText(context)
+			Dictionary<Value>:
+				object.asText(context)
+			FunctionCall:
+				object.asText(context)
+			Input:
+				object.asText(context)
+			Output:
+				object.asText(context)
+			List:
+				object.asText(context)
+			Number:
+				object.asText(context)
+			ResourceReference:
+				object.asText(context)
+			Specification:
+				object.asText(context)
+			Text:
+				object.asText(context)
+			TextExpression:
+				object.asText(context)
 			// It's at the end to prevent inputs and outputs from being
 			// processed as simple resources
 			Resource: {
