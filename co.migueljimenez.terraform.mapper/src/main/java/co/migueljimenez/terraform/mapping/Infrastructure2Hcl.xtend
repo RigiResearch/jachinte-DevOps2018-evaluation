@@ -277,7 +277,11 @@ class Infrastructure2Hcl {
 						String: h.text(value.toString)
 						Number: h.number(value.toString)
 						Boolean: h.bool(value)
-						// TODO support complex types: lists and dictionaries
+						default:
+							// TODO support complex types: lists and dictionaries
+							throw new UnsupportedOperationException(
+								"Complex types are not supported yet"
+							)
 					}
 				)
 			]
