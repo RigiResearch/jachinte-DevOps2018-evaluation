@@ -301,7 +301,7 @@ class Infrastructure2Hcl {
 	 * @return the quantity in Megabytes as a String
 	 */
 	def private asMbString(StorageUnit<?> quantity) {
-		val format = new DecimalFormat("0.00")
+		val format = new DecimalFormat("0")
 		format.format(quantity.asMegabyte.inMegabyte)
 	}
 
@@ -309,7 +309,7 @@ class Infrastructure2Hcl {
 	 * @return the quantity in Gigabytes as a String
 	 */
 	def private asGbString(StorageUnit<?> quantity) {
-		val format = new DecimalFormat("0.00")
+		val format = new DecimalFormat("0")
 		format.format(quantity.asGigabyte.inGigabyte)
 	}
 }
