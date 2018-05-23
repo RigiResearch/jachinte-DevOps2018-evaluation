@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapper
+package co.migueljimenez.terraform.mapping
 
 import java.nio.charset.Charset
 import java.nio.file.Files

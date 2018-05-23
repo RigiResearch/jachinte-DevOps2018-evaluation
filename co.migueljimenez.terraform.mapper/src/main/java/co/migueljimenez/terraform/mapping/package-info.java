@@ -22,4 +22,4 @@
 // Contains the classes to map:
 // - DSL <--> HCL model
 // - HCL model <--> Infrastructure model
-package co.migueljimenez.terraform.mapper;
+package co.migueljimenez.terraform.mapping;
