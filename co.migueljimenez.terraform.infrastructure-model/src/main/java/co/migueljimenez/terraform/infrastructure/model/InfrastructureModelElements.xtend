@@ -33,14 +33,17 @@ import de.xn__ho_hia.storage_unit.StorageUnit
  */
 class InfrastructureModelElements {
 
-	def infrastructure(List<Flavor> flavors, List<Image> images,
-		List<Instance> instances, List<Network> networks, List<Volume> volumes,
-			List<UnknownResource<String, Object>> otherResources) {
+	def infrastructure(List<Credential> credentials, List<Flavor> flavors,
+		List<Image> images, List<Instance> instances, List<Network> networks,
+			List<SecurityGroup> securityGroups, List<Volume> volumes,
+				List<UnknownResource<String, Object>> otherResources) {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
+		infrastructure.credentials.addAll(credentials)
 		infrastructure.flavors.addAll(flavors)
 		infrastructure.images.addAll(images)
 		infrastructure.instances.addAll(instances)
 		infrastructure.networks.addAll(networks)
+		infrastructure.securityGroups.addAll(securityGroups)
 		infrastructure.volumes.addAll(volumes)
 		infrastructure.resources.addAll(otherResources)
 		return infrastructure
