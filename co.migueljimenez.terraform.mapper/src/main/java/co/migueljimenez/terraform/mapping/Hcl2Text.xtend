@@ -40,7 +40,8 @@ import java.util.Queue
 import org.eclipse.emf.ecore.EObject
 
 /**
- * Decorates an HCL model instance.
+ * Translates an HCL model instance (a {@link Specification}) to a Terraform
+ * template.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
@@ -68,21 +69,24 @@ class Hcl2Text {
 		return this.origin.asText(new PriorityQueue)
 	}
 
-	// TODO sort/format the specification before printing it
+	/**
+	 * Translates an {@link EObject} from the HCL model to a {@link String}.
+	 * TODO sort/format the specification before printing it
+	 */
 	def protected String asText(EObject object, Queue<String> context) {
 		context.add(object.eClass.class.canonicalName)
 		val text = switch (object) {
-			Specification: object.asText(context)
+			Bool: object.asText(context)
+			Dictionary<Value>: object.asText(context)
+			FunctionCall: object.asText(context)
 			Input: object.asText(context)
 			Output: object.asText(context)
-			TextExpression: object.asText(context)
-			ResourceReference: object.asText(context)
-			FunctionCall: object.asText(context)
-			Dictionary<Value>: object.asText(context)
 			List: object.asText(context)
 			Number: object.asText(context)
+			ResourceReference: object.asText(context)
+			Specification: object.asText(context)
 			Text: object.asText(context)
-			Bool: object.asText(context)
+			TextExpression: object.asText(context)
 			// It's at the end to prevent inputs and outputs from being
 			// processed as simple resources
 			Resource: {
@@ -94,10 +98,37 @@ class Hcl2Text {
 		return text
 	}
 
-	def protected String asText(Specification object, Queue<String> context) {
-		'''«FOR r : object.resources SEPARATOR "\n"»«r.asText(context)»«ENDFOR»'''
+	/**
+	 * Translates a {@link Bool} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(Bool object, Queue<String> context) {
+		object.value.toString
 	}
 
+	/**
+	 * Translates a {@link Dictionary} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(Dictionary<Value> object, Queue<String> context) {
+		val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
+		'''
+		«IF object.name !== null»
+			"«object.name»" «ENDIF»{
+			«FOR p : object.elements»
+				«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
+			«ENDFOR»
+		}'''
+	}
+
+	/**
+	 * Translates a {@link FunctionCall} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(FunctionCall object, Queue<String> context) {
+		'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
+	}
+
+	/**
+	 * Translates an {@link Input} from the HCL model to a {@link String}.
+	 */
 	def protected String asText(Input object, Queue<String> context) {
 		// Ignore extra attributes
 		'''
@@ -112,6 +143,9 @@ class Hcl2Text {
 		}'''
 	}
 
+	/**
+	 * Translates an {@link Output} from the HCL model to a {@link String}.
+	 */
 	def protected String asText(Output object, Queue<String> context) {
 		// Ignore extra attributes
 		'''
@@ -124,44 +158,47 @@ class Hcl2Text {
 		}'''
 	}
 
-	def protected String asText(TextExpression object, Queue<String> context) {
-		'''"${«object.expression.asText(context)»}"'''
+	/**
+	 * Translates a {@link List} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(List object, Queue<String> context) {
+		'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
 	}
 
+	/**
+	 * Translates a {@link Number} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(Number object, Queue<String> context) {
+		'''«object.value»'''
+	}
+
+	/**
+	 * Translates a {@link ResourceReference} from the HCL model to a {@link String}.
+	 */
 	def protected String asText(ResourceReference object, Queue<String> context) {
 		val className = ModelPackage.eINSTANCE.functionCall.class.canonicalName
 		val qm = if (context.peek.equals(className)) "" else '"'
 		'''«qm»«FOR e : object.fullyQualifiedName SEPARATOR '.'»«e»«ENDFOR»«qm»'''
 	}
 
-	def protected String asText(FunctionCall object, Queue<String> context) {
-		'''«object.name»(«FOR e : object.arguments SEPARATOR ', '»«e.asText(context)»«ENDFOR»)'''
+	/**
+	 * Translates a {@link Specification} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(Specification object, Queue<String> context) {
+		'''«FOR r : object.resources SEPARATOR "\n"»«r.asText(context)»«ENDFOR»'''
 	}
 
-	def protected String asText(Dictionary<Value> object, Queue<String> context) {
-		val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
-		'''
-		«IF object.name !== null»
-			"«object.name»" «ENDIF»{
-			«FOR p : object.elements»
-				«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
-			«ENDFOR»
-		}'''
-	}
-
-	def protected String asText(List object, Queue<String> context) {
-		'''[«FOR v : object.elements SEPARATOR ", "»«v.asText(context)»«ENDFOR»]'''
-	}
-
-	def protected String asText(Number object, Queue<String> context) {
-		'''«object.value»'''
-	}
-
+	/**
+	 * Translates a {@link Text} from the HCL model to a {@link String}.
+	 */
 	def protected String asText(Text object, Queue<String> context) {
 		'''"«object.value.toString»"'''
 	}
 
-	def protected String asText(Bool object, Queue<String> context) {
-		object.value.toString
+	/**
+	 * Translates a {@link TextExpression} from the HCL model to a {@link String}.
+	 */
+	def protected String asText(TextExpression object, Queue<String> context) {
+		'''"${«object.expression.asText(context)»}"'''
 	}
 }

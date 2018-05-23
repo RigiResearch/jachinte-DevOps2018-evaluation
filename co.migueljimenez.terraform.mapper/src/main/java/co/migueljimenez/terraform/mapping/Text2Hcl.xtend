@@ -38,7 +38,8 @@ import org.eclipse.emf.ecore.EObject
 import co.migueljimenez.terraform.terraform.Template
 
 /**
- * Instantiates an HCL model from a Terraform template.
+ * Instantiates the HCL model (a {@link Specification}) from a Terraform
+ * template.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
