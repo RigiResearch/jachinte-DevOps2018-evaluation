@@ -83,7 +83,7 @@ class Infrastructure2Hcl {
 	 * Maps an object from {@link VirtualInfrastructure} to a list of
 	 * {@link Specification} resources.
 	 */
-	def private List<Resource> resources(EObject object) {
+	def protected List<Resource> resources(EObject object) {
 		switch (object) {
 			Credential: object.resources
 			Flavor: object.resources
@@ -98,7 +98,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps a {@link Credential} to an OpenStack Compute KeyPair.
 	 */
-	def private List<Resource> resources(Credential object) {
+	def protected List<Resource> resources(Credential object) {
 		#[h.resource(
 			"data",
 			"openstack_compute_keypair_v2",
@@ -114,7 +114,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps a {@link Flavor} to an OpenStack Compute Flavor.
 	 */
-	def private List<Resource> resources(Flavor object) {
+	def protected List<Resource> resources(Flavor object) {
 		#[h.resource(
 			"data",
 			"openstack_compute_flavor_v2",
@@ -133,7 +133,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps a {@link Volume} to an OpenStack BlockStorage Volume.
 	 */
-	def private List<Resource> resources(Volume object) {
+	def protected List<Resource> resources(Volume object) {
 		#[h.resource(
 			"resource",
 			"openstack_blockstorage_volume_v2",
@@ -150,7 +150,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps a {@link SecurityGroup} to an OpenStack Compute Security Group.
 	 */
-	def private List<Resource> resources(SecurityGroup object) {
+	def protected List<Resource> resources(SecurityGroup object) {
 		val List<KeyValuePair<String, Value>> entries = object.rules.map[ rule |
 			h.<String, Value>entry(
 				"rule",
@@ -178,7 +178,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps an {@link Image} to an OpenStack Image.
 	 */
-	def private List<Resource> resources(Image object) {
+	def protected List<Resource> resources(Image object) {
 		#[h.resource(
 			"data",
 			"openstack_images_image_v2",
@@ -201,7 +201,7 @@ class Infrastructure2Hcl {
 	 * Maps an {@link Instance} to an OpenStack Compute Instance and its
 	 * corresponding volume.
 	 */
-	def private List<Resource> resources(Instance object) {
+	def protected List<Resource> resources(Instance object) {
 		val List<KeyValuePair<String, Value>> entries = newArrayList(
 			h.<String, Value>entry("name", h.text(object.name)),
 			h.<String, Value>entry("flavor_id", h.text(object.flavor.id)),
@@ -267,7 +267,7 @@ class Infrastructure2Hcl {
 	/**
 	 * Maps an {@link UnknownResource} to a generic resource.
 	 */
-	def private List<Resource> resources(UnknownResource<String, Object> object) {
+	def protected List<Resource> resources(UnknownResource<String, Object> object) {
 		val attributes = newArrayList
 		attributes.addAll(
 			object.attributes.elements.map[ p |
