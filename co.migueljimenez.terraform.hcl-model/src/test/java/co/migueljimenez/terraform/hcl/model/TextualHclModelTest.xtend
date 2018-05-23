@@ -73,22 +73,23 @@ class TextualHclModelTest {
 		)
 		val specification = e.specification(variable, resource, output)
 		val text = new TextualHclModel(specification).asText
-		val expected = '''variable "image" {
-	default = "Ubuntu 14.04"
-}
-resource "openstack_networking_router_interface_v2" "terraform" {
-	router_id = "ABC"
-	subnet_id = "DEF"
-	depends_on = ["openstack_networking_router_interface_v2.terraform"]
-	public_key = "${file("~/.ssh/id_rsa.terraform.pub")}"
-	provisioner "remote-exec" {
-		inline = ["sudo apt-get -y update", "sudo apt-get -y install nginx"]
-	}
-}
-output "address" {
-	sensitive = false
-	value = "${openstack_compute_floatingip_v2.terraform.address}"
-}'''
+		val expected = '''
+		variable "image" {
+			default = "Ubuntu 14.04"
+		}
+		resource "openstack_networking_router_interface_v2" "terraform" {
+			router_id = "ABC"
+			subnet_id = "DEF"
+			depends_on = ["openstack_networking_router_interface_v2.terraform"]
+			public_key = "${file("~/.ssh/id_rsa.terraform.pub")}"
+			provisioner "remote-exec" {
+				inline = ["sudo apt-get -y update", "sudo apt-get -y install nginx"]
+			}
+		}
+		output "address" {
+			sensitive = false
+			value = "${openstack_compute_floatingip_v2.terraform.address}"
+		}'''
 		Assert.assertEquals(expected, text)
 	}
 
