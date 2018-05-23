@@ -100,13 +100,13 @@ class Hcl2Infrastructure {
 							)
 						}
 						case "openstack_compute_flavor_v2": {
-//							this.i.flavor(
-//								null,
-//								resource.name,
-//								resource.attr("vcpus"),
-//								gigabyte(BigInteger.valueOf(resource.attr("disk"))),
-//								megabyte(BigInteger.valueOf(resource.attr("ram")))
-//							)
+							this.i.flavor(
+								null,
+								resource.name,
+								Integer.valueOf(resource.attr("vcpus").toString),
+								gigabyte(BigInteger.valueOf(Long.valueOf(resource.attr("disk").toString))),
+								megabyte(BigInteger.valueOf(Long.valueOf(resource.attr("disk").toString)))
+							)
 						}
 						case "openstack_blockstorage_volume_v2": {
 							
