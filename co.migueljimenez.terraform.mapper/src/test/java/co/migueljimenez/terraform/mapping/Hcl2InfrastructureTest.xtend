@@ -68,16 +68,7 @@ class Hcl2InfrastructureTest {
 		Assert.assertTrue(model.resources.size == 1)
 		Assert.assertEquals("variable", model.resources.get(0).resourceType)
 		Assert.assertEquals("image", model.resources.get(0).name)
-	}
-
-	@Test
-	def void inputRoundtrip() {
-		val source = '''
-		variable "image" {
-			default = "Ubuntu 14.04"
-		}'''
-		val specification = new Text2Hcl(source).model
-		val model = this.translator.model(specification)
+		// Round-trip test
 		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
 		Assert.assertEquals(source, text)
 	}
@@ -101,6 +92,96 @@ class Hcl2InfrastructureTest {
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.credentials.size == 1)
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
 	}
 
+	@Test
+	def void flavor() {
+		val source = '''
+		resource "openstack_compute_flavor_v2" "small" {
+			name = "small"
+			ram = 8096
+			vcpus = 2
+			disk = 20
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.images,
+			model.instances,
+			model.networks,
+			model.resources,
+			model.securityGroups,
+			model.volumes
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		Assert.assertTrue(model.flavors.size == 1)
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
+
+	@Test
+	def void image() {
+		val source = '''
+		resource "openstack_images_image_v2" "rancher-os" {
+			name = "rancher-os"
+			container_format = "bare"
+			disk_format = "ari"
+			image_source_url = "https://image"
+			min_disk_gb = 1
+			min_ram_mb = 1024
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.flavors,
+			model.instances,
+			model.networks,
+			model.resources,
+			model.securityGroups,
+			model.volumes
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		Assert.assertTrue(model.images.size == 1)
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
+
+	@Test
+	def void volume() {
+		val source = '''
+		resource "openstack_images_image_v2" "rancher-os" {
+			name = "rancher-os"
+			container_format = "bare"
+			disk_format = "ari"
+			image_source_url = "https://image"
+			min_disk_gb = 1
+			min_ram_mb = 1024
+		}
+		resource "openstack_blockstorage_volume_v2" "volume_1" {
+			name = "volume_1"
+			description = "first test volume"
+			image_id = "${openstack_images_image_v2.rancher-os.id}"
+			size = 5
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.flavors,
+			model.instances,
+			model.networks,
+			model.resources,
+			model.securityGroups
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+//		Assert.assertTrue(model.images.size == 1)
+//		Assert.assertTrue(model.volumes.size == 1)
+		// Round-trip test
+//		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+//		Assert.assertEquals(source, text)
+	}
 }
