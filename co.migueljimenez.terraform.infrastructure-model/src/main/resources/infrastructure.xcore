@@ -94,6 +94,7 @@ class Subnet {
 	id String ^id
 	String name
 	String cidr
+	int ipVersion
 	container Network network opposite subnets
 }
 
