@@ -63,11 +63,10 @@ class Hcl2InfrastructureTest {
 			model.instances,
 			model.networks,
 			model.securityGroups,
+			model.subnets,
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.resources.size == 1)
-		Assert.assertEquals("variable", model.resources.get(0).resourceType)
-		Assert.assertEquals("image", model.resources.get(0).name)
 		// Round-trip test
 		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
 		Assert.assertEquals(source, text)
@@ -89,6 +88,7 @@ class Hcl2InfrastructureTest {
 			model.networks,
 			model.resources,
 			model.securityGroups,
+			model.subnets,
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.credentials.size == 1)
@@ -115,6 +115,7 @@ class Hcl2InfrastructureTest {
 			model.networks,
 			model.resources,
 			model.securityGroups,
+			model.subnets,
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.flavors.size == 1)
@@ -143,6 +144,7 @@ class Hcl2InfrastructureTest {
 			model.networks,
 			model.resources,
 			model.securityGroups,
+			model.subnets,
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.images.size == 1)
@@ -176,10 +178,13 @@ class Hcl2InfrastructureTest {
 			model.instances,
 			model.networks,
 			model.resources,
+			model.subnets,
 			model.securityGroups
 		].forEach[l|Assert.assertTrue(l.size == 0)]
-//		Assert.assertTrue(model.images.size == 1)
-//		Assert.assertTrue(model.volumes.size == 1)
+		#[
+			model.images,
+			model.volumes
+		].forEach[l|Assert.assertTrue(l.size == 1)]
 		// Round-trip test
 //		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
 //		Assert.assertEquals(source, text)
@@ -213,6 +218,7 @@ class Hcl2InfrastructureTest {
 			model.instances,
 			model.networks,
 			model.resources,
+			model.subnets,
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 0)]
 		Assert.assertTrue(model.securityGroups.size == 1)
@@ -220,4 +226,156 @@ class Hcl2InfrastructureTest {
 		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
 		Assert.assertEquals(source, text)
 	}
+
+	@Test
+	def void network() {
+		val source = '''
+		resource "openstack_networking_network_v2" "network_1" {
+			name = "network_1"
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.flavors,
+			model.images,
+			model.instances,
+			model.resources,
+			model.volumes,
+			model.subnets,
+			model.securityGroups
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		Assert.assertTrue(model.networks.size == 1)
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
+
+	@Test
+	def void subnet() {
+		val source = '''
+		resource "openstack_networking_network_v2" "network_1" {
+			name = "network_1"
+		}
+		resource "openstack_networking_subnet_v2" "subnet_1" {
+			name = "subnet_1"
+			network_id = "${openstack_networking_network_v2.network_1.id}"
+			cidr = "192.168.199.0/24"
+			ip_version = 4
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.flavors,
+			model.images,
+			model.instances,
+			model.resources,
+			model.volumes,
+			model.securityGroups
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		#[
+			model.networks,
+			model.subnets
+		].forEach[l|Assert.assertTrue(l.size == 1)]
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
+
+	@Test
+	def void instance() {
+		val source = '''
+		resource "openstack_compute_keypair_v2" "terraform" {
+			name = "terraform"
+			public_key = "${file("~/.ssh/id_rsa.terraform.pub")}"
+		}
+		resource "openstack_compute_flavor_v2" "small" {
+			name = "small"
+			ram = 8096
+			vcpus = 2
+			disk = 20
+		}
+		resource "openstack_networking_network_v2" "network_1" {
+			name = "network_1"
+		}
+		resource "openstack_networking_subnet_v2" "subnet_1" {
+			name = "subnet_1"
+			network_id = "${openstack_networking_network_v2.network_1.id}"
+			cidr = "192.168.199.0/24"
+			ip_version = 4
+		}
+		resource "openstack_compute_secgroup_v2" "secgroup_1" {
+			rule {
+				from_port = 22
+				to_port = 22
+				ip_protocol = "tcp"
+				cidr = "0.0.0.0/0"
+			}
+			name = "secgroup_1"
+			description = "my security group"
+		}
+		resource "openstack_compute_instance_v2" "basic" {
+			name = "basic"
+			flavor_id = "${openstack_compute_flavor_v2.small.id}"
+			key_pair = "${openstack_compute_keypair_v2.terraform.name}"
+			security_groups = ["${openstack_compute_secgroup_v2.secgroup_1.name}"]
+			network {
+				name = "${openstack_networking_network_v2.network_1.name}"
+			}
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.images,
+			model.resources,
+			model.volumes
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		#[
+			model.flavors,
+			model.credentials,
+			model.networks,
+			model.subnets,
+			model.securityGroups,
+			model.instances
+		].forEach[l|Assert.assertTrue(l.size == 1)]
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
+
+//		@Test
+//	def void attachment() {
+//		val source = '''
+//		resource "openstack_blockstorage_volume_v2" "myvol" {
+//			name = "myvol"
+//		}
+//		resource "openstack_compute_instance_v2" "myinstance" {
+//			name = "myinstance"
+//		}
+//		resource "openstack_compute_volume_attach_v2" "attached" {
+//			compute_id = "${openstack_compute_instance_v2.myinstance.id}"
+//			volume_id = "${openstack_blockstorage_volume_v2.myvol.id}"
+//		}
+//		'''
+//		val specification = new Text2Hcl(source).model
+//		val model = this.translator.model(specification)
+//		#[
+//			model.credentials,
+//			model.flavors,
+//			model.images,
+//			model.instances,
+//			model.networks,
+//			model.subnets,
+//			model.resources,
+//			model.securityGroups
+//		].forEach[l|Assert.assertTrue(l.size == 0)]
+//		#[
+//			model.volumes,
+//			model.instances
+//		].forEach[l|Assert.assertTrue(l.size == 1)]
+//		// Round-trip test
+////		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+////		Assert.assertEquals(source, text)
+//	}
 }

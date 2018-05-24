@@ -89,17 +89,15 @@ class Infrastructure2HclTest {
 		this.translator = new Infrastructure2Hcl
 		this.textTranslator = new Hcl2Text
 		this.flavor = this.i.flavor(
-			"small-flavor-id",
-			"small",
 			null,
+			"small",
 			1,
 			StorageUnits.gigabyte(4),
 			StorageUnits.megabyte(512)
 		)
 		this.image = this.i.image(
-			"rancher-os-image-id",
+			null,
 			"rancher-os",
-			"a demo image",
 			ContainerFormat.BARE,
 			DiskFormat.ARI,
 			"https://image",
@@ -107,25 +105,24 @@ class Infrastructure2HclTest {
 			StorageUnits.megabyte(1024)
 		)
 		this.volume = this.i.volume(
-			"myvolume-volume-id",
+			null,
 			"myvolume",
 			null,
 			this.image,
 			StorageUnits.gigabyte(5)
 		)
 		this.instance = this.i.instance(
-			"basic-instance-id",
-			"basic",
 			null,
+			"basic",
 			this.i.credentials(
 				UUID.randomUUID.toString,
 				"access",
-				"a demo credential",
 				"public-key"
 			),
 			this.flavor,
-			this.volume,
-			newArrayList
+			#[this.volume],
+			#[],
+			#[]
 		)
 		this.provider = this.i.unknownResource(
 			"provider",
@@ -150,7 +147,6 @@ class Infrastructure2HclTest {
 		Assert.assertEquals('''
 		resource "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
-			description = "a demo image"
 			container_format = "bare"
 			disk_format = "ari"
 			image_source_url = "https://image"
@@ -183,8 +179,8 @@ class Infrastructure2HclTest {
 		Assert.assertEquals('''
 		resource "openstack_compute_instance_v2" "basic" {
 			name = "basic"
-			flavor_id = "small-flavor-id"
-			key_pair = "access"
+			flavor_id = "${openstack_compute_flavor_v2.small.id}"
+			key_pair = "${openstack_compute_keypair_v2.access.name}"
 			security_groups = []
 		}
 		resource "openstack_compute_volume_attach_v2" "basic_myvolume" {

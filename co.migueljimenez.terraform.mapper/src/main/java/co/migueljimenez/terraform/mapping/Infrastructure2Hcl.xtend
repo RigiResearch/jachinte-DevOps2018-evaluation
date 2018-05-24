@@ -43,6 +43,8 @@ import de.xn__ho_hia.storage_unit.StorageUnit
 import java.text.DecimalFormat
 import java.util.List
 import org.eclipse.emf.ecore.EObject
+import co.migueljimenez.terraform.infrastructure.model.Subnet
+import co.migueljimenez.terraform.infrastructure.model.Network
 
 /**
  * Translates a {@link VirtualInfrastructure} to a {@link Specification}.
@@ -71,10 +73,13 @@ class Infrastructure2Hcl {
 	 * @return the code representation of the model in HCL
 	 */
 	def Specification specification(VirtualInfrastructure model) {
+		// Order is dependency-wise
 		val resources = #[
 			model.credentials,
 			model.flavors,
 			model.volumes,
+			model.networks,
+			model.subnets,
 			model.images,
 			model.securityGroups,
 			model.instances,
@@ -93,6 +98,8 @@ class Infrastructure2Hcl {
 			Flavor: object.resources
 			Image: object.resources
 			Instance: object.resources
+			Network: object.resources
+			Subnet: object.resources
 			SecurityGroup: object.resources
 			Volume: object.resources
 			UnknownResource<String, Object>: object.resources
@@ -110,7 +117,6 @@ class Infrastructure2Hcl {
 			h.dictionary(
 				null,
 				h.entry("name", h.text(object.name)),
-				h.entry("description", h.text(object.description)),
 				h.entry("public_key", h.text(object.publicKey))
 			)
 		)]
@@ -128,7 +134,6 @@ class Infrastructure2Hcl {
 				null,
 				#[
 					h.entry("name", h.text(object.name)),
-					h.entry("description", h.text(object.description)),
 					h.entry("ram", h.number(object.ram.asMbString)),
 					h.entry("vcpus", h.number('''«object.vcpus»''')),
 					h.entry("disk", h.number(object.disk.asGbString))
@@ -211,14 +216,31 @@ class Infrastructure2Hcl {
 
 	/**
 	 * Translates an {@link Instance} to an OpenStack Compute Instance and its
-	 * corresponding volume.
+	 * corresponding volumes.
 	 */
 	def protected List<Resource> resources(Instance object) {
 		val List<KeyValuePair<String, Value>> entries = newArrayList(
 			h.<String, Value>entry("name", h.text(object.name)),
-			h.<String, Value>entry("description", h.text(object.description)),
-			h.<String, Value>entry("flavor_id", h.text(object.flavor.id)),
-			h.<String, Value>entry("key_pair", h.text(object.credential.name))
+			h.<String, Value>entry(
+				"flavor_id",
+				h.expression(
+					h.resourceRef(
+						"openstack_compute_flavor_v2",
+						object.flavor.name,
+						"id"
+					)
+				)
+			),
+			h.<String, Value>entry(
+				"key_pair",
+				h.expression(
+					h.resourceRef(
+						"openstack_compute_keypair_v2",
+						object.credential.name,
+						"name"
+					)
+				)
+			)
 		)
 		val securityGroups = h.<String, Value>entry(
 			"security_groups",
@@ -228,53 +250,114 @@ class Infrastructure2Hcl {
 						h.resourceRef(
 							"openstack_compute_secgroup_v2",
 							group.name,
-							group.name
+							"name"
 						)
 					)
 				]
 			)
 		)
-		val networks = object.networks.map[ network |
+		val networks = object.networks.map [ network |
 			h.<String, Value>entry(
 				"network",
 				h.dictionary(
-					"network",
-					h.entry("name", h.text(network.name))
+					null,
+					h.entry(
+						"name",
+						h.expression(
+							h.resourceRef(
+								"openstack_networking_network_v2",
+								network.name,
+								"name"
+							)
+						)
+					)
 				)
 			)
 		]
 		entries.addAll(securityGroups)
 		entries.addAll(networks)
-		#[
+		val resources = newArrayList
+		resources.add(
 			h.resource(
 				"resource",
 				"openstack_compute_instance_v2",
 				object.name,
 				h.dictionary(null, entries)
-			),
-			h.resource(
-				"resource",
-				"openstack_compute_volume_attach_v2",
-				'''«object.name»_«object.volume.name»''',
-				h.dictionary(
-					null,
-					#[
-						h.entry(
-							"compute_id",
-							h.expression(
-								h.resourceRef("openstack_compute_instance_v2", object.name, "id")
+			)
+		)
+		resources.addAll(
+			object.volumes.map [volume |
+				h.resource(
+					"resource",
+					"openstack_compute_volume_attach_v2",
+					'''«object.name»_«volume.name»''',
+					h.dictionary(
+						null,
+						#[
+							h.entry(
+								"compute_id",
+								h.expression(
+									h.resourceRef("openstack_compute_instance_v2", object.name, "id")
+								)
+							),
+							h.entry(
+								"volume_id",
+								h.expression(
+									h.resourceRef("openstack_blockstorage_volume_v2", volume.name, "id")
+								)
 							)
-						),
-						h.entry(
-							"volume_id",
-							h.expression(
-								h.resourceRef("openstack_blockstorage_volume_v2", object.volume.name, "id")
+						]
+					)
+				)
+			]
+		)
+		resources
+	}
+
+	/**
+	 * Translates a {@link Network} to an OpenStack Compute Network.
+	 */
+	def protected List<Resource> resources(Network object) {
+		#[h.resource(
+			"resource",
+			"openstack_networking_network_v2",
+			object.name,
+			h.dictionary(
+				null,
+				#[
+					h.entry("name", h.text(object.name))
+				]
+			)
+		)]
+	}
+
+	/**
+	 * Translates a {@link Subnet} to an OpenStack Compute Subnet.
+	 */
+	def protected List<Resource> resources(Subnet object) {
+		#[h.resource(
+			"resource",
+			"openstack_networking_subnet_v2",
+			object.name,
+			h.dictionary(
+				null,
+				#[
+					h.entry("name", h.text(object.name)),
+					h.entry(
+						"network_id",
+						h.expression(
+							h.resourceRef(
+								"openstack_networking_network_v2",
+								object.network.name,
+								"id"
 							)
 						)
-					]
-				)
+					),
+					h.entry("cidr", h.text(object.cidr)),
+					h.entry("ip_version", h.number(object.ipVersion.toString))
+				]
 			)
-		]
+		)]
 	}
 
 	/**

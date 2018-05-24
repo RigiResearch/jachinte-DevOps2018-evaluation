@@ -35,39 +35,38 @@ class InfrastructureModelElements {
 
 	def infrastructure(List<Credential> credentials, List<Flavor> flavors,
 		List<Image> images, List<Instance> instances, List<Network> networks,
-			List<SecurityGroup> securityGroups, List<Volume> volumes,
-				List<UnknownResource<String, Object>> otherResources) {
+			List<Subnet> subnets, List<SecurityGroup> securityGroups,
+				List<Volume> volumes, List<UnknownResource<String, Object>> otherResources) {
 		val infrastructure = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		infrastructure.credentials.addAll(credentials)
 		infrastructure.flavors.addAll(flavors)
 		infrastructure.images.addAll(images)
 		infrastructure.instances.addAll(instances)
 		infrastructure.networks.addAll(networks)
+		infrastructure.subnets.addAll(subnets)
 		infrastructure.securityGroups.addAll(securityGroups)
 		infrastructure.volumes.addAll(volumes)
 		infrastructure.resources.addAll(otherResources)
 		return infrastructure
 	}
 
-	def flavor(String id, String name, String description, int vcpus,
-		StorageUnit<?> disk, StorageUnit<?> ram) {
+	def flavor(String id, String name, int vcpus, StorageUnit<?> disk,
+		StorageUnit<?> ram) {
 		val flavor = ModelFactory.eINSTANCE.createFlavor
 		flavor.id = id
 		flavor.name = name
-		flavor.description = description
 		flavor.vcpus = vcpus
 		flavor.disk = disk
 		flavor.ram = ram
 		return flavor
 	}
 
-	def image(String id, String name,  String description,
-		ContainerFormat containerFormat, DiskFormat diskFormat,
-			String imageSourceUrl, StorageUnit<?> minDisk, StorageUnit<?> minRam) {
+	def image(String id, String name, ContainerFormat containerFormat,
+		DiskFormat diskFormat, String imageSourceUrl, StorageUnit<?> minDisk,
+			StorageUnit<?> minRam) {
 		val image = ModelFactory.eINSTANCE.createImage
 		image.id = id
 		image.name = name
-		image.description = description
 		image.containerFormat = containerFormat
 		image.diskFormat = diskFormat
 		image.imageSourceUrl = imageSourceUrl
@@ -76,12 +75,10 @@ class InfrastructureModelElements {
 		return image
 	}
 
-	def credentials(String id, String name, String description,
-		String publicKey) {
+	def credentials(String id, String name, String publicKey) {
 		val credentials = ModelFactory.eINSTANCE.createCredential
 		credentials.id = id
 		credentials.name = name
-		credentials.description = description
 		credentials.publicKey = publicKey
 		return credentials
 	}
@@ -97,19 +94,20 @@ class InfrastructureModelElements {
 		return volume
 	}
 
-	def network(String id, String name,  String description) {
+	def network(String id, String name) {
 		val network = ModelFactory.eINSTANCE.createNetwork
 		network.id = id
 		network.name = name
-		network.description = description
 		return network
 	}
 
-	def subnet(String id, String name, String cidr, Network network) {
+	def subnet(String id, String name, String cidr, int ipVersion,
+		Network network) {
 		val subnet = ModelFactory.eINSTANCE.createSubnet
 		subnet.id = id
 		subnet.name = name
 		subnet.cidr = cidr
+		subnet.ipVersion = ipVersion
 		subnet.network = network
 		return subnet
 	}
@@ -133,16 +131,16 @@ class InfrastructureModelElements {
 		return group
 	}
 
-	def instance(String id, String name,  String description,
-		Credential credential, Flavor flavor, Volume volume,
+	def instance(String id, String name, Credential credential, Flavor flavor,
+		List<Volume> volumes, List<Network> networks,
 			List<SecurityGroup> securityGroups) {
 		val server = ModelFactory.eINSTANCE.createInstance
 		server.id = id
 		server.name = name
-		server.description = description
 		server.credential = credential
 		server.flavor = flavor
-		server.volume = volume
+		server.volumes.addAll(volumes)
+		server.networks.addAll(networks)
 		server.securityGroups.addAll(securityGroups)
 		return server
 	}
