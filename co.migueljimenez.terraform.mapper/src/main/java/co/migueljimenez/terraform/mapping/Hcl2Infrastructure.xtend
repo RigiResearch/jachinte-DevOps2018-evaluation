@@ -45,6 +45,12 @@ import static de.xn__ho_hia.storage_unit.StorageUnits.gigabyte
 import static de.xn__ho_hia.storage_unit.StorageUnits.megabyte
 import co.migueljimenez.terraform.dtos.FkDictionary
 import co.migueljimenez.terraform.dtos.FkResourceReference
+import co.migueljimenez.terraform.infrastructure.model.Credential
+import co.migueljimenez.terraform.infrastructure.model.Flavor
+import co.migueljimenez.terraform.infrastructure.model.Volume
+import co.migueljimenez.terraform.infrastructure.model.Image
+import co.migueljimenez.terraform.infrastructure.model.ContainerFormat
+import co.migueljimenez.terraform.infrastructure.model.DiskFormat
 
 /**
  * Maps the elements from a {@link Specification} to
@@ -90,31 +96,22 @@ class Hcl2Infrastructure {
 					otherResources.addAll(resource.vResources)
 				Resource:
 					switch (resource.type) {
-						case "openstack_compute_keypair_v2": {
-							credentials.add(
-								this.i.credentials(
-									null,
-									resource.name,
-									resource.attr("public_key").toString
-								)
-							)
-						}
-						case "openstack_compute_flavor_v2": {
-							this.i.flavor(
-								null,
-								resource.name,
-								Integer.valueOf(resource.attr("vcpus").toString),
-								gigabyte(BigInteger.valueOf(Long.valueOf(resource.attr("disk").toString))),
-								megabyte(BigInteger.valueOf(Long.valueOf(resource.attr("disk").toString)))
-							)
-						}
+						case "openstack_compute_keypair_v2":
+							credentials.add(resource.createCredential)
+						case "openstack_compute_flavor_v2":
+							flavors.add(resource.createFlavor)
+						case "openstack_images_image_v2":
+							images.add(resource.createImage)
 						case "openstack_blockstorage_volume_v2": {
-							
+							val ir = resource.attr("image_id").find(specification.resources)
+							var image = images.findFirst[i|i.name.equals(ir.name)]
+							if (image === null) {
+								image = ir.createImage
+								images.add(image)
+							}
+							volumes.add(resource.createVolume(image))
 						}
 						case "openstack_compute_secgroup_v2": {
-							
-						}
-						case "openstack_images_image_v2": {
 							
 						}
 						case "openstack_compute_instance_v2": {
@@ -147,6 +144,83 @@ class Hcl2Infrastructure {
 		resource.attributes.elements.findFirst [ p |
 			p.key.equals(attributeName)
 		].value.unwrap
+	}
+
+	/**
+	 * Searches a referenced resource (value) in a given list of resources.
+	 */
+	def protected find(Object value, java.util.List<Resource> resources) {
+		switch (value) {
+			FkTextExpression: {
+				val expression = value.expression
+				switch (expression) {
+					FkResourceReference: {
+						val type = expression.segments.get(0)
+						val name = expression.segments.get(1)
+						resources.findFirst[r|r.type.equals(type) && r.name.equals(name)]
+					}
+					default:
+						throw new UnsupportedOperationException(
+							'''Unexpected function call "«value»"'''
+						)
+				}
+			}
+			default:
+				throw new UnsupportedOperationException(
+					'''Invalid value "«value»". Only resource references are allowed'''
+				)
+		}
+	}
+
+	/**
+	 * Creates a {@link Credential} from the given resource.
+	 */
+	def protected createCredential(Resource resource) {
+		this.i.credentials(
+			null,
+			resource.name,
+			resource.attr("public_key").toString
+		)
+	}
+
+	/**
+	 * Creates a {@link Flavor} from the given resource.
+	 */
+	def protected createFlavor(Resource resource) {
+		this.i.flavor(
+			null,
+			resource.name,
+			Integer.valueOf(resource.attr("vcpus").toString),
+			gigabyte(resource.attr("disk").asBigInteger),
+			megabyte(resource.attr("ram").asBigInteger)
+		)
+	}
+
+	/**
+	 * Creates an {@link Image} from the given resource.
+	 */
+	def protected createImage(Resource resource) {
+		this.i.image(
+			null,
+			resource.name,
+			ContainerFormat.get(resource.attr("container_format").toString),
+			DiskFormat.get(resource.attr("disk_format").toString),
+			resource.attr("image_source_url").toString,
+			gigabyte(resource.attr("min_disk_gb").asBigInteger),
+			megabyte(resource.attr("min_ram_mb").asBigInteger)
+		)
+	}
+
+	/**
+	 * Creates a {@link Volume} from the given resource.
+	 */
+	def protected createVolume(Resource resource, Image image) {
+		this.i.volume(
+			null,
+			resource.name,
+			image,
+			gigabyte(resource.attr("size").asBigInteger)
+		)
 	}
 
 	/**
@@ -271,6 +345,13 @@ class Hcl2Infrastructure {
 	 */
 	def protected unwrap(TextExpression value) {
 		new FkTextExpression(FkReference.from(value.expression.unwrap))
+	}
+
+	/**
+	 * Instantiates a {@link BigInteger} from a given value.
+	 */
+	def private asBigInteger(Object value) {
+		BigInteger.valueOf(Long.valueOf(value.toString))
 	}
 
 }
