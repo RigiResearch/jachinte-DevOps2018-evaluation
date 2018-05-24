@@ -179,6 +179,7 @@ class Hcl2Infrastructure {
 		this.i.credentials(
 			null,
 			resource.name,
+			resource.attr("description")?.toString,
 			resource.attr("public_key").toString
 		)
 	}
@@ -190,6 +191,7 @@ class Hcl2Infrastructure {
 		this.i.flavor(
 			null,
 			resource.name,
+			resource.attr("description")?.toString,
 			Integer.valueOf(resource.attr("vcpus").toString),
 			gigabyte(resource.attr("disk").asBigInteger),
 			megabyte(resource.attr("ram").asBigInteger)
@@ -203,6 +205,7 @@ class Hcl2Infrastructure {
 		this.i.image(
 			null,
 			resource.name,
+			resource.attr("description")?.toString,
 			ContainerFormat.get(resource.attr("container_format").toString),
 			DiskFormat.get(resource.attr("disk_format").toString),
 			resource.attr("image_source_url").toString,
@@ -218,6 +221,7 @@ class Hcl2Infrastructure {
 		this.i.volume(
 			null,
 			resource.name,
+			resource.attr("description")?.toString,
 			image,
 			gigabyte(resource.attr("size").asBigInteger)
 		)
