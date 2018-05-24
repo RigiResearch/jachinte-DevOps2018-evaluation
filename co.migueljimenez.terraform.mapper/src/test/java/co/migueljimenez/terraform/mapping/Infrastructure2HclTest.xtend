@@ -143,7 +143,7 @@ class Infrastructure2HclTest {
 		val specification = this.translator.specification(infrastructure)
 		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
-		data "openstack_images_image_v2" "rancher-os" {
+		resource "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
 			container_format = "bare"
 			disk_format = "ari"
@@ -160,7 +160,8 @@ class Infrastructure2HclTest {
 		val specification = this.translator.specification(infrastructure)
 		val text = this.textTranslator.source(specification)
 		Assert.assertEquals('''
-		data "openstack_compute_flavor_v2" "small" {
+		resource "openstack_compute_flavor_v2" "small" {
+			name = "small"
 			ram = 512
 			vcpus = 1
 			disk = 4

@@ -104,7 +104,7 @@ class Infrastructure2Hcl {
 	 */
 	def protected List<Resource> resources(Credential object) {
 		#[h.resource(
-			"data",
+			"resource",
 			"openstack_compute_keypair_v2",
 			object.name,
 			h.dictionary(
@@ -120,12 +120,13 @@ class Infrastructure2Hcl {
 	 */
 	def protected List<Resource> resources(Flavor object) {
 		#[h.resource(
-			"data",
+			"resource",
 			"openstack_compute_flavor_v2",
 			object.name,
 			h.dictionary(
 				null,
 				#[
+					h.entry("name", h.text(object.name)),
 					h.entry("ram", h.number(object.ram.asMbString)),
 					h.entry("vcpus", h.number('''«object.vcpus»''')),
 					h.entry("disk", h.number(object.disk.asGbString))
@@ -184,7 +185,7 @@ class Infrastructure2Hcl {
 	 */
 	def protected List<Resource> resources(Image object) {
 		#[h.resource(
-			"data",
+			"resource",
 			"openstack_images_image_v2",
 			object.name,
 			h.dictionary(
