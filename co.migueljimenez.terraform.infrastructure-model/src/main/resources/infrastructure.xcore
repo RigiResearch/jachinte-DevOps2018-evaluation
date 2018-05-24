@@ -40,26 +40,26 @@ class KeyValuePair<K, V> {
 }
 
 class Dictionary<K, V> {
-	contains KeyValuePair<K, V>[] elements
+	refers KeyValuePair<K, V>[] elements
 }
 
 // Entities
 
 class VirtualInfrastructure {
-	contains Credential[] credentials
-	contains Flavor[] flavors
-	contains Image[] images
-	contains Instance[] instances
-	contains Network[] networks
-	contains SecurityGroup[] securityGroups
-	contains Volume[] volumes
-	contains UnknownResource<String, Object>[] resources
+	refers Credential[] credentials
+	refers Flavor[] flavors
+	refers Image[] images
+	refers Instance[] instances
+	refers Network[] networks
+	refers Subnet[] subnets
+	refers SecurityGroup[] securityGroups
+	refers Volume[] volumes
+	refers UnknownResource<String, Object>[] resources
 }
 
 class Flavor {
 	id String ^id
 	String name
-	String description
 	int vcpus
 	StorageQuantity disk
 	StorageQuantity ram
@@ -79,7 +79,6 @@ class Image {
 class Credential {
 	id String ^id
 	String name
-	String description
 	String publicKey
 }
 
@@ -88,7 +87,7 @@ class Volume {
 	String name
 	String description
 	StorageQuantity size
-	contains Image image
+	refers Image image
 }
 
 class Subnet {
@@ -101,7 +100,6 @@ class Subnet {
 class Network {
 	id String ^id
 	String name
-	String description
 	contains Subnet[] subnets opposite network
 }
 
@@ -116,18 +114,17 @@ class SecurityGroup {
 	id String ^id
 	String name
 	String description
-	contains SecurityRule[] rules
+	refers SecurityRule[] rules
 }
 
 class Instance {
 	id String ^id
 	String name
-	String description
-	contains Credential credential
-	contains Flavor flavor
-	contains Network[] networks
-	contains Volume volume
-	contains SecurityGroup[] securityGroups
+	refers Credential credential
+	refers Flavor flavor
+	refers Network[] networks
+	refers Volume[] volumes
+	refers SecurityGroup[] securityGroups
 }
 
 class UnknownResource<K, V> {
@@ -136,5 +133,5 @@ class UnknownResource<K, V> {
 	// The specific OpenStack type
 	String ^type
 	String name
-	contains Dictionary<K, V> attributes
+	refers Dictionary<K, V> attributes
 }
