@@ -59,6 +59,7 @@ class VirtualInfrastructure {
 class Flavor {
 	id String ^id
 	String name
+	String description
 	int vcpus
 	StorageQuantity disk
 	StorageQuantity ram
@@ -67,6 +68,7 @@ class Flavor {
 class Image {
 	id String ^id
 	String name
+	String description
 	ContainerFormat containerFormat
 	DiskFormat diskFormat
 	String imageSourceUrl
@@ -77,12 +79,14 @@ class Image {
 class Credential {
 	id String ^id
 	String name
+	String description
 	String publicKey
 }
 
 class Volume {
 	id String ^id
 	String name
+	String description
 	StorageQuantity size
 	contains Image image
 }
@@ -97,6 +101,7 @@ class Subnet {
 class Network {
 	id String ^id
 	String name
+	String description
 	contains Subnet[] subnets opposite network
 }
 
@@ -110,12 +115,14 @@ class SecurityRule {
 class SecurityGroup {
 	id String ^id
 	String name
+	String description
 	contains SecurityRule[] rules
 }
 
 class Instance {
 	id String ^id
 	String name
+	String description
 	contains Credential credential
 	contains Flavor flavor
 	contains Network[] networks

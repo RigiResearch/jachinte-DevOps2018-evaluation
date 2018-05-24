@@ -49,23 +49,25 @@ class InfrastructureModelElements {
 		return infrastructure
 	}
 
-	def flavor(String id, String name, int vcpus, StorageUnit<?> disk,
-		StorageUnit<?> ram) {
+	def flavor(String id, String name, String description, int vcpus,
+		StorageUnit<?> disk, StorageUnit<?> ram) {
 		val flavor = ModelFactory.eINSTANCE.createFlavor
 		flavor.id = id
 		flavor.name = name
+		flavor.description = description
 		flavor.vcpus = vcpus
 		flavor.disk = disk
 		flavor.ram = ram
 		return flavor
 	}
 
-	def image(String id, String name, ContainerFormat containerFormat,
-		DiskFormat diskFormat, String imageSourceUrl, StorageUnit<?> minDisk,
-			StorageUnit<?> minRam) {
+	def image(String id, String name,  String description,
+		ContainerFormat containerFormat, DiskFormat diskFormat,
+			String imageSourceUrl, StorageUnit<?> minDisk, StorageUnit<?> minRam) {
 		val image = ModelFactory.eINSTANCE.createImage
 		image.id = id
 		image.name = name
+		image.description = description
 		image.containerFormat = containerFormat
 		image.diskFormat = diskFormat
 		image.imageSourceUrl = imageSourceUrl
@@ -74,27 +76,32 @@ class InfrastructureModelElements {
 		return image
 	}
 
-	def credentials(String id, String name, String publicKey) {
+	def credentials(String id, String name, String description,
+		String publicKey) {
 		val credentials = ModelFactory.eINSTANCE.createCredential
 		credentials.id = id
 		credentials.name = name
+		credentials.description = description
 		credentials.publicKey = publicKey
 		return credentials
 	}
 
-	def volume(String id, String name, Image image, StorageUnit<?> size) {
+	def volume(String id, String name,  String description, Image image,
+		StorageUnit<?> size) {
 		val volume = ModelFactory.eINSTANCE.createVolume
 		volume.id = id
 		volume.name = name
+		volume.description = description
 		volume.image = image
 		volume.size = size
 		return volume
 	}
 
-	def network(String id, String name) {
+	def network(String id, String name,  String description) {
 		val network = ModelFactory.eINSTANCE.createNetwork
 		network.id = id
 		network.name = name
+		network.description = description
 		return network
 	}
 
@@ -116,19 +123,23 @@ class InfrastructureModelElements {
 		return rule
 	}
 
-	def securityGroup(String id, String name, List<SecurityRule> rules) {
+	def securityGroup(String id, String name, String description,
+		List<SecurityRule> rules) {
 		val group = ModelFactory.eINSTANCE.createSecurityGroup
 		group.id = id
 		group.name = name
+		group.description = description
 		group.rules.addAll(rules)
 		return group
 	}
 
-	def instance(String id, String name, Credential credential, Flavor flavor,
-		Volume volume, List<SecurityGroup> securityGroups) {
+	def instance(String id, String name,  String description,
+		Credential credential, Flavor flavor, Volume volume,
+			List<SecurityGroup> securityGroups) {
 		val server = ModelFactory.eINSTANCE.createInstance
 		server.id = id
 		server.name = name
+		server.description = description
 		server.credential = credential
 		server.flavor = flavor
 		server.volume = volume

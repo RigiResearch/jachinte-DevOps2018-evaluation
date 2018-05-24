@@ -110,6 +110,7 @@ class Infrastructure2Hcl {
 			h.dictionary(
 				null,
 				h.entry("name", h.text(object.name)),
+				h.entry("description", h.text(object.description)),
 				h.entry("public_key", h.text(object.publicKey))
 			)
 		)]
@@ -127,6 +128,7 @@ class Infrastructure2Hcl {
 				null,
 				#[
 					h.entry("name", h.text(object.name)),
+					h.entry("description", h.text(object.description)),
 					h.entry("ram", h.number(object.ram.asMbString)),
 					h.entry("vcpus", h.number('''«object.vcpus»''')),
 					h.entry("disk", h.number(object.disk.asGbString))
@@ -146,6 +148,7 @@ class Infrastructure2Hcl {
 			h.dictionary(
 				null,
 				h.entry("name", h.text(object.name)),
+				h.entry("description", h.text(object.description)),
 				h.entry("image_id", h.text(object.image.id)),
 				h.entry("size", h.text(object.size.asGbString))
 			)
@@ -156,19 +159,22 @@ class Infrastructure2Hcl {
 	 * Translates a {@link SecurityGroup} to an OpenStack Compute Security Group.
 	 */
 	def protected List<Resource> resources(SecurityGroup object) {
-		val List<KeyValuePair<String, Value>> entries = object.rules.map[ rule |
-			h.<String, Value>entry(
-				"rule",
-				h.<Value>dictionary(
+		val List<KeyValuePair<String, Value>> entries = newArrayList(
+			object.rules.map[ rule |
+				h.<String, Value>entry(
 					"rule",
-					h.entry("from_port", h.number('''«rule.from»''')),
-					h.entry("to_port", h.number('''«rule.to»''')),
-					h.entry("ip_protocol", h.number(rule.protocol)),
-					h.entry("cidr", h.text(rule.cidr))
+					h.<Value>dictionary(
+						null,
+						h.entry("from_port", h.number('''«rule.from»''')),
+						h.entry("to_port", h.number('''«rule.to»''')),
+						h.entry("ip_protocol", h.text(rule.protocol)),
+						h.entry("cidr", h.text(rule.cidr))
+					)
 				)
-			)
-		]
+			]
+		)
 		entries.add(h.entry("name", h.text(object.name)))
+		entries.add(h.entry("description", h.text(object.description)))
 		#[h.resource(
 			"resource",
 			"openstack_compute_secgroup_v2",
@@ -192,6 +198,7 @@ class Infrastructure2Hcl {
 				null,
 				#[
 					h.entry("name", h.text(object.name)),
+					h.entry("description", h.text(object.description)),
 					h.entry("container_format", h.text(object.containerFormat.literal)),
 					h.entry("disk_format", h.text(object.diskFormat.literal)),
 					h.entry("image_source_url", h.text(object.imageSourceUrl)),
@@ -209,6 +216,7 @@ class Infrastructure2Hcl {
 	def protected List<Resource> resources(Instance object) {
 		val List<KeyValuePair<String, Value>> entries = newArrayList(
 			h.<String, Value>entry("name", h.text(object.name)),
+			h.<String, Value>entry("description", h.text(object.description)),
 			h.<String, Value>entry("flavor_id", h.text(object.flavor.id)),
 			h.<String, Value>entry("key_pair", h.text(object.credential.name))
 		)

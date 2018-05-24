@@ -91,6 +91,7 @@ class Infrastructure2HclTest {
 		this.flavor = this.i.flavor(
 			"small-flavor-id",
 			"small",
+			null,
 			1,
 			StorageUnits.gigabyte(4),
 			StorageUnits.megabyte(512)
@@ -98,6 +99,7 @@ class Infrastructure2HclTest {
 		this.image = this.i.image(
 			"rancher-os-image-id",
 			"rancher-os",
+			"a demo image",
 			ContainerFormat.BARE,
 			DiskFormat.ARI,
 			"https://image",
@@ -107,15 +109,18 @@ class Infrastructure2HclTest {
 		this.volume = this.i.volume(
 			"myvolume-volume-id",
 			"myvolume",
+			null,
 			this.image,
 			StorageUnits.gigabyte(5)
 		)
 		this.instance = this.i.instance(
 			"basic-instance-id",
 			"basic",
+			null,
 			this.i.credentials(
 				UUID.randomUUID.toString,
 				"access",
+				"a demo credential",
 				"public-key"
 			),
 			this.flavor,
@@ -145,6 +150,7 @@ class Infrastructure2HclTest {
 		Assert.assertEquals('''
 		resource "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
+			description = "a demo image"
 			container_format = "bare"
 			disk_format = "ari"
 			image_source_url = "https://image"
