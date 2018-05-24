@@ -51,6 +51,7 @@ import co.migueljimenez.terraform.infrastructure.model.Volume
 import co.migueljimenez.terraform.infrastructure.model.Image
 import co.migueljimenez.terraform.infrastructure.model.ContainerFormat
 import co.migueljimenez.terraform.infrastructure.model.DiskFormat
+import co.migueljimenez.terraform.infrastructure.model.SecurityGroup
 
 /**
  * Maps the elements from a {@link Specification} to
@@ -111,9 +112,8 @@ class Hcl2Infrastructure {
 							}
 							volumes.add(resource.createVolume(image))
 						}
-						case "openstack_compute_secgroup_v2": {
-							
-						}
+						case "openstack_compute_secgroup_v2":
+							securityGroups.add(resource.createSecurityGroup)
 						case "openstack_compute_instance_v2": {
 							
 						}
@@ -138,12 +138,19 @@ class Hcl2Infrastructure {
 	}
 
 	/**
+	 * Gets the specified attribute list from the resource.
+	 */
+	def protected attrs(Resource resource, String attributeName) {
+		resource.attributes.elements
+			.filter[p|p.key.equals(attributeName)]
+			.map[p|p.value.unwrap]
+	}
+
+	/**
 	 * Gets the specified attribute from the resource.
 	 */
 	def protected attr(Resource resource, String attributeName) {
-		resource.attributes.elements.findFirst [ p |
-			p.key.equals(attributeName)
-		].value.unwrap
+		resource.attrs(attributeName).findFirst[a|true]
 	}
 
 	/**
@@ -224,6 +231,30 @@ class Hcl2Infrastructure {
 			resource.attr("description")?.toString,
 			image,
 			gigabyte(resource.attr("size").asBigInteger)
+		)
+	}
+
+	/**
+	 * Creates an {@link SecurityGroup} from the given resource.
+	 */
+	def protected createSecurityGroup(Resource resource) {
+		val rules = resource.attrs("rule").map [ d |
+			switch (d) {
+				FkDictionary<String, Object>: {
+					this.i.securityRule(
+						Integer.valueOf(d.get("from_port").toString),
+						Integer.valueOf(d.get("to_port").toString),
+						d.get("cidr").toString,
+						d.get("ip_protocol").toString
+					)
+				}
+			}
+		]
+		this.i.securityGroup(
+			null,
+			resource.name,
+			resource.attr("description")?.toString,
+			rules.toList
 		)
 	}
 
