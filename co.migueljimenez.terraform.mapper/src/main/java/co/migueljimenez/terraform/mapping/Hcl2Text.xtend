@@ -108,11 +108,21 @@ class Hcl2Text {
 	 */
 	def protected String asText(Dictionary<Value> object, Queue<String> context) {
 		val className = ModelPackage.eINSTANCE.dictionary.class.canonicalName
+		val elements = object.elements
+			.filter [ e |
+				val text = e.value.asText(context)
+				!text.empty && !text.equals('""')
+			]
+			.map [ e |
+				val eq = if(!(e.value instanceof Dictionary<?> && context.peek.equals(className))) "= "
+				val text = e.value.asText(context)
+				'''«e.key» «eq»«text»'''
+			]
 		'''
 		«IF object.name !== null»
 			"«object.name»" «ENDIF»{
-			«FOR p : object.elements»
-				«p.key» «IF !(p.value instanceof Dictionary<?> && context.peek.equals(className))»= «ENDIF»«p.value.asText(context)»
+			«FOR e : elements»
+				«e»
 			«ENDFOR»
 		}'''
 	}
@@ -190,7 +200,7 @@ class Hcl2Text {
 	 * Translates a {@link Text} from the HCL model to a {@link String}.
 	 */
 	def protected String asText(Text object, Queue<String> context) {
-		'''"«object.value.toString»"'''
+		'''"«object.value?.toString»"'''
 	}
 
 	/**
