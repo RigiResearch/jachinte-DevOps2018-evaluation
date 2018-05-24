@@ -184,4 +184,40 @@ class Hcl2InfrastructureTest {
 //		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
 //		Assert.assertEquals(source, text)
 	}
+
+	@Test
+	def void securityGroup() {
+		val source = '''
+		resource "openstack_compute_secgroup_v2" "secgroup_1" {
+			rule {
+				from_port = 22
+				to_port = 22
+				ip_protocol = "tcp"
+				cidr = "0.0.0.0/0"
+			}
+			rule {
+				from_port = 80
+				to_port = 80
+				ip_protocol = "tcp"
+				cidr = "0.0.0.0/0"
+			}
+			name = "secgroup_1"
+			description = "my security group"
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.credentials,
+			model.flavors,
+			model.images,
+			model.instances,
+			model.networks,
+			model.resources,
+			model.volumes
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		Assert.assertTrue(model.securityGroups.size == 1)
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
 }
