@@ -46,6 +46,17 @@ class FkFunctionCall extends FkReference {
 	val List<Object> arguments
 
 	override toString() {
-		'''«this.name»(«FOR a : this.arguments SEPARATOR ", "»«a.toString»«ENDFOR»)'''
+		'''«this.name»(«FOR a : this.arguments SEPARATOR ", "»«this.toString(a)»«ENDFOR»)'''
+	}
+
+	/**
+	 * Properly formats the String representation of a given argument.
+	 */
+	def private toString(Object argument) {
+		switch (argument) {
+			String: '''"«argument»"'''
+			default:
+				argument.toString
+		}
 	}
 }
