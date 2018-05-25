@@ -31,7 +31,6 @@ import co.migueljimenez.terraform.infrastructure.model.ModelFactory
 import co.migueljimenez.terraform.infrastructure.model.UnknownResource
 import co.migueljimenez.terraform.infrastructure.model.Volume
 import de.xn__ho_hia.storage_unit.StorageUnits
-import java.util.UUID
 import org.junit.Assert
 import org.junit.Test
 
@@ -89,14 +88,12 @@ class Infrastructure2HclTest {
 		this.translator = new Infrastructure2Hcl
 		this.textTranslator = new Hcl2Text
 		this.flavor = this.i.flavor(
-			null,
 			"small",
 			1,
 			StorageUnits.gigabyte(4),
 			StorageUnits.megabyte(512)
 		)
 		this.image = this.i.image(
-			null,
 			"rancher-os",
 			ContainerFormat.BARE,
 			DiskFormat.ARI,
@@ -105,17 +102,14 @@ class Infrastructure2HclTest {
 			StorageUnits.megabyte(1024)
 		)
 		this.volume = this.i.volume(
-			null,
 			"myvolume",
 			null,
 			this.image,
 			StorageUnits.gigabyte(5)
 		)
 		this.instance = this.i.instance(
-			null,
 			"basic",
 			this.i.credentials(
-				UUID.randomUUID.toString,
 				"access",
 				"public-key"
 			),
@@ -181,7 +175,6 @@ class Infrastructure2HclTest {
 			name = "basic"
 			flavor_id = "${openstack_compute_flavor_v2.small.id}"
 			key_pair = "${openstack_compute_keypair_v2.access.name}"
-			security_groups = []
 		}
 		resource "openstack_compute_volume_attach_v2" "basic_myvolume" {
 			compute_id = "${openstack_compute_instance_v2.basic.id}"
