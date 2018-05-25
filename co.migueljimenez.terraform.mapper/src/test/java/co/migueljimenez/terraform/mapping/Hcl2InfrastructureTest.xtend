@@ -156,6 +156,12 @@ class Hcl2InfrastructureTest {
 	@Test
 	def void volume() {
 		val source = '''
+		resource "openstack_blockstorage_volume_v2" "volume_1" {
+			name = "volume_1"
+			description = "first test volume"
+			image_id = "${openstack_images_image_v2.rancher-os.id}"
+			size = 5
+		}
 		resource "openstack_images_image_v2" "rancher-os" {
 			name = "rancher-os"
 			container_format = "bare"
@@ -163,12 +169,6 @@ class Hcl2InfrastructureTest {
 			image_source_url = "https://image"
 			min_disk_gb = 1
 			min_ram_mb = 1024
-		}
-		resource "openstack_blockstorage_volume_v2" "volume_1" {
-			name = "volume_1"
-			description = "first test volume"
-			image_id = "${openstack_images_image_v2.rancher-os.id}"
-			size = 5
 		}'''
 		val specification = new Text2Hcl(source).model
 		val model = this.translator.model(specification)
@@ -186,8 +186,8 @@ class Hcl2InfrastructureTest {
 			model.volumes
 		].forEach[l|Assert.assertTrue(l.size == 1)]
 		// Round-trip test
-//		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
-//		Assert.assertEquals(source, text)
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
 	}
 
 	@Test
@@ -344,38 +344,59 @@ class Hcl2InfrastructureTest {
 		Assert.assertEquals(source, text)
 	}
 
-//		@Test
-//	def void attachment() {
-//		val source = '''
-//		resource "openstack_blockstorage_volume_v2" "myvol" {
-//			name = "myvol"
-//		}
-//		resource "openstack_compute_instance_v2" "myinstance" {
-//			name = "myinstance"
-//		}
-//		resource "openstack_compute_volume_attach_v2" "attached" {
-//			compute_id = "${openstack_compute_instance_v2.myinstance.id}"
-//			volume_id = "${openstack_blockstorage_volume_v2.myvol.id}"
-//		}
-//		'''
-//		val specification = new Text2Hcl(source).model
-//		val model = this.translator.model(specification)
-//		#[
-//			model.credentials,
-//			model.flavors,
-//			model.images,
-//			model.instances,
-//			model.networks,
-//			model.subnets,
-//			model.resources,
-//			model.securityGroups
-//		].forEach[l|Assert.assertTrue(l.size == 0)]
-//		#[
-//			model.volumes,
-//			model.instances
-//		].forEach[l|Assert.assertTrue(l.size == 1)]
-//		// Round-trip test
-////		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
-////		Assert.assertEquals(source, text)
-//	}
+	@Test
+	def void attachment() {
+		val source = '''
+		resource "openstack_compute_keypair_v2" "terraform" {
+			name = "terraform"
+			public_key = "${file("~/.ssh/id_rsa.terraform.pub")}"
+		}
+		resource "openstack_compute_flavor_v2" "small" {
+			name = "small"
+			ram = 8096
+			vcpus = 2
+			disk = 20
+		}
+		resource "openstack_blockstorage_volume_v2" "volume_1" {
+			name = "volume_1"
+			description = "first test volume"
+			image_id = "${openstack_images_image_v2.rancher-os.id}"
+			size = 5
+		}
+		resource "openstack_images_image_v2" "rancher-os" {
+			name = "rancher-os"
+			container_format = "bare"
+			disk_format = "ari"
+			image_source_url = "https://image"
+			min_disk_gb = 1
+			min_ram_mb = 1024
+		}
+		resource "openstack_compute_instance_v2" "basic" {
+			name = "basic"
+			flavor_id = "${openstack_compute_flavor_v2.small.id}"
+			key_pair = "${openstack_compute_keypair_v2.terraform.name}"
+		}
+		resource "openstack_compute_volume_attach_v2" "basic_volume_1" {
+			compute_id = "${openstack_compute_instance_v2.basic.id}"
+			volume_id = "${openstack_blockstorage_volume_v2.volume_1.id}"
+		}'''
+		val specification = new Text2Hcl(source).model
+		val model = this.translator.model(specification)
+		#[
+			model.networks,
+			model.subnets,
+			model.resources,
+			model.securityGroups
+		].forEach[l|Assert.assertTrue(l.size == 0)]
+		#[
+			model.credentials,
+			model.flavors,
+			model.images,
+			model.volumes,
+			model.instances
+		].forEach[l|Assert.assertTrue(l.size == 1)]
+		// Round-trip test
+		val text = new Hcl2Text().source(this.inverseTranslator.specification(model))
+		Assert.assertEquals(source, text)
+	}
 }

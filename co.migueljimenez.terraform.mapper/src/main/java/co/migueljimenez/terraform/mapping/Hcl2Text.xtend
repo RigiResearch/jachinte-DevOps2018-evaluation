@@ -111,7 +111,7 @@ class Hcl2Text {
 		val elements = object.elements
 			.filter [ e |
 				val text = e.value.asText(context)
-				!text.empty && !text.equals('""')
+				!text.empty && !text.equals('""') && !text.equals('[]')
 			]
 			.map [ e |
 				val eq = if(!(e.value instanceof Dictionary<?> && context.peek.equals(className))) "= "

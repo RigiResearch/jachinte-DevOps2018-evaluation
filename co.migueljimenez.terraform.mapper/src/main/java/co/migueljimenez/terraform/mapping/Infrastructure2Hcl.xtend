@@ -154,8 +154,17 @@ class Infrastructure2Hcl {
 				null,
 				h.entry("name", h.text(object.name)),
 				h.entry("description", h.text(object.description)),
-				h.entry("image_id", h.text(object.image.id)),
-				h.entry("size", h.text(object.size.asGbString))
+				h.entry(
+					"image_id",
+					h.expression(
+						h.resourceRef(
+							"openstack_images_image_v2",
+							object.image.name,
+							"id"
+						)
+					)
+				),
+				h.entry("size", h.number(object.size.asGbString))
 			)
 		)]
 	}

@@ -86,14 +86,17 @@ class Hcl2Infrastructure {
 	 */
 	def VirtualInfrastructure model(Specification specification) {
 		val model = ModelFactory.eINSTANCE.createVirtualInfrastructure
+		val removed = newArrayList
 		specification.resources.forEach [ resource |
-			switch (resource) {
-				Input:
-					model.resources.add(resource.createGenericResource)
-				Output:
-					model.resources.add(resource.createGenericResource)
-				Resource:
-					this.processResource(resource, specification, model)
+			if (!removed.contains(resource)) {
+				switch (resource) {
+					Input:
+						model.resources.add(resource.createGenericResource)
+					Output:
+						model.resources.add(resource.createGenericResource)
+					Resource:
+						this.processResource(resource, specification, model, removed)
+				}
 			}
 		]
 		model
@@ -102,8 +105,8 @@ class Hcl2Infrastructure {
 	/**
 	 * Instantiates and stores the given resource.
 	 */
-	def private void processResource(Resource resource,
-		Specification specification, VirtualInfrastructure model) {
+	def private void processResource(Resource resource, Specification specification,
+		VirtualInfrastructure model, java.util.List<Resource> removedResources) {
 		switch (resource.type) {
 			case "openstack_compute_keypair_v2":
 				model.credentials.add(resource.createCredential)
@@ -112,7 +115,7 @@ class Hcl2Infrastructure {
 			case "openstack_images_image_v2":
 				model.images.add(resource.createImage)
 			case "openstack_blockstorage_volume_v2":
-				model.volumes.add(this.processVolume(resource, specification, model))
+				model.volumes.add(this.processVolume(resource, specification, model, removedResources))
 			case "openstack_compute_secgroup_v2":
 				model.securityGroups.add(resource.createSecurityGroup)
 			case "openstack_networking_network_v2":
@@ -121,24 +124,27 @@ class Hcl2Infrastructure {
 				val network = specification.resources.getOrCreate(
 					resource.attr("network_id"),
 					model.networks,
+					removedResources,
 					[r|r.createNetwork],
 					[r|r.name]
 				)
 				model.subnets.add(resource.createSubnet(network))
 			}
 			case "openstack_compute_instance_v2":
-				model.instances.add(this.processInstance(resource, specification, model))
+				model.instances.add(this.processInstance(resource, specification, model, removedResources))
 			case "openstack_compute_volume_attach_v2": {
 				val instance = specification.resources.getOrCreate(
 					resource.attr("compute_id"),
 					model.instances,
-					[r|this.processInstance(r, specification, model)],
+					removedResources,
+					[r|this.processInstance(r, specification, model, removedResources)],
 					[r|r.name]
 				)
 				val volume = specification.resources.getOrCreate(
 					resource.attr("volume_id"),
 					model.volumes,
-					[r|this.processVolume(r, specification, model)],
+					removedResources,
+					[r|this.processVolume(r, specification, model, removedResources)],
 					[r|r.name]
 				)
 				instance.volumes.add(volume)
@@ -152,10 +158,11 @@ class Hcl2Infrastructure {
 	 * Given a resource, instantiates and stores the corresponding Volume element.
 	 */
 	def processVolume(Resource resource, Specification specification,
-		VirtualInfrastructure model) {
+		VirtualInfrastructure model, java.util.List<Resource> removedResources) {
 		val image = specification.resources.getOrCreate(
 			resource.attr("image_id"),
 			model.images,
+			removedResources,
 			[r|r.createImage],
 			[r|r.name]
 		)
@@ -166,16 +173,18 @@ class Hcl2Infrastructure {
 	 * Given a resource, instantiates and stores the corresponding Instance element.
 	 */
 	def processInstance(Resource resource, Specification specification,
-		VirtualInfrastructure model) {
+		VirtualInfrastructure model, java.util.List<Resource> removedResources) {
 		val credential = specification.resources.getOrCreate(
 			resource.attr("key_pair"),
 			model.credentials,
+			removedResources,
 			[r|r.createCredential],
 			[r|r.name]
 		)
 		val flavor = specification.resources.getOrCreate(
 			resource.attr("flavor_id"),
 			model.flavors,
+			removedResources,
 			[r|r.createFlavor],
 			[r|r.name]
 		)
@@ -185,17 +194,20 @@ class Hcl2Infrastructure {
 					specification.resources.getOrCreate(
 						value.get("name"),
 						model.networks,
+						removedResources,
 						[r|r.createNetwork],
 						[r|r.name]
 					)
 				}
 			}
 		]
-		val groups = resource.attr("security_groups") as java.util.List<Object>
+		val groupsAttr = resource.attr("security_groups")
+		val groups = if(groupsAttr !== null) groupsAttr as java.util.List<Object> else #[]
 		val _securityGroups = groups.map [ reference |
 			specification.resources.getOrCreate(
 				reference,
 				model.securityGroups,
+				removedResources,
 				[r|r.createSecurityGroup],
 				[r|r.name]
 			)
@@ -255,13 +267,14 @@ class Hcl2Infrastructure {
 	 */
 	def protected <T> getOrCreate(java.util.List<Resource> specResources,
 		Object reference, java.util.List<T> virtualresources,
-			Function<Resource, T> factory, Function<T, Object> name) {
+			java.util.List<Resource> removedResources,
+				Function<Resource, T> factory, Function<T, Object> name) {
 		val resource = specResources.findByRef(reference)
 		var virtualResource = virtualresources.findFirst[i|name.apply(i).equals(resource.name)]
 		if (virtualResource === null) {
 			virtualResource = factory.apply(resource)
 			virtualresources.add(virtualResource)
-			specResources.remove(resource)
+			removedResources.add(resource)
 		}
 		virtualResource
 	}
@@ -270,11 +283,7 @@ class Hcl2Infrastructure {
 	 * Creates a {@link Credential} from the given resource.
 	 */
 	def protected createCredential(Resource resource) {
-		this.i.credentials(
-			null,
-			resource.name,
-			resource.attr("public_key").toString
-		)
+		this.i.credentials(resource.name, resource.attr("public_key").toString)
 	}
 
 	/**
@@ -282,7 +291,6 @@ class Hcl2Infrastructure {
 	 */
 	def protected createFlavor(Resource resource) {
 		this.i.flavor(
-			null,
 			resource.name,
 			Integer.valueOf(resource.attr("vcpus").toString),
 			gigabyte(resource.attr("disk").asBigInteger),
@@ -295,7 +303,6 @@ class Hcl2Infrastructure {
 	 */
 	def protected createImage(Resource resource) {
 		this.i.image(
-			null,
 			resource.name,
 			ContainerFormat.get(resource.attr("container_format").toString),
 			DiskFormat.get(resource.attr("disk_format").toString),
@@ -310,7 +317,6 @@ class Hcl2Infrastructure {
 	 */
 	def protected createVolume(Resource resource, Image image) {
 		this.i.volume(
-			null,
 			resource.name,
 			resource.attr("description")?.toString,
 			image,
@@ -335,7 +341,6 @@ class Hcl2Infrastructure {
 			}
 		]
 		this.i.securityGroup(
-			null,
 			resource.name,
 			resource.attr("description")?.toString,
 			rules.toList
@@ -346,10 +351,7 @@ class Hcl2Infrastructure {
 	 * Creates a {@link Network} from the given resource.
 	 */
 	def protected createNetwork(Resource resource) {
-		this.i.network(
-			null,
-			resource.name
-		)
+		this.i.network(resource.name)
 	}
 
 	/**
@@ -357,7 +359,6 @@ class Hcl2Infrastructure {
 	 */
 	def protected createSubnet(Resource resource, Network network) {
 		this.i.subnet(
-			null,
 			resource.name,
 			resource.attr("cidr").toString,
 			Integer.valueOf(resource.attr("ip_version").toString),
@@ -375,7 +376,6 @@ class Hcl2Infrastructure {
 		// attachments
 		val volumes = #[]
 		this.i.instance(
-			null,
 			resource.name,
 			credential,
 			flavor,
