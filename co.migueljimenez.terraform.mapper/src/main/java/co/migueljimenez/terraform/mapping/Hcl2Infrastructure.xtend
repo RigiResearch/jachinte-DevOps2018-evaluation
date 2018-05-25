@@ -59,8 +59,8 @@ import static de.xn__ho_hia.storage_unit.StorageUnits.megabyte
 import co.migueljimenez.terraform.infrastructure.model.ModelFactory
 
 /**
- * Maps the elements from a {@link Specification} to
- * a {@link VirtualInfrastructure} instance.
+ * Translates a {@link Specification} to a {@link VirtualInfrastructure}
+ * instance.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-22
  * @version $Id$
