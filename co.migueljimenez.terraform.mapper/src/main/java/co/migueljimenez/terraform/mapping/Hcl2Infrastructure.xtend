@@ -89,9 +89,9 @@ class Hcl2Infrastructure {
 		specification.resources.forEach [ resource |
 			switch (resource) {
 				Input:
-					model.resources.add(resource.vResources)
+					model.resources.add(resource.createGenericResource)
 				Output:
-					model.resources.add(resource.vResources)
+					model.resources.add(resource.createGenericResource)
 				Resource:
 					this.processResource(resource, specification, model)
 			}
@@ -144,7 +144,7 @@ class Hcl2Infrastructure {
 				instance.volumes.add(volume)
 			}
 			default:
-				model.resources.addAll(resource.vResources)
+				model.resources.addAll(resource.createGenericResource)
 		}
 	}
 
@@ -227,10 +227,10 @@ class Hcl2Infrastructure {
 	/**
 	 * Searches a referenced resource (value) in a given list of resources.
 	 */
-	def protected findByRef(java.util.List<Resource> resources, Object value) {
-		switch (value) {
+	def protected findByRef(java.util.List<Resource> resources, Object reference) {
+		switch (reference) {
 			FkTextExpression: {
-				val expression = value.expression
+				val expression = reference.expression
 				switch (expression) {
 					FkResourceReference: {
 						val type = expression.segments.get(0)
@@ -239,13 +239,13 @@ class Hcl2Infrastructure {
 					}
 					default:
 						throw new UnsupportedOperationException(
-							'''Unexpected function call "«value»"'''
+							'''Unexpected function call "«reference»"'''
 						)
 				}
 			}
 			default:
 				throw new UnsupportedOperationException(
-					'''Invalid value "«value»". Only resource references are allowed'''
+					'''Invalid value "«reference»". Only resource references are allowed'''
 				)
 		}
 	}
@@ -253,17 +253,17 @@ class Hcl2Infrastructure {
 	/**
 	 * Finds a referenced resource or creates a new instance if it hasn't been processed yet.
 	 */
-	def protected <T> getOrCreate(java.util.List<Resource> genericResources,
-		Object reference, java.util.List<T> resources,
+	def protected <T> getOrCreate(java.util.List<Resource> specResources,
+		Object reference, java.util.List<T> virtualresources,
 			Function<Resource, T> factory, Function<T, Object> name) {
-		val resource = genericResources.findByRef(reference)
-		var specializedResource = resources.findFirst[i|name.apply(i).equals(resource.name)]
-		if (specializedResource === null) {
-			specializedResource = factory.apply(resource)
-			resources.add(specializedResource)
-			genericResources.remove(resource)
+		val resource = specResources.findByRef(reference)
+		var virtualResource = virtualresources.findFirst[i|name.apply(i).equals(resource.name)]
+		if (virtualResource === null) {
+			virtualResource = factory.apply(resource)
+			virtualresources.add(virtualResource)
+			specResources.remove(resource)
 		}
-		specializedResource
+		virtualResource
 	}
 
 	/**
@@ -371,7 +371,7 @@ class Hcl2Infrastructure {
 	def protected createInstance(Resource resource, Credential credential,
 		Flavor flavor, java.util.List<Network> networks,
 			java.util.List<SecurityGroup> securityGroups) {
-		// This list is initially empty and it's populated while processing
+		// This list is initially empty and is populated while processing
 		// attachments
 		val volumes = #[]
 		this.i.instance(
@@ -386,10 +386,9 @@ class Hcl2Infrastructure {
 	}
 
 	/**
-	 * Translates an {@link Input} to a set of {@link VirtualInfrastructure}
-	 * resources.
+	 * Translates an {@link Input} to a {@link VirtualInfrastructure} resource.
 	 */
-	def protected vResources(Input resource) {
+	def protected createGenericResource(Input resource) {
 		this.i.<String, Object>unknownResource(
 			"variable",
 			null,
@@ -405,7 +404,7 @@ class Hcl2Infrastructure {
 	 * Translates an {@link Output} to a set of {@link VirtualInfrastructure}
 	 * resources.
 	 */
-	def protected vResources(Output resource) {
+	def protected createGenericResource(Output resource) {
 		this.i.<String, Object>unknownResource(
 			"output",
 			null,
@@ -419,10 +418,10 @@ class Hcl2Infrastructure {
 	}
 
 	/**
-	 * Translates a generic {@link Resource} to a set of
-	 * {@link VirtualInfrastructure} resources.
+	 * Translates a specification {@link Resource} to a
+	 * {@link VirtualInfrastructure} resource.
 	 */
-	def protected vResources(Resource resource) {
+	def protected createGenericResource(Resource resource) {
 		this.i.<String, Object>unknownResource(
 			"resource",
 			null,
@@ -515,5 +514,4 @@ class Hcl2Infrastructure {
 	def private asBigInteger(Object value) {
 		BigInteger.valueOf(Long.valueOf(value.toString))
 	}
-
 }
