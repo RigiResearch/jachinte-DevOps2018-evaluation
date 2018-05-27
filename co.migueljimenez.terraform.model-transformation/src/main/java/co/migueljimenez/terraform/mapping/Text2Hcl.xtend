@@ -126,36 +126,28 @@ class Text2Hcl {
 	 */
 	def private Value modelValue(EObject dslObject) {
 		switch (dslObject) {
-			NumberLiteral: {
+			NumberLiteral:
 				this.e.number('''«IF dslObject.negative»-«ENDIF»«dslObject.value.toString»''')
-			}
-			BooleanLiteral: {
+			BooleanLiteral:
 				this.e.bool(dslObject.value)
-			}
-			TextLiteral: {
+			TextLiteral:
 				this.e.text(dslObject.value)
-			}
-			TextExpression: {
+			TextExpression:
 				this.e.expression(dslObject.expression.modelValue as Reference)
-			}
-			ResourceReference: {
+			ResourceReference:
 				this.e.resourceRef(dslObject.references)
-			}
-			FunctionCall: {
+			FunctionCall:
 				this.e.functionCall(
 					dslObject.function,
 					dslObject.parameters.map[p|p.modelValue]
 				)
-			}
-			ListLiteral: {
+			ListLiteral:
 				this.e.list(dslObject.elements.map[el|el.modelValue])
-			}
-			Dictionary: {
+			Dictionary:
 				this.e.dictionary(
-					if (dslObject.name !== null) dslObject.name.value else null,
+					dslObject.name?.value,
 					dslObject.elements.map[p|e.entry(p.key, p.value.modelValue)]
 				)
-			}
 		}
 	}
 }

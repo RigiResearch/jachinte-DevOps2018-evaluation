@@ -28,10 +28,10 @@
 		<artifactId>co.migueljimenez.terraform</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>co.migueljimenez.terraform.mapper</artifactId>
+	<artifactId>co.migueljimenez.terraform.model-transformation</artifactId>
 
-	<name>Mapper HCL-MART</name>
-	<description>Maps concepts from the HCL notation to the infrastructure MART and vice versa</description>
+	<name>Translator HCL-Infrastructure</name>
+	<description>Translates concepts from the HCL notation to the virtual infrastructure model and vice versa</description>
 
 	<dependencies>
 		<dependency>
