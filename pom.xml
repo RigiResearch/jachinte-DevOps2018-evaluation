@@ -71,6 +71,7 @@
 		<module>co.migueljimenez.terraform.infrastructure-model</module>
 		<module>co.migueljimenez.terraform.hcl-model</module>
 		<module>co.migueljimenez.terraform.model-transformation</module>
+		<module>co.migueljimenez.terraform.openstack</module>
 	</modules>
 
 	<profiles>
