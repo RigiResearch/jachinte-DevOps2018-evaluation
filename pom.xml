@@ -24,7 +24,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>co.migueljimenez</groupId>
 	<version>1.0.0-SNAPSHOT</version>
-	<artifactId>co.migueljimenez.terraform</artifactId>
+	<artifactId>co.migueljimenez.devops</artifactId>
 	<packaging>pom</packaging>
 
 	<name>Round-trip Software Engineering in DevOps</name>
@@ -67,11 +67,11 @@
 	</properties>
 
 	<modules>
-		<module>co.migueljimenez.terraform.terraform</module>
-		<module>co.migueljimenez.terraform.infrastructure-model</module>
-		<module>co.migueljimenez.terraform.hcl-model</module>
-		<module>co.migueljimenez.terraform.model-transformation</module>
-		<module>co.migueljimenez.terraform.openstack</module>
+		<module>co.migueljimenez.devops.terraform</module>
+		<module>co.migueljimenez.devops.infrastructure</module>
+		<module>co.migueljimenez.devops.hcl</module>
+		<module>co.migueljimenez.devops.transformation</module>
+		<module>co.migueljimenez.devops.openstack</module>
 	</modules>
 
 	<profiles>

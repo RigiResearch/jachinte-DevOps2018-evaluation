@@ -25,10 +25,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>co.migueljimenez</groupId>
-		<artifactId>co.migueljimenez.terraform</artifactId>
+		<artifactId>co.migueljimenez.devops</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>co.migueljimenez.terraform.terraform</artifactId>
+	<artifactId>co.migueljimenez.devops.terraform</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Terraform Templates DSL</name>
