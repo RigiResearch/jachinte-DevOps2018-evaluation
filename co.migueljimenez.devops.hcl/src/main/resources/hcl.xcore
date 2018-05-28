@@ -1,10 +1,10 @@
-@Ecore(nsPrefix="hcl", nsURI="https:/migueljimenez.co/terraform/hcl")
+@Ecore(nsPrefix="hcl", nsURI="https:/migueljimenez.co/devops/hcl")
 @GenModel(
     bundleManifest="false",
-    modelDirectory="co.migueljimenez.terraform.hcl-model/src/main/java-gen",
+    modelDirectory="co.migueljimenez.devops.hcl/src/main/java-gen",
     complianceLevel="8.0"
 )
-package co.migueljimenez.terraform.hcl.model
+package co.migueljimenez.devops.hcl.model
 
 // Type hierarchy
 

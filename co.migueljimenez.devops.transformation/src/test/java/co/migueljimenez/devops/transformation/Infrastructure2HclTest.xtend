@@ -19,17 +19,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.infrastructure.model.ContainerFormat
-import co.migueljimenez.terraform.infrastructure.model.DiskFormat
-import co.migueljimenez.terraform.infrastructure.model.Flavor
-import co.migueljimenez.terraform.infrastructure.model.Image
-import co.migueljimenez.terraform.infrastructure.model.InfrastructureModelElements
-import co.migueljimenez.terraform.infrastructure.model.Instance
-import co.migueljimenez.terraform.infrastructure.model.ModelFactory
-import co.migueljimenez.terraform.infrastructure.model.UnknownResource
-import co.migueljimenez.terraform.infrastructure.model.Volume
+import co.migueljimenez.devops.infrastructure.model.ContainerFormat
+import co.migueljimenez.devops.infrastructure.model.DiskFormat
+import co.migueljimenez.devops.infrastructure.model.Flavor
+import co.migueljimenez.devops.infrastructure.model.Image
+import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
+import co.migueljimenez.devops.infrastructure.model.Instance
+import co.migueljimenez.devops.infrastructure.model.ModelFactory
+import co.migueljimenez.devops.infrastructure.model.UnknownResource
+import co.migueljimenez.devops.infrastructure.model.Volume
 import de.xn__ho_hia.storage_unit.StorageUnits
 import org.junit.Assert
 import org.junit.Test

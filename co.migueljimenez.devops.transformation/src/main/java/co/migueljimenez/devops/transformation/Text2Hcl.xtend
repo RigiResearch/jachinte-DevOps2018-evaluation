@@ -19,12 +19,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.hcl.model.HclModelElements
-import co.migueljimenez.terraform.hcl.model.Reference
-import co.migueljimenez.terraform.hcl.model.Specification
-import co.migueljimenez.terraform.hcl.model.Value
+import co.migueljimenez.devops.hcl.model.HclModelElements
+import co.migueljimenez.devops.hcl.model.Reference
+import co.migueljimenez.devops.hcl.model.Specification
+import co.migueljimenez.devops.hcl.model.Value
 import co.migueljimenez.terraform.parsing.HclParser
 import co.migueljimenez.terraform.terraform.BooleanLiteral
 import co.migueljimenez.terraform.terraform.Dictionary
@@ -98,7 +98,7 @@ class Text2Hcl {
 							d.resource,
 							d.type.value,
 							d.name.value,
-							d.value.modelValue as co.migueljimenez.terraform.hcl.model.Dictionary<Value>
+							d.value.modelValue as co.migueljimenez.devops.hcl.model.Dictionary<Value>
 						)
 					)
 				}

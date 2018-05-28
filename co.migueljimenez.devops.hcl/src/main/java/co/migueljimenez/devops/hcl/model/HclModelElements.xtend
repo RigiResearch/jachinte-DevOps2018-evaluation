@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.hcl.model
+package co.migueljimenez.devops.hcl.model
 
 /**
  * Facilitates creating elements from the HCL model.

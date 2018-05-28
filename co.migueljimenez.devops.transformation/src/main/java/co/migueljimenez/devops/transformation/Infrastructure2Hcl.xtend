@@ -19,32 +19,32 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.dtos.FkDictionary
-import co.migueljimenez.terraform.dtos.FkFunctionCall
-import co.migueljimenez.terraform.dtos.FkResourceReference
-import co.migueljimenez.terraform.dtos.FkTextExpression
-import co.migueljimenez.terraform.hcl.model.HclModelElements
-import co.migueljimenez.terraform.hcl.model.KeyValuePair
-import co.migueljimenez.terraform.hcl.model.Reference
-import co.migueljimenez.terraform.hcl.model.Resource
-import co.migueljimenez.terraform.hcl.model.Specification
-import co.migueljimenez.terraform.hcl.model.Value
-import co.migueljimenez.terraform.infrastructure.model.Credential
-import co.migueljimenez.terraform.infrastructure.model.Flavor
-import co.migueljimenez.terraform.infrastructure.model.Image
-import co.migueljimenez.terraform.infrastructure.model.Instance
-import co.migueljimenez.terraform.infrastructure.model.SecurityGroup
-import co.migueljimenez.terraform.infrastructure.model.UnknownResource
-import co.migueljimenez.terraform.infrastructure.model.VirtualInfrastructure
-import co.migueljimenez.terraform.infrastructure.model.Volume
+import co.migueljimenez.devops.hcl.model.HclModelElements
+import co.migueljimenez.devops.hcl.model.KeyValuePair
+import co.migueljimenez.devops.hcl.model.Reference
+import co.migueljimenez.devops.hcl.model.Resource
+import co.migueljimenez.devops.hcl.model.Specification
+import co.migueljimenez.devops.hcl.model.Value
+import co.migueljimenez.devops.infrastructure.model.Credential
+import co.migueljimenez.devops.infrastructure.model.Flavor
+import co.migueljimenez.devops.infrastructure.model.Image
+import co.migueljimenez.devops.infrastructure.model.Instance
+import co.migueljimenez.devops.infrastructure.model.Network
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
+import co.migueljimenez.devops.infrastructure.model.Subnet
+import co.migueljimenez.devops.infrastructure.model.UnknownResource
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.infrastructure.model.Volume
+import co.migueljimenez.devops.transformation.dtos.FkDictionary
+import co.migueljimenez.devops.transformation.dtos.FkFunctionCall
+import co.migueljimenez.devops.transformation.dtos.FkResourceReference
+import co.migueljimenez.devops.transformation.dtos.FkTextExpression
 import de.xn__ho_hia.storage_unit.StorageUnit
 import java.text.DecimalFormat
 import java.util.List
 import org.eclipse.emf.ecore.EObject
-import co.migueljimenez.terraform.infrastructure.model.Subnet
-import co.migueljimenez.terraform.infrastructure.model.Network
 
 /**
  * Translates a {@link VirtualInfrastructure} to a {@link Specification}.

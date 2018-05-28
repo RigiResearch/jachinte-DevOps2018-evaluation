@@ -19,37 +19,26 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.dtos
+package co.migueljimenez.devops.transformation.dtos
 
-import co.migueljimenez.terraform.hcl.model.Dictionary
-import java.util.HashMap
-import org.eclipse.xtend.lib.annotations.Accessors
+import co.migueljimenez.devops.hcl.model.ResourceReference
+import java.util.List
+import org.eclipse.xtend.lib.annotations.Data
 
 /**
- * Local representation of the {@link Dictionary} concept from the HCL model.
+ * Local representation of the {@link ResourceReference} concept from the HCL
+ * model.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
  * @since 0.0.1
  */
-class FkDictionary<K, V> extends HashMap<K, V> {
+@Data
+class FkResourceReference extends FkReference {
 
 	/**
-	 * This map's name (optional).
+	 * The segments in the qualified name.
 	 */
-	@Accessors
-	val String name
+	val List<String> segments
 
-	new(String name) {
-		super()
-		this.name = name
-	}
-
-	/**
-	 * Puts all of the given pairs in this dictionary.
-	 */
-	def putAll(Pair<K, V>... pairs) {
-		pairs.forEach[p|this.put(p.key, p.value)]
-		return this
-	}
 }

@@ -19,7 +19,5 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-// Contains the classes to map:
-// - DSL <--> HCL model
-// - HCL model <--> Infrastructure model
-package co.migueljimenez.terraform.mapping;
+// Contains utility objects to work with the HCL model
+package co.migueljimenez.devops.hcl.model;

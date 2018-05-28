@@ -1,10 +1,10 @@
-@Ecore(nsPrefix="infrastructure", nsURI="https:/migueljimenez.co/terraform/infrastructure")
+@Ecore(nsPrefix="infrastructure", nsURI="https:/migueljimenez.co/devops/infrastructure")
 @GenModel(
     bundleManifest="false",
-    modelDirectory="co.migueljimenez.terraform.infrastructure-model/src/main/java-gen",
+    modelDirectory="co.migueljimenez.devops.infrastructure/src/main/java-gen",
     complianceLevel="8.0"
 )
-package co.migueljimenez.terraform.infrastructure.model
+package co.migueljimenez.devops.infrastructure.model
 
 import de.xn__ho_hia.storage_unit.StorageUnit
 

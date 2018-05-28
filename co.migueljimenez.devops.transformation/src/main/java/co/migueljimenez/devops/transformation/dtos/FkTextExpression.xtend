@@ -19,5 +19,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-// Contains local definitions of some of the concepts from the HCL model.
-package co.migueljimenez.terraform.dtos;
+package co.migueljimenez.devops.transformation.dtos
+
+import co.migueljimenez.devops.hcl.model.TextExpression
+import org.eclipse.xtend.lib.annotations.Data
+
+/**
+ * Local representation of the {@link TextExpression} concept from the HCL model.
+ * @author Miguel Jimenez (miguel@uvic.ca)
+ * @date 2018-05-03
+ * @version $Id$
+ * @since 0.0.1
+ */
+@Data
+class FkTextExpression {
+
+	/**
+	 * The expression.
+	 */
+	val FkReference expression
+
+	override toString() {
+		'''${«this.expression.toString»}'''
+	}
+
+}

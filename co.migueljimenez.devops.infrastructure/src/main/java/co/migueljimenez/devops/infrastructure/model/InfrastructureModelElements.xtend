@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.infrastructure.model
+package co.migueljimenez.devops.infrastructure.model
 
 import java.util.List
 import de.xn__ho_hia.storage_unit.StorageUnit

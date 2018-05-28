@@ -19,22 +19,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.hcl.model.Bool
-import co.migueljimenez.terraform.hcl.model.Dictionary
-import co.migueljimenez.terraform.hcl.model.FunctionCall
-import co.migueljimenez.terraform.hcl.model.Input
-import co.migueljimenez.terraform.hcl.model.List
-import co.migueljimenez.terraform.hcl.model.ModelPackage
-import co.migueljimenez.terraform.hcl.model.Number
-import co.migueljimenez.terraform.hcl.model.Output
-import co.migueljimenez.terraform.hcl.model.Resource
-import co.migueljimenez.terraform.hcl.model.ResourceReference
-import co.migueljimenez.terraform.hcl.model.Specification
-import co.migueljimenez.terraform.hcl.model.Text
-import co.migueljimenez.terraform.hcl.model.TextExpression
-import co.migueljimenez.terraform.hcl.model.Value
+import co.migueljimenez.devops.hcl.model.Bool
+import co.migueljimenez.devops.hcl.model.Dictionary
+import co.migueljimenez.devops.hcl.model.FunctionCall
+import co.migueljimenez.devops.hcl.model.Input
+import co.migueljimenez.devops.hcl.model.List
+import co.migueljimenez.devops.hcl.model.ModelPackage
+import co.migueljimenez.devops.hcl.model.Number
+import co.migueljimenez.devops.hcl.model.Output
+import co.migueljimenez.devops.hcl.model.Resource
+import co.migueljimenez.devops.hcl.model.ResourceReference
+import co.migueljimenez.devops.hcl.model.Specification
+import co.migueljimenez.devops.hcl.model.Text
+import co.migueljimenez.devops.hcl.model.TextExpression
+import co.migueljimenez.devops.hcl.model.Value
 import java.util.PriorityQueue
 import java.util.Queue
 import org.eclipse.emf.ecore.EObject

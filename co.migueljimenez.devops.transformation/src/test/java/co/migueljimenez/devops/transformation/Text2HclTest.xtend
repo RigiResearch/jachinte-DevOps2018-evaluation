@@ -19,26 +19,32 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.dtos
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.hcl.model.ResourceReference
-import java.util.List
-import org.eclipse.xtend.lib.annotations.Data
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
+import org.junit.Test
+import org.junit.Assert
 
 /**
- * Local representation of the {@link ResourceReference} concept from the HCL
- * model.
+ * Tests {@link Text2Hcl}
  * @author Miguel Jimenez (miguel@uvic.ca)
- * @date 2018-05-03
+ * @date 2018-05-04
  * @version $Id$
  * @since 0.0.1
  */
-@Data
-class FkResourceReference extends FkReference {
+class Text2HclTest {
 
-	/**
-	 * The segments in the qualified name.
-	 */
-	val List<String> segments
-
+	@Test
+	def void parse() {
+		val url = this.class.classLoader.getResource("openstack-demo.tf")
+		val contents = new String(
+			Files.readAllBytes(Paths.get(url.toURI)),
+			Charset.forName("UTF-8")
+		)
+		val mapping = new Text2Hcl(contents)
+		val translated = new Hcl2Text().source(mapping.model)
+		Assert.assertEquals(contents, translated)
+	}
 }

@@ -19,44 +19,44 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
+package co.migueljimenez.devops.transformation
 
-import co.migueljimenez.terraform.dtos.FkDictionary
-import co.migueljimenez.terraform.dtos.FkFunctionCall
-import co.migueljimenez.terraform.dtos.FkReference
-import co.migueljimenez.terraform.dtos.FkResourceReference
-import co.migueljimenez.terraform.dtos.FkTextExpression
-import co.migueljimenez.terraform.hcl.model.Bool
-import co.migueljimenez.terraform.hcl.model.Dictionary
-import co.migueljimenez.terraform.hcl.model.FunctionCall
-import co.migueljimenez.terraform.hcl.model.Input
-import co.migueljimenez.terraform.hcl.model.List
-import co.migueljimenez.terraform.hcl.model.Number
-import co.migueljimenez.terraform.hcl.model.Output
-import co.migueljimenez.terraform.hcl.model.Resource
-import co.migueljimenez.terraform.hcl.model.ResourceReference
-import co.migueljimenez.terraform.hcl.model.Specification
-import co.migueljimenez.terraform.hcl.model.Text
-import co.migueljimenez.terraform.hcl.model.TextExpression
-import co.migueljimenez.terraform.hcl.model.Value
-import co.migueljimenez.terraform.infrastructure.model.ContainerFormat
-import co.migueljimenez.terraform.infrastructure.model.Credential
-import co.migueljimenez.terraform.infrastructure.model.DiskFormat
-import co.migueljimenez.terraform.infrastructure.model.Flavor
-import co.migueljimenez.terraform.infrastructure.model.Image
-import co.migueljimenez.terraform.infrastructure.model.InfrastructureModelElements
-import co.migueljimenez.terraform.infrastructure.model.Instance
-import co.migueljimenez.terraform.infrastructure.model.Network
-import co.migueljimenez.terraform.infrastructure.model.SecurityGroup
-import co.migueljimenez.terraform.infrastructure.model.Subnet
-import co.migueljimenez.terraform.infrastructure.model.VirtualInfrastructure
-import co.migueljimenez.terraform.infrastructure.model.Volume
+import co.migueljimenez.devops.hcl.model.Bool
+import co.migueljimenez.devops.hcl.model.Dictionary
+import co.migueljimenez.devops.hcl.model.FunctionCall
+import co.migueljimenez.devops.hcl.model.Input
+import co.migueljimenez.devops.hcl.model.List
+import co.migueljimenez.devops.hcl.model.Number
+import co.migueljimenez.devops.hcl.model.Output
+import co.migueljimenez.devops.hcl.model.Resource
+import co.migueljimenez.devops.hcl.model.ResourceReference
+import co.migueljimenez.devops.hcl.model.Specification
+import co.migueljimenez.devops.hcl.model.Text
+import co.migueljimenez.devops.hcl.model.TextExpression
+import co.migueljimenez.devops.hcl.model.Value
+import co.migueljimenez.devops.infrastructure.model.ContainerFormat
+import co.migueljimenez.devops.infrastructure.model.Credential
+import co.migueljimenez.devops.infrastructure.model.DiskFormat
+import co.migueljimenez.devops.infrastructure.model.Flavor
+import co.migueljimenez.devops.infrastructure.model.Image
+import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
+import co.migueljimenez.devops.infrastructure.model.Instance
+import co.migueljimenez.devops.infrastructure.model.ModelFactory
+import co.migueljimenez.devops.infrastructure.model.Network
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
+import co.migueljimenez.devops.infrastructure.model.Subnet
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.infrastructure.model.Volume
+import co.migueljimenez.devops.transformation.dtos.FkDictionary
+import co.migueljimenez.devops.transformation.dtos.FkFunctionCall
+import co.migueljimenez.devops.transformation.dtos.FkReference
+import co.migueljimenez.devops.transformation.dtos.FkResourceReference
+import co.migueljimenez.devops.transformation.dtos.FkTextExpression
 import com.google.common.base.Function
 import java.math.BigInteger
 
 import static de.xn__ho_hia.storage_unit.StorageUnits.gigabyte
 import static de.xn__ho_hia.storage_unit.StorageUnits.megabyte
-import co.migueljimenez.terraform.infrastructure.model.ModelFactory
 
 /**
  * Translates a {@link Specification} to a {@link VirtualInfrastructure}

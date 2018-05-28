@@ -19,32 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.mapping
-
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
-import org.junit.Test
-import org.junit.Assert
-
-/**
- * Tests {@link Text2Hcl}
- * @author Miguel Jimenez (miguel@uvic.ca)
- * @date 2018-05-04
- * @version $Id$
- * @since 0.0.1
- */
-class Text2HclTest {
-
-	@Test
-	def void parse() {
-		val url = this.class.classLoader.getResource("openstack-demo.tf")
-		val contents = new String(
-			Files.readAllBytes(Paths.get(url.toURI)),
-			Charset.forName("UTF-8")
-		)
-		val mapping = new Text2Hcl(contents)
-		val translated = new Hcl2Text().source(mapping.model)
-		Assert.assertEquals(contents, translated)
-	}
-}
+// Contains the classes to map:
+// - DSL <--> HCL model
+// - HCL model <--> Infrastructure model
+package co.migueljimenez.devops.transformation;

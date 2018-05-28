@@ -19,28 +19,37 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.dtos
+package co.migueljimenez.devops.transformation.dtos
 
-import co.migueljimenez.terraform.hcl.model.TextExpression
-import org.eclipse.xtend.lib.annotations.Data
+import co.migueljimenez.devops.hcl.model.Dictionary
+import java.util.HashMap
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
- * Local representation of the {@link TextExpression} concept from the HCL model.
+ * Local representation of the {@link Dictionary} concept from the HCL model.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
  * @since 0.0.1
  */
-@Data
-class FkTextExpression {
+class FkDictionary<K, V> extends HashMap<K, V> {
 
 	/**
-	 * The expression.
+	 * This map's name (optional).
 	 */
-	val FkReference expression
+	@Accessors
+	val String name
 
-	override toString() {
-		'''${«this.expression.toString»}'''
+	new(String name) {
+		super()
+		this.name = name
 	}
 
+	/**
+	 * Puts all of the given pairs in this dictionary.
+	 */
+	def putAll(Pair<K, V>... pairs) {
+		pairs.forEach[p|this.put(p.key, p.value)]
+		return this
+	}
 }

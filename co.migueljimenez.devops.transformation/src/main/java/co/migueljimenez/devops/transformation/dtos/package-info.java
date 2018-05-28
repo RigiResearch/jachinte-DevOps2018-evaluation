@@ -19,5 +19,5 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-// Contains utility objects to work with the HCL model
-package co.migueljimenez.terraform.hcl.model;
+// Contains local definitions of some of the concepts from the HCL model.
+package co.migueljimenez.devops.transformation.dtos;

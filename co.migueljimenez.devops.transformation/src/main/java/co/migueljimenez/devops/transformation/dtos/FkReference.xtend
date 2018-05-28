@@ -19,44 +19,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.terraform.dtos
+package co.migueljimenez.devops.transformation.dtos
 
-import co.migueljimenez.terraform.hcl.model.FunctionCall
-import java.util.List
+import co.migueljimenez.devops.hcl.model.Reference
 import org.eclipse.xtend.lib.annotations.Data
 
- /**
- * Local representation of the {@link FunctionCall} concept from the HCL model.
+/**
+ * Local representation of the {@link Reference} concept from the HCL model.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-03
  * @version $Id$
  * @since 0.0.1
  */
 @Data
-class FkFunctionCall extends FkReference {
+class FkReference {
 
-	/**
-	 * The function name.
-	 */
-	val String name
-
-	/**
-	 * The function arguments.
-	 */
-	val List<Object> arguments
-
-	override toString() {
-		'''«this.name»(«FOR a : this.arguments SEPARATOR ", "»«this.toString(a)»«ENDFOR»)'''
-	}
-
-	/**
-	 * Properly formats the String representation of a given argument.
-	 */
-	def private toString(Object argument) {
-		switch (argument) {
-			String: '''"«argument»"'''
-			default:
-				argument.toString
+	def static FkReference from(Object reference) {
+		switch (reference) {
+			FkFunctionCall: reference
+			FkResourceReference: reference
+			default: throw new IllegalArgumentException('''
+				Expected either «FkFunctionCall.simpleName» or «FkResourceReference.simpleName»''')
 		}
 	}
+
 }
