@@ -71,7 +71,7 @@
 		<module>co.migueljimenez.devops.infrastructure</module>
 		<module>co.migueljimenez.devops.hcl</module>
 		<module>co.migueljimenez.devops.transformation</module>
-		<module>co.migueljimenez.devops.openstack</module>
+		<module>co.migueljimenez.devops.listener</module>
 	</modules>
 
 	<profiles>
