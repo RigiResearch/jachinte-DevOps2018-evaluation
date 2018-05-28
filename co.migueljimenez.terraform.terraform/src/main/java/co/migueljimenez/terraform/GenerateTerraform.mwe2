@@ -30,7 +30,7 @@ Workflow {
 	component = XtextGenerator {
 		configuration = {
 			project = StandardProjectConfig {
-				baseName = "co.migueljimenez.terraform.dsl"
+				baseName = "co.migueljimenez.terraform.terraform"
 				rootPath = rootPath
 				runtimeTest = {
 					enabled = true

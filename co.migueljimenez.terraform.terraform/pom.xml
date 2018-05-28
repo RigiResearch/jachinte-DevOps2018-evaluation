@@ -28,11 +28,11 @@
 		<artifactId>co.migueljimenez.terraform</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>co.migueljimenez.terraform.dsl</artifactId>
+	<artifactId>co.migueljimenez.terraform.terraform</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Terraform DSL</name>
-	<description>Xtext project for the Terraform notation (HCL)</description>
+	<name>Terraform Templates DSL</name>
+	<description>Xtext project for processing Terraform templates</description>
 
 	<dependencies>
 		<dependency>

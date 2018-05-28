@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>co.migueljimenez</groupId>
-			<artifactId>co.migueljimenez.terraform.dsl</artifactId>
+			<artifactId>co.migueljimenez.terraform.terraform</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
