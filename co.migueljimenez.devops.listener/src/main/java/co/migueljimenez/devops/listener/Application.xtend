@@ -29,6 +29,7 @@ import org.openstack4j.openstack.OSFactory
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import java.io.File
 import org.slf4j.LoggerFactory
+import org.openstack4j.model.identity.v3.Token
 
 /**
  * The main execution entry.
@@ -80,7 +81,7 @@ class Application {
 		this.listeners.forEach [ l |
 			l.listen [ e |
 				switch (e) {
-					OpenStackEvent: e.handle
+					OpenStackEvent: e.handle(this.client.token)
 					default: println('''Unknown event: «e»''')
 				}
 			]
@@ -98,11 +99,12 @@ class Application {
 	/**
 	 * Handles an OpenStack event.
 	 */
-	def protected handle(OpenStackEvent e) {
+	def protected handle(OpenStackEvent e, Token token) {
+		val client = OSFactory.clientFromToken(token)
 		switch (e.eventType) {
 			case "keypair.create.end": {
 				val name = e.payload.get("key_name").asText
-				val keypair = this.client.compute.keypairs.get(name)
+				val keypair = client.compute.keypairs.get(name)
 				println(
 					'''
 					name: «keypair.name»
