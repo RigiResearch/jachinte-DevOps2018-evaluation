@@ -24,13 +24,13 @@ package com.rigiresearch.lcastane.framework;
 import java.io.Serializable;
 
 /**
- * Represents the basic behavior of a notation.
+ * Represents the basic behavior of a textual specification.
  * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
  * @since 0.0.1
  */
-public interface Notation extends Serializable {
+public interface Specification extends Serializable {
 
     /**
      * Returns this notation's name.

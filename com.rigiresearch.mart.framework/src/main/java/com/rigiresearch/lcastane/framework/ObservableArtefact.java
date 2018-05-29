@@ -65,8 +65,8 @@ public final class ObservableArtefact<T extends Artefact>
      *  #apply(com.rigiresearch.lcastane.framework.Sentence)
      */
     @Override
-    public void apply(Sentence sentence) throws ValidationException {
-        this.origin.apply(sentence);
-        this.notifyObservers(sentence);
+    public void apply(Command command) throws ValidationException {
+        this.origin.apply(command);
+        this.notifyObservers(command);
     }
 }

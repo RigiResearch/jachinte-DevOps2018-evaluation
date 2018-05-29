@@ -37,8 +37,8 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
-public final class ObservableNotation<T extends Notation>
-    extends Observable implements Notation {
+public final class ObservableNotation<T extends Specification>
+    extends Observable implements Specification {
 
     /**
      * Serial version UID.

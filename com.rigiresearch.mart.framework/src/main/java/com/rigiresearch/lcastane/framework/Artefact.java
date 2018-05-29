@@ -40,9 +40,9 @@ public interface Artefact extends Serializable {
     String name();
 
     /**
-     * Applies the given (supported) operation to the given operands.
-     * @param sentence The request sentence
+     * Applies the commanded (supported) operation to the given operands.
+     * @param command The command to apply
      * @throws ValidationException If the operation cannot be performed
      */
-    void apply(Sentence sentence) throws ValidationException;
+    void apply(Command command) throws ValidationException;
 }

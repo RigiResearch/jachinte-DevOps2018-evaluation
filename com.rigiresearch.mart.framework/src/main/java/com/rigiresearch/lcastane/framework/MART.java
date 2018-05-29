@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @version $Id$
  * @since 0.0.1
  */
-public interface MART<N extends Notation, A extends Artefact>
+public interface MART<N extends Specification, A extends Artefact>
     extends Serializable {
 
     /**

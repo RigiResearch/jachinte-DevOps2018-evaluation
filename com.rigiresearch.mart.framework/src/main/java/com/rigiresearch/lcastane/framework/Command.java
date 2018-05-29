@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public final class Sentence implements Serializable {
+public final class Command implements Serializable {
 
     /**
      * Serial version UID.
@@ -62,7 +62,7 @@ public final class Sentence implements Serializable {
      * @param operationType The operation type
      * @param operands The operation's required operands
      */
-    public Sentence(final OperationType operationType,
+    public Command(final OperationType operationType,
         final Node... operands) {
         this.operationType = operationType;
         this.operands = operands;
