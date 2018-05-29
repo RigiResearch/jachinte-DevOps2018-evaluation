@@ -21,7 +21,11 @@
  */
 package co.migueljimenez.devops.listener.openstack
 
-import org.eclipse.xtend.lib.annotations.Data
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtend.lib.annotations.ToString
+import com.fasterxml.jackson.databind.node.ObjectNode
 
 /**
  * An OpenStack Event.
@@ -30,12 +34,41 @@ import org.eclipse.xtend.lib.annotations.Data
  * @version $Id$
  * @since 0.0.1
  */
-@Data
+@Accessors
+@ToString
+@JsonIgnoreProperties(ignoreUnknown=true)
 class OpenStackEvent {
 
-	/**
-	 * The original event body.
-	 */
-	val String body
+	@JsonProperty("_context_project_domain")
+	String projectDomain
 
+	@JsonProperty("_context_user_domain")
+	String userDomain
+
+	@JsonProperty("_context_project_name")
+	String projectName
+
+	@JsonProperty("_context_project_id")
+	String projectId
+
+	@JsonProperty("_context_user_name")
+	String user
+
+	@JsonProperty("_context_user_id")
+	String userId
+
+	@JsonProperty("message_id")
+	String messageId
+
+	@JsonProperty("event_type")
+	String eventType
+
+	@JsonProperty("payload")
+	ObjectNode payload
+
+	@JsonProperty("timestamp")
+	String timestamp
+
+	@JsonProperty("priority")
+	String priority
 }

@@ -21,7 +21,13 @@
  */
 package co.migueljimenez.devops.listener
 
+import co.migueljimenez.devops.listener.openstack.OpenStackEvent
 import co.migueljimenez.devops.listener.openstack.OpenStackListener
+import org.openstack4j.api.OSClient.OSClientV3
+import org.openstack4j.model.common.Identifier
+import org.openstack4j.openstack.OSFactory
+import org.apache.commons.configuration2.builder.fluent.Configurations
+import java.io.File
 
 /**
  * The main execution entry.
@@ -32,9 +38,69 @@ import co.migueljimenez.devops.listener.openstack.OpenStackListener
  */
 class Application {
 
-	def static void main(String[] args) {
-		new OpenStackListener("nova", "notifications.info").listen [ e |
-			println(e)
+	/**
+	 * The OpenStack client.
+	 */
+	val OSClientV3 client
+
+	/**
+	 * The event listeners.
+	 */
+	val EventListener[] listeners
+
+	/**
+	 * Default constructor.
+	 */
+	new(EventListener... listeners) {
+		this.listeners = listeners
+		val configuration = Configurations.newInstance.properties(
+			new File("openstack.properties")
+		)
+		this.client = OSFactory.builderV3()
+			.endpoint(configuration.getString("endpoint"))
+			.credentials(
+				configuration.getString("username"),
+				configuration.getString("password"),
+				Identifier.byId(configuration.getString("domainId"))
+			)
+			.authenticate()
+		this.start()
+	}
+
+	/**
+	 * Causes all listeners to start listening for events.
+	 */
+	def protected start() {
+		this.listeners.forEach [ l |
+			l.listen [ e |
+				switch (e) {
+					OpenStackEvent: e.handle
+				}
+			]
 		]
+	}
+
+	/**
+	 * Handles an OpenStack event.
+	 */
+	def protected handle(OpenStackEvent e) {
+		switch (e.eventType) {
+			case "keypair.create.end": {
+				val name = e.payload.get("key_name").asText
+				val keypair = this.client.compute.keypairs.get(name)
+				println(
+					'''
+					name: «keypair.name»
+					public_key: «keypair.publicKey»
+					'''
+				)
+			}
+		}
+	}
+
+	def static void main(String[] args) {
+		new Application(
+			new OpenStackListener("nova", "notifications.info")
+		)
 	}
 }

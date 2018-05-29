@@ -22,6 +22,7 @@
 package co.migueljimenez.devops.listener.openstack
 
 import co.migueljimenez.devops.listener.EventListener
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
@@ -30,9 +31,9 @@ import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
 import java.io.File
 import java.io.IOException
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 
 /**
  * Listens for OpenStack Events.
@@ -105,7 +106,13 @@ class OpenStackListener implements EventListener {
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
-					handler.apply(new OpenStackEvent(new String(body)))
+					val mapper = new ObjectMapper()
+					val node = mapper
+						.readTree(new String(body))
+						.get("oslo.message")
+					val parser = node.traverse
+					parser.codec = mapper
+					handler.apply(parser.readValueAs(OpenStackEvent))
 					channel.basicAck(envelope.getDeliveryTag(), false)
 				}
 			}
