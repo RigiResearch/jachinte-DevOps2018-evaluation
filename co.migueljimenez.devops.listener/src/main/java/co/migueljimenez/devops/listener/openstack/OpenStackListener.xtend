@@ -35,7 +35,6 @@ import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 import org.slf4j.LoggerFactory
-import com.fasterxml.jackson.databind.DeserializationFeature
 
 /**
  * Listens for OpenStack Events.
@@ -115,13 +114,10 @@ class OpenStackListener implements EventListener {
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
-					val message = new String(body)
 					OpenStackListener.this.logger.info('''Handling OpenStack event''')
-					OpenStackListener.this.logger.info(message)
 					val mapper = new ObjectMapper()
-					mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-					val node = mapper.readTree(message).get("oslo.message")
-					val parser = node.traverse
+					val innerMessage = mapper.readTree(new String(body)).path("oslo.message").asText
+					val parser = mapper.readTree(innerMessage).traverse
 					parser.codec = mapper
 					handler.apply(parser.readValueAs(OpenStackEvent))
 					channel.basicAck(envelope.getDeliveryTag(), false)
