@@ -35,6 +35,7 @@ import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 import org.slf4j.LoggerFactory
+import com.fasterxml.jackson.databind.DeserializationFeature
 
 /**
  * Listens for OpenStack Events.
@@ -118,9 +119,8 @@ class OpenStackListener implements EventListener {
 						'''Handling OpenStack event'''
 					)
 					val mapper = new ObjectMapper()
-					val node = mapper
-						.readTree(new String(body))
-						.get("oslo.message")
+					mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+					val node = mapper.readTree(new String(body)).get("oslo.message")
 					val parser = node.traverse
 					parser.codec = mapper
 					handler.apply(parser.readValueAs(OpenStackEvent))
