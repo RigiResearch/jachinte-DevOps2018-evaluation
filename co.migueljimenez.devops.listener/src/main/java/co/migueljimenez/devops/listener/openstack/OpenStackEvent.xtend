@@ -71,4 +71,9 @@ class OpenStackEvent {
 
 	@JsonProperty("priority")
 	String priority
+
+	/**
+	 * Empty constructor.
+	 */
+	new() {}
 }
