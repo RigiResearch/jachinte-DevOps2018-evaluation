@@ -24,6 +24,7 @@ package co.migueljimenez.devops.listener.openstack
 import org.junit.Test
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Assert
+import com.fasterxml.jackson.databind.DeserializationFeature
 
 /**
  * Tests {@link OpenStackEvent}.
@@ -83,100 +84,58 @@ class OpenStackEventTest {
 		Assert.assertNotNull(event)
 	}
 
+	@Test
 	def instantiation2() {
+		// This input is not complete
 		val input = '''
 		{
-		  "_context_domain":null,
-		  "_context_roles":[
-		    "admin"
-		  ],
-		  "_context_global_request_id":null,
-		  "_context_quota_class":null,
-		  "event_type":"keypair.delete.start",
-		  "_context_request_id":"req-e233bdb6-8a1d-43d0-ba9b-75243ce45e30",
-		  "_context_service_catalog":[
-		    {
-		      "endpoints":[
-		        {
-		          "adminURL":"http://192.168.113.5:8778/placement",
-		          "region":"RegionOne",
-		          "internalURL":"http://192.168.113.5:8778/placement",
-		          "publicURL":"http://206.167.181.110:8778/placement"
-		        }
-		      ],
-		      "type":"placement",
-		      "name":"placement"
+		  "oslo.message":{
+		    "_context_domain":null,
+		    "_context_roles":[
+		      "admin"
+		    ],
+		    "_context_global_request_id":null,
+		    "_context_quota_class":null,
+		    "event_type":"keypair.delete.start",
+		    "_context_request_id":"req-e233bdb6-8a1d-43d0-ba9b-75243ce45e30",
+		    "timestamp":"2018-05-29 18:45:22.103293",
+		    "_context_user":"f7b01aaf29cc446383f83f04396d6f3f",
+		    "_unique_id":"1e89f22e972e4b58a2c42dd970631d35",
+		    "_context_resource_uuid":null,
+		    "_context_instance_lock_checked":false,
+		    "_context_is_admin_project":true,
+		    "_context_user_id":"f7b01aaf29cc446383f83f04396d6f3f",
+		    "payload":{
+		      "tenant_id":"a9434954adf940a3bdbdaab99e8751bb",
+		      "user_id":"f7b01aaf29cc446383f83f04396d6f3f",
+		      "key_name":"mykeypair"
 		    },
-		    {
-		      "endpoints":[
-		        {
-		          "adminURL":"http://192.168.113.5:8776/v3/a9434954adf940a3bdbdaab99e8751bb",
-		          "region":"RegionOne",
-		          "internalURL":"http://192.168.113.5:8776/v3/a9434954adf940a3bdbdaab99e8751bb",
-		          "publicURL":"http://206.167.181.110:8776/v3/a9434954adf940a3bdbdaab99e8751bb"
-		        }
-		      ],
-		      "type":"volumev3",
-		      "name":"cinderv3"
-		    },
-		    {
-		      "endpoints":[
-		        {
-		          "adminURL":"http://192.168.113.5:9696",
-		          "region":"RegionOne",
-		          "internalURL":"http://192.168.113.5:9696",
-		          "publicURL":"http://206.167.181.110:9696"
-		        }
-		      ],
-		      "type":"network",
-		      "name":"neutron"
-		    },
-		    {
-		      "endpoints":[
-		        {
-		          "adminURL":"http://192.168.113.5:9292",
-		          "region":"RegionOne",
-		          "internalURL":"http://192.168.113.5:9292",
-		          "publicURL":"http://206.167.181.110:9292"
-		        }
-		      ],
-		      "type":"image",
-		      "name":"glance"
-		    }
-		  ],
-		  "timestamp":"2018-05-29 18:45:22.103293",
-		  "_context_user":"f7b01aaf29cc446383f83f04396d6f3f",
-		  "_unique_id":"1e89f22e972e4b58a2c42dd970631d35",
-		  "_context_resource_uuid":null,
-		  "_context_instance_lock_checked":false,
-		  "_context_is_admin_project":true,
-		  "_context_user_id":"f7b01aaf29cc446383f83f04396d6f3f",
-		  "payload":{
-		    "tenant_id":"a9434954adf940a3bdbdaab99e8751bb",
-		    "user_id":"f7b01aaf29cc446383f83f04396d6f3f",
-		    "key_name":"mykeypair"
-		  },
-		  "_context_project_name":"devops-project",
-		  "_context_read_deleted":"no",
-		  "_context_user_identity":"f7b01aaf29cc446383f83f04396d6f3f a9434954adf940a3bdbdaab99e8751bb - default default",
-		  "_context_auth_token":"gAAAAABbDZ1258hhCtDFuP4Si12LSLw8ntBNurqK8JgieU6D9nofgK-ngMmrgQuoJ_8ZqcB-okfJGx9tkYilzmO3dioFTzxjSIcbTtICeDynL2EqbFKi8Y9tuORL08td-Q5wam8c7xgnck_90ppPEEa-fIneG2uRt-8EBhCN7trNF-6TulTI2VX-B4ECXqM8Ihdp74yPvngr",
-		  "_context_show_deleted":false,
-		  "_context_tenant":"a9434954adf940a3bdbdaab99e8751bb",
-		  "priority":"INFO",
-		  "_context_read_only":false,
-		  "_context_is_admin":true,
-		  "_context_project_id":"a9434954adf940a3bdbdaab99e8751bb",
-		  "_context_project_domain":"default",
-		  "_context_timestamp":"2018-05-29T18:45:22.093228",
-		  "_context_user_domain":"default",
-		  "_context_user_name":"devops-admin",
-		  "publisher_id":"api.packstack-instance.openstacklocal",
-		  "message_id":"3bc71c0b-34db-4c49-9e36-371d157514ed",
-		  "_context_project":"a9434954adf940a3bdbdaab99e8751bb",
-		  "_context_remote_address":"206.167.181.110"
+		    "_context_project_name":"devops-project",
+		    "_context_read_deleted":"no",
+		    "_context_user_identity":"f7b01aaf29cc446383f83f04396d6f3f a9434954adf940a3bdbdaab99e8751bb - default default",
+		    "_context_auth_token":"gAAAAABbDZ1258hhCtDFuP4Si12LSLw8ntBNurqK8JgieU6D9nofgK-ngMmrgQuoJ_8ZqcB-okfJGx9tkYilzmO3dioFTzxjSIcbTtICeDynL2EqbFKi8Y9tuORL08td-Q5wam8c7xgnck_90ppPEEa-fIneG2uRt-8EBhCN7trNF-6TulTI2VX-B4ECXqM8Ihdp74yPvngr",
+		    "_context_show_deleted":false,
+		    "_context_tenant":"a9434954adf940a3bdbdaab99e8751bb",
+		    "priority":"INFO",
+		    "_context_read_only":false,
+		    "_context_is_admin":true,
+		    "_context_project_id":"a9434954adf940a3bdbdaab99e8751bb",
+		    "_context_project_domain":"default",
+		    "_context_timestamp":"2018-05-29T18:45:22.093228",
+		    "_context_user_domain":"default",
+		    "_context_user_name":"devops-admin",
+		    "publisher_id":"api.packstack-instance.openstacklocal",
+		    "message_id":"3bc71c0b-34db-4c49-9e36-371d157514ed",
+		    "_context_project":"a9434954adf940a3bdbdaab99e8751bb",
+		    "_context_remote_address":"100.100.100.100"
+		  }
 		}'''
 		val mapper = new ObjectMapper()
-		val event = mapper.readValue(input, OpenStackEvent)
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+		val node = mapper.readTree(input).get("oslo.message")
+		val parser = node.traverse
+		parser.codec = mapper
+		val event = parser.readValueAs(OpenStackEvent)
 		Assert.assertNotNull(event)
 	}
 }
