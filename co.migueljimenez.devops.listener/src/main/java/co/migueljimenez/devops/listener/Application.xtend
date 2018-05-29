@@ -28,6 +28,7 @@ import org.openstack4j.model.common.Identifier
 import org.openstack4j.openstack.OSFactory
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import java.io.File
+import org.slf4j.LoggerFactory
 
 /**
  * The main execution entry.
@@ -37,6 +38,11 @@ import java.io.File
  * @since 0.0.1
  */
 class Application {
+
+	/**
+     * The logger.
+     */
+	val logger = LoggerFactory.getLogger(Application)
 
 	/**
 	 * The OpenStack client.
@@ -70,6 +76,7 @@ class Application {
 	 * Causes all listeners to start listening for events.
 	 */
 	def start() {
+		this.logger.info("Starting listeners")
 		this.listeners.forEach [ l |
 			new Thread() [
 				l.listen [ e |
@@ -87,6 +94,7 @@ class Application {
 	 * Causes all listeners to stop listening for events.
 	 */
 	def stop() {
+		this.logger.info("Stopping listeners")
 		this.listeners.forEach[l|l.stop]
 	}
 

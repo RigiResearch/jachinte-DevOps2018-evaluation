@@ -34,6 +34,7 @@ import java.io.IOException
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.slf4j.LoggerFactory
 
 /**
  * Listens for OpenStack Events.
@@ -43,6 +44,11 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
  * @since 0.0.1
  */
 class OpenStackListener implements EventListener {
+
+	/**
+     * The logger.
+     */
+	val logger = LoggerFactory.getLogger(OpenStackListener)
 
 	/**
 	 * RabbitMQ configuration.
@@ -73,6 +79,7 @@ class OpenStackListener implements EventListener {
 	 * Default constructor.
 	 */
 	new(String exchange, String routingKey) {
+		this.logger.info("Initializing OpenStack listener")
 		val configurations = new Configurations()
 		this.configuration = configurations.properties(
             new File("rabbitmq.properties")
@@ -97,6 +104,7 @@ class OpenStackListener implements EventListener {
 	}
 
 	override listen(Procedure1<Object> handler) {
+		this.logger.info("Declaring volatile queue and creating exchange binding")
 		val queue = this.channel.queueDeclare().queue
 		this.channel.queueBind(queue, this.exchange, this.routingKey)
 		this.channel.basicConsume(
@@ -106,6 +114,9 @@ class OpenStackListener implements EventListener {
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
+					OpenStackListener.this.logger.info(
+						'''Handling OpenStack event'''
+					)
 					val mapper = new ObjectMapper()
 					val node = mapper
 						.readTree(new String(body))
@@ -120,6 +131,7 @@ class OpenStackListener implements EventListener {
 	}
 
 	override stop() {
+		this.logger.info("Stopping OpenStack listener")
 		this.connection.close
 		this.channel.close
 	}
