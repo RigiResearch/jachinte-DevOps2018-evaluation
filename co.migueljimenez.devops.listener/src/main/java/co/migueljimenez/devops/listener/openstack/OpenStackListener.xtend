@@ -115,12 +115,12 @@ class OpenStackListener implements EventListener {
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
-					OpenStackListener.this.logger.info(
-						'''Handling OpenStack event'''
-					)
+					val message = new String(body)
+					OpenStackListener.this.logger.info('''Handling OpenStack event''')
+					OpenStackListener.this.logger.info(message)
 					val mapper = new ObjectMapper()
 					mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-					val node = mapper.readTree(new String(body)).get("oslo.message")
+					val node = mapper.readTree(message).get("oslo.message")
 					val parser = node.traverse
 					parser.codec = mapper
 					handler.apply(parser.readValueAs(OpenStackEvent))
