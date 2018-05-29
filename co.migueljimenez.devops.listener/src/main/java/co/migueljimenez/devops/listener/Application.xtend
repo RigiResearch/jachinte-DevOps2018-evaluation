@@ -71,13 +71,15 @@ class Application {
 	 */
 	def start() {
 		this.listeners.forEach [ l |
-			l.listen [ e |
-				switch (e) {
-					OpenStackEvent: e.handle
-					default:
-						println('''Unknown event: «e»''')
-				}
-			]
+			new Thread() [
+				l.listen [ e |
+					switch (e) {
+						OpenStackEvent: e.handle
+						default:
+							println('''Unknown event: «e»''')
+					}
+				]	
+			].start()
 		]
 	}
 
