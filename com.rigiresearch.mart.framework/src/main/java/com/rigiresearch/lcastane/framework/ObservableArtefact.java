@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Adds observability to an {@link Artefact}.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2018-02-25
  * @version $Id$
  * @since 0.0.1

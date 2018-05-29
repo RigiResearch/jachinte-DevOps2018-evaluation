@@ -29,7 +29,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Adds observability to a {@link Notation}.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
  * @since 0.0.1

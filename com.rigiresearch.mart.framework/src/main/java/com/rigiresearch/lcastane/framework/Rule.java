@@ -25,7 +25,7 @@ import java.io.Serializable;
 
 /**
  * Represents a validation rule for a specific {@link Artefact}.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
  * @since 0.0.1

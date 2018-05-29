@@ -26,7 +26,7 @@ import java.io.Serializable;
 
 /**
  * Represents an operation supported by the framework.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-14
  * @version $Id$
  * @since 0.0.1
@@ -49,7 +49,6 @@ public interface Operation<T extends Artefact> extends Serializable {
          *  corresponding artefact)
          */
         String name();
-
     }
 
     /**

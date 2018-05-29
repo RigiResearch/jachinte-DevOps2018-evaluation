@@ -31,7 +31,7 @@ import lombok.experimental.Accessors;
 
 /**
  * Represents an operation call.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-07-11
  * @version $Id$
  * @since 0.0.1

@@ -26,7 +26,7 @@ import java.io.Serializable;
 
 /**
  * Defines the basic behavior for a runtime artefact.
- * @author Lorena Castaneda
+ * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
  * @since 0.0.1
