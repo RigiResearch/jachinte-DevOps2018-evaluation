@@ -64,20 +64,28 @@ class Application {
 				Identifier.byId(configuration.getString("domainId"))
 			)
 			.authenticate()
-		this.start()
 	}
 
 	/**
 	 * Causes all listeners to start listening for events.
 	 */
-	def protected start() {
+	def start() {
 		this.listeners.forEach [ l |
 			l.listen [ e |
 				switch (e) {
 					OpenStackEvent: e.handle
+					default:
+						println('''Unknown event: «e»''')
 				}
 			]
 		]
+	}
+
+	/**
+	 * Causes all listeners to stop listening for events.
+	 */
+	def stop() {
+		this.listeners.forEach[l|l.stop]
 	}
 
 	/**
@@ -95,12 +103,14 @@ class Application {
 					'''
 				)
 			}
+			default:
+				println('''Unknown OpenStack event: «e»''')
 		}
 	}
 
 	def static void main(String[] args) {
 		new Application(
 			new OpenStackListener("nova", "notifications.info")
-		)
+		).start()
 	}
 }
