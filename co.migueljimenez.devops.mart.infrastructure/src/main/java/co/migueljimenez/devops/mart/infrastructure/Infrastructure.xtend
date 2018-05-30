@@ -31,6 +31,20 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
+import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
+import co.migueljimenez.devops.mart.infrastructure.operations.AddResource
+import co.migueljimenez.devops.mart.infrastructure.rules.TypesValidation
+import co.migueljimenez.devops.mart.infrastructure.rules.AnyOf
+import co.migueljimenez.devops.infrastructure.model.Credential
+import com.rigiresearch.lcastane.framework.Rule
+import co.migueljimenez.devops.infrastructure.model.Flavor
+import co.migueljimenez.devops.infrastructure.model.Image
+import co.migueljimenez.devops.infrastructure.model.Instance
+import co.migueljimenez.devops.infrastructure.model.Network
+import co.migueljimenez.devops.infrastructure.model.Subnet
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
+import co.migueljimenez.devops.infrastructure.model.Volume
+import co.migueljimenez.devops.infrastructure.model.UnknownResource
 
 /**
  * Represents an inventory of infrastructure resources.
@@ -59,13 +73,29 @@ class Infrastructure implements Artefact {
 	new() {
 		this.model = ModelFactory.eINSTANCE.createVirtualInfrastructure
 		this.operations = <OperationType, Operation<Infrastructure>>newHashMap
-		// TODO populate the operations map
+		this.operations.put(
+			InfrastructureModelOp.ADD_RESOURCE,
+			new AddResource(
+				new AnyOf(
+					Rule.Type.PRE,
+					new TypesValidation(Credential),
+					new TypesValidation(Flavor),
+					new TypesValidation(Image),
+					new TypesValidation(Instance),
+					new TypesValidation(Network),
+					new TypesValidation(Subnet),
+					new TypesValidation(SecurityGroup),
+					new TypesValidation(Volume),
+					new TypesValidation(UnknownResource)
+				)
+			)
+		)
 	}
 
 	override apply(Command command) throws ValidationException {
 		this.operations
             .get(command.operationType)
-            .apply(this, command.operands)
+            .apply(this, command.arguments)
 	}
 
 	override name() '''«Infrastructure.simpleName»'''
