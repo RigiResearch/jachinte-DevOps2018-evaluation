@@ -73,6 +73,7 @@
 		<module>co.migueljimenez.devops.transformation</module>
 		<module>co.migueljimenez.devops.listener</module>
 		<module>com.rigiresearch.mart.framework</module>
+		<module>co.migueljimenez.devops.mart.infrastructure</module>
 	</modules>
 
 	<profiles>
