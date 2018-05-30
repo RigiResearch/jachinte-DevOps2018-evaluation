@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
-public final class ObservableNotation<T extends Specification>
+public final class ObservableSpecification<T extends Specification>
     extends Observable implements Specification {
 
     /**
@@ -52,7 +52,7 @@ public final class ObservableNotation<T extends Specification>
     private final T origin;
 
     /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Notation#name()
+     * @see com.rigiresearch.lcastane.framework.Specification#name()
      */
     @Override
     public String name() {
@@ -60,7 +60,7 @@ public final class ObservableNotation<T extends Specification>
     }
 
     /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Notation#contents()
+     * @see com.rigiresearch.lcastane.framework.Specification#contents()
      */
     @Override
     public String contents() {
@@ -68,7 +68,7 @@ public final class ObservableNotation<T extends Specification>
     }
 
     /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Notation
+     * @see com.rigiresearch.lcastane.framework.Specification
      *  #update(java.lang.String)
      */
     @Override
