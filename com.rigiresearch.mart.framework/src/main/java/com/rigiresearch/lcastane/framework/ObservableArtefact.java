@@ -62,12 +62,12 @@ public final class ObservableArtefact<T extends Artefact>
 
     /* (non-Javadoc)
      * @see com.rigiresearch.lcastane.framework.Artefact
-     *  #apply(com.rigiresearch.lcastane.framework.Sentence)
+     *  #apply(com.rigiresearch.lcastane.framework.Command)
      */
     @Override
     public void apply(Command command) throws ValidationException {
         this.origin.apply(command);
         this.setChanged();
-        this.notifyObservers(command);
+        this.notifyObservers(this.origin);
     }
 }
