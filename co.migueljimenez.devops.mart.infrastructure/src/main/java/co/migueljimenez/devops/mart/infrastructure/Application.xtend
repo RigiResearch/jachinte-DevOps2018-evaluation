@@ -42,8 +42,10 @@ class Application {
 	/**
 	 * Default constructor.
 	 */
-	new(TerraformTemplate template) {
-		this.mart = new InfrastructureMart(template)
+	new(File template) {
+		this.mart = new InfrastructureMart(
+			new TerraformTemplate(template)
+		)
 	}
 
 	/**
