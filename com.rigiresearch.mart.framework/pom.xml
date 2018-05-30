@@ -28,6 +28,7 @@
 		<artifactId>co.migueljimenez.devops</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+	<groupId>com.rigiresearch</groupId>
 	<artifactId>com.rigiresearch.mart.framework</artifactId>
 	
 	<name>MART Operational Framework</name>
