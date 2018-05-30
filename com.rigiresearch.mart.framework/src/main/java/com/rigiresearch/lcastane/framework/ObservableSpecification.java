@@ -74,6 +74,7 @@ public final class ObservableSpecification<T extends Specification>
     @Override
     public void update(String contents) {
         this.origin.update(contents);
+        this.setChanged();
         this.notifyObservers(contents);
     }
 }
