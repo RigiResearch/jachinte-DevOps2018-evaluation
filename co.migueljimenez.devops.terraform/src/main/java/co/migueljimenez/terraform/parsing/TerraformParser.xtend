@@ -34,23 +34,23 @@ import org.eclipse.xtext.diagnostics.Severity
 import co.migueljimenez.terraform.terraform.Template
 
 /**
- * Parses HCL-compliant code into the grammar model.
+ * Parses Terraform-compliant code into the grammar model.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-14
  * @version $Id$
  * @since 0.0.1
  */
-class HclParser {
+class TerraformParser {
 
 	static var Injector INJECTOR = new TerraformStandaloneSetup().createInjectorAndDoEMFRegistration
-	static var XtextResourceSet RESOURCE_SET = HclParser.initialize
-	static var IResourceValidator VALIDATOR = HclParser.INJECTOR.getInstance(IResourceValidator)
+	static var XtextResourceSet RESOURCE_SET = TerraformParser.initialize
+	static var IResourceValidator VALIDATOR = TerraformParser.INJECTOR.getInstance(IResourceValidator)
 
 	/**
 	 * Initializes the Xtext result set.
 	 */
 	def static initialize() {
-		val resourceSet = HclParser.INJECTOR.getInstance(XtextResourceSet)
+		val resourceSet = TerraformParser.INJECTOR.getInstance(XtextResourceSet)
 		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE)
 		return resourceSet
 	}
@@ -62,7 +62,7 @@ class HclParser {
 	def parse(String specification) {
 		val resource = this.temporalResource
 		resource.load(new ByteArrayInputStream(specification.bytes), newHashMap)
-		val issues = HclParser.VALIDATOR.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
+		val issues = TerraformParser.VALIDATOR.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
 		val errors = issues.filter[i|i.severity.equals(Severity.ERROR)]
 		if (!errors.empty) {
 			issues.forEach[i|System.err.println(i)]
@@ -76,10 +76,10 @@ class HclParser {
 	 */
 	def private temporalResource() {
 		val uri = URI.createURI('''temp-«Math.abs(Math.random())».tf''')
-		var resource = HclParser.RESOURCE_SET.resources
+		var resource = TerraformParser.RESOURCE_SET.resources
 			.findFirst[r|r.URI.toFileString.equals(uri.toFileString)]
 		if (resource === null)
-			resource = HclParser.RESOURCE_SET.createResource(uri)
+			resource = TerraformParser.RESOURCE_SET.createResource(uri)
 		resource.unload
 		return resource
 	}

@@ -25,7 +25,6 @@ import co.migueljimenez.devops.hcl.model.HclModelElements
 import co.migueljimenez.devops.hcl.model.Reference
 import co.migueljimenez.devops.hcl.model.Specification
 import co.migueljimenez.devops.hcl.model.Value
-import co.migueljimenez.terraform.parsing.HclParser
 import co.migueljimenez.terraform.terraform.BooleanLiteral
 import co.migueljimenez.terraform.terraform.Dictionary
 import co.migueljimenez.terraform.terraform.FunctionCall
@@ -36,6 +35,7 @@ import co.migueljimenez.terraform.terraform.TextExpression
 import co.migueljimenez.terraform.terraform.TextLiteral
 import org.eclipse.emf.ecore.EObject
 import co.migueljimenez.terraform.terraform.Template
+import co.migueljimenez.terraform.parsing.TerraformParser
 
 /**
  * Instantiates the HCL model (a {@link Specification}) from a Terraform
@@ -68,7 +68,7 @@ class Text2Hcl {
 	 */
 	new(String source) {
 		this.source = source
-		this.template = new HclParser().parse(this.source)
+		this.template = new TerraformParser().parse(this.source)
 		this.e = new HclModelElements
 	}
 
