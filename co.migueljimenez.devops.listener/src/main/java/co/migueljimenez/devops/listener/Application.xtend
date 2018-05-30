@@ -117,6 +117,12 @@ class Application {
 		}
 	}
 
+	/**
+	 * Instantiates an OpenStack Listener.
+	 * 
+	 * TODO Translate each event into a MART command and send it to the MART
+	 * infrastructure's remote service.
+	 */
 	def static void main(String[] args) {
 		new Application(
 			new OpenStackListener("nova", "notifications.info")
