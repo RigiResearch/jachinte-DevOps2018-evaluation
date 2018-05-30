@@ -75,6 +75,6 @@ public final class ObservableSpecification<T extends Specification>
     public void update(String contents) {
         this.origin.update(contents);
         this.setChanged();
-        this.notifyObservers(this.origin);
+        this.notifyObservers(contents);
     }
 }

@@ -93,14 +93,14 @@ class InfrastructureMart
 	override update(Observable observable, Object argument) {
 		// Update the observed object directly to avoid an infinite loop
 		switch (argument) {
-			Infrastructure: {
+			ObservableArtefact<Infrastructure>: {
 				this.specification.origin.update(
 					this.textParser.source(
-						this.hclParser.specification(argument.model)
+						this.hclParser.specification(argument.origin.model)
 					)
 				)
 			}
-			TerraformTemplate: {
+			ObservableSpecification<TerraformTemplate>: {
 				// TODO Implement a diff mechanism to update the model
 				this.artefact.origin.model = this.infrastructureParser.model(
 					new Text2Hcl(argument.contents).model

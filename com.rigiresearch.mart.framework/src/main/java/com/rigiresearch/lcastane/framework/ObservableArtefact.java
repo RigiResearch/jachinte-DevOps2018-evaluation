@@ -68,6 +68,6 @@ public final class ObservableArtefact<T extends Artefact>
     public void apply(Command command) throws ValidationException {
         this.origin.apply(command);
         this.setChanged();
-        this.notifyObservers(this.origin);
+        this.notifyObservers(command);
     }
 }
