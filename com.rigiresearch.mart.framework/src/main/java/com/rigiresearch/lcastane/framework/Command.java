@@ -55,17 +55,17 @@ public final class Command implements Serializable {
      * The operation's required operands.
      */
     @Setter
-    private Node[] operands;
+    private Object[] arguments;
 
     /**
      * Default constructor.
      * @param operationType The operation type
-     * @param operands The operation's required operands
+     * @param arguments The operation's required operands
      */
     public Command(final OperationType operationType,
-        final Node... operands) {
+        final Object... arguments) {
         this.operationType = operationType;
-        this.operands = operands;
+        this.arguments = arguments;
     }
 
     /*
@@ -78,7 +78,7 @@ public final class Command implements Serializable {
             "%s%s", 
             this.operationType.toString(),
             Arrays.toString(
-                this.operands
+                this.arguments
             )
         );
     }

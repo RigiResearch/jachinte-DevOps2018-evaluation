@@ -66,7 +66,8 @@ public interface Rule<T extends Artefact> extends Serializable {
     /**
      * Applies this validation rule to the given {@link Artefact}.
      * @param artefact The {@link Artefact} using this rule
+     * @param arguments The same arguments passed to the operation
      * @return whether this rule passes or fails
      */
-    boolean apply(T artefact, Node... operands);
+    boolean apply(T artefact, Object... arguments);
 }

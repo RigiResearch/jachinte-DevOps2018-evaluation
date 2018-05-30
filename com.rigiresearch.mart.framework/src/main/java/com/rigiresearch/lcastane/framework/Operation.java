@@ -54,11 +54,11 @@ public interface Operation<T extends Artefact> extends Serializable {
     /**
      * Applies this operation on the given {@link Node}s.
      * @param artefcat The artefact in whose context this operation is applied
-     * @param operands This operation's operands
+     * @param arguments This operation's operands
      * @throws ValidationException If the operation cannot be performed on
      *  the given operands
      */
-    void apply(T artefact, Node... operands) throws ValidationException;
+    void apply(T artefact, Object... arguments) throws ValidationException;
 
     /**
      * Returns this operation's type.
