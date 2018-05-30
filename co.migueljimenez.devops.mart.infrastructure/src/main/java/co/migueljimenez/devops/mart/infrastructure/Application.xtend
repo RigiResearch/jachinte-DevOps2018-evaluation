@@ -35,7 +35,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 class Application {
 
 	/**
-	 * An demo instance of an Infrastructure MART.
+	 * The MART instance corresponding to the given template.
 	 */
 	val InfrastructureMart mart
 
@@ -46,19 +46,19 @@ class Application {
 		this.mart = new InfrastructureMart(template)
 	}
 
+	/**
+	 * Instantiates a new Infrastructure MART associated with the specified
+	 * Terraform template as argument.
+	 * 
+	 * TODO in the future: support Git repository, accepting only the template
+	 * file path relative to the repository. Test the local MART instance, and
+	 * deploy if tests are good.
+	 * 
+	 * @param args This application arguments
+	 */
 	def static void main(String[] args) {
 		if (args.length != 1)
 			throw new IllegalArgumentException("The Terraform file path is expected as argument")
-		/*
-		 * TODO:
-		 * 1. Get events from OpenStack
-		 * 2. Convert each event to a Command
-		 * 3. Alter the MART's artefact based on supported operations
-		 */
-		new Application(
-			new TerraformTemplate(
-				new File(args.get(0))
-			)
-		)
+		new Application(new File(args.get(0)))
 	}
 }
