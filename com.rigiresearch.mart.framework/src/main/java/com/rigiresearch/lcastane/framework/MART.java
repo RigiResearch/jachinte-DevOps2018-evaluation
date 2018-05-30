@@ -45,5 +45,5 @@ public interface MART<N extends Specification, A extends Artefact>
      * associated {@link Artefact}.
      * @return an instance of {@code Notation}
      */
-    N notation();
+    N specification();
 }
