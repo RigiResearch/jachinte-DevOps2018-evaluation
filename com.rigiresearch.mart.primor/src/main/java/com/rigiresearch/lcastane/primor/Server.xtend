@@ -74,7 +74,7 @@ class Server {
 	 * @param manager The manager service instance to publish
 	 */
 	new(ManagerService manager) {
-		this.configuration = new Configurations().properties("rmi.properties")
+		this.configuration = new Configurations().properties("primor.properties")
 		this.registry = LocateRegistry.createRegistry(
 			this.configuration.getInt("manager-port")
 		)
