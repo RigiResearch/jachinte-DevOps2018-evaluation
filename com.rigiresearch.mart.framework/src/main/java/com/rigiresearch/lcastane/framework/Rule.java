@@ -25,6 +25,7 @@ import java.io.Serializable;
 
 /**
  * Represents a validation rule for a specific {@link Artefact}.
+ * @author Miguel Jimenez (miguel@uvic.ca) - Minor changes to generalize the concept of validation
  * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
@@ -45,12 +46,6 @@ public interface Rule<T extends Artefact> extends Serializable {
     }
 
     /**
-     * Determines when this rule should be applied.
-     * @return This rule's type
-     */
-    Type type();
-
-    /**
      * Describes this rule's purpose.
      * @return a short name
      */
@@ -66,7 +61,7 @@ public interface Rule<T extends Artefact> extends Serializable {
     /**
      * Applies this validation rule to the given {@link Artefact}.
      * @param artefact The {@link Artefact} using this rule
-     * @param arguments The same arguments passed to the operation
+     * @param arguments An array of optional arguments
      * @return whether this rule passes or fails
      */
     boolean apply(T artefact, Object... arguments);
