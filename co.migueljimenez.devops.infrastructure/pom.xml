@@ -70,6 +70,12 @@
 			<artifactId>org.eclipse.xtext.xbase.lib</artifactId>
 			<version>${xtextVersion}</version>
 		</dependency>
+		<!-- Ecore serialization -->
+		<dependency>
+			<groupId>org.eclipse.emf</groupId>
+			<artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+			<version>${emf-version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
