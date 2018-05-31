@@ -23,8 +23,11 @@ package com.rigiresearch.lcastane.framework;
 
 import java.io.Serializable;
 
+import com.rigiresearch.lcastane.framework.validation.ValidationException;
+
 /**
  * Describes the basic behavior of a model.
+ * @author Miguel Jimenez (miguel@uvic.ca) - Add method {@link #validate()}
  * @author Lorena Castaneda - Initial contribution and API
  * @date 2017-06-13
  * @version $Id$
@@ -46,4 +49,10 @@ public interface MART<S extends Specification, A extends Artefact>
      * @return an instance of {@code Notation}
      */
     S specification();
+
+    /**
+     * Runs the semantic validations associated with this MART.
+     * @throws ValidationException If any of the validations fail
+     */
+    void validate() throws ValidationException;
 }
