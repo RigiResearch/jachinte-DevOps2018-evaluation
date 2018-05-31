@@ -58,4 +58,20 @@ public final class ValidationException extends Exception {
             )
         );
     }
+
+    /**
+     * Secondary constructor.
+     * @param artefact The artefact that threw this exception
+     * @param validation The failing validation rule
+     */
+    public ValidationException(final Artefact artefact,
+    	final Rule<?> rule) {
+    	super(
+    		String.format(
+    			"Validation rule '%s' failed to validate artefact '%s'.",
+    			rule.name(),
+    			artefact.name()
+    		)
+    	);
+    }
 }
