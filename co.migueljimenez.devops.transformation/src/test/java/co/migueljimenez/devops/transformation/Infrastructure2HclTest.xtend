@@ -33,6 +33,7 @@ import co.migueljimenez.devops.infrastructure.model.Volume
 import de.xn__ho_hia.storage_unit.StorageUnits
 import org.junit.Assert
 import org.junit.Test
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 
 /**
  * Tests {@link Infrastructure2Hcl}
@@ -57,6 +58,11 @@ class Infrastructure2HclTest {
 	 * The HCL-to-text translator.
 	 */
 	val Hcl2Text textTranslator
+
+	/**
+	 * Dummy project.
+	 */
+	val VirtualInfrastructure project
 
 	/**
 	 * Dummy flavor for testing purposes.
@@ -87,11 +93,13 @@ class Infrastructure2HclTest {
 		this.i = new InfrastructureModelElements
 		this.translator = new Infrastructure2Hcl
 		this.textTranslator = new Hcl2Text
+		this.project = this.i.infrastructure
 		this.flavor = this.i.flavor(
 			"small",
 			1,
 			StorageUnits.gigabyte(4),
-			StorageUnits.megabyte(512)
+			StorageUnits.megabyte(512),
+			this.project
 		)
 		this.image = this.i.image(
 			"rancher-os",
@@ -99,24 +107,28 @@ class Infrastructure2HclTest {
 			DiskFormat.ARI,
 			"https://image",
 			StorageUnits.gigabyte(1),
-			StorageUnits.megabyte(1024)
+			StorageUnits.megabyte(1024),
+			this.project
 		)
 		this.volume = this.i.volume(
 			"myvolume",
 			null,
 			this.image,
-			StorageUnits.gigabyte(5)
+			StorageUnits.gigabyte(5),
+			this.project
 		)
 		this.instance = this.i.instance(
 			"basic",
-			this.i.credentials(
+			this.i.credential(
 				"access",
-				"public-key"
+				"public-key",
+				this.project
 			),
 			this.flavor,
 			#[this.volume],
 			#[],
-			#[]
+			#[],
+			this.project
 		)
 		this.provider = this.i.unknownResource(
 			"provider",
@@ -128,7 +140,8 @@ class Infrastructure2HclTest {
 				this.i.entry("password", "pwd"),
 				this.i.entry("auth_url", "http://myauthurl:5000/v2.0"),
 				this.i.entry("region", "RegionOne")
-			]
+			],
+			this.project
 		)
 	}
 

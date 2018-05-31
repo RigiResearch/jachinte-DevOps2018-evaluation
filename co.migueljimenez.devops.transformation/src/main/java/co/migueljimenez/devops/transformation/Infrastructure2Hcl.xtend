@@ -79,7 +79,6 @@ class Infrastructure2Hcl {
 			model.flavors,
 			model.volumes,
 			model.networks,
-			model.subnets,
 			model.images,
 			model.securityGroups,
 			model.instances,
@@ -212,7 +211,6 @@ class Infrastructure2Hcl {
 				null,
 				#[
 					h.entry("name", h.text(object.name)),
-					h.entry("description", h.text(object.description)),
 					h.entry("container_format", h.text(object.containerFormat.literal)),
 					h.entry("disk_format", h.text(object.diskFormat.literal)),
 					h.entry("image_source_url", h.text(object.imageSourceUrl)),
@@ -327,17 +325,22 @@ class Infrastructure2Hcl {
 	 * Translates a {@link Network} to an OpenStack Compute Network.
 	 */
 	def protected List<Resource> resources(Network object) {
-		#[h.resource(
-			"resource",
-			"openstack_networking_network_v2",
-			object.name,
-			h.dictionary(
-				null,
-				#[
-					h.entry("name", h.text(object.name))
-				]
+		val elements = newArrayList
+		elements.add(
+			h.resource(
+				"resource",
+				"openstack_networking_network_v2",
+				object.name,
+				h.dictionary(
+					null,
+					#[
+						h.entry("name", h.text(object.name))
+					]
+				)
 			)
-		)]
+		)
+		elements.addAll(object.subnets.map[s|s.resources].flatten)
+		elements
 	}
 
 	/**

@@ -46,15 +46,14 @@ class Dictionary<K, V> {
 // Entities
 
 class VirtualInfrastructure {
-	refers Credential[] credentials
-	refers Flavor[] flavors
-	refers Image[] images
-	refers Instance[] instances
-	refers Network[] networks
-	refers Subnet[] subnets
-	refers SecurityGroup[] securityGroups
-	refers Volume[] volumes
-	refers UnknownResource<String, Object>[] resources
+	contains Credential[] credentials opposite project
+	contains Flavor[] flavors opposite project
+	contains Image[] images opposite project
+	contains Instance[] instances opposite project
+	contains Network[] networks opposite project
+	contains SecurityGroup[] securityGroups opposite project
+	contains Volume[] volumes opposite project
+	contains UnknownResource<String, Object>[] resources opposite project
 }
 
 class Flavor {
@@ -62,21 +61,23 @@ class Flavor {
 	int vcpus
 	StorageQuantity disk
 	StorageQuantity ram
+	container VirtualInfrastructure project opposite flavors
 }
 
 class Image {
 	id String name
-	String description
 	ContainerFormat containerFormat
 	DiskFormat diskFormat
 	String imageSourceUrl
 	StorageQuantity minDisk
 	StorageQuantity minRam
+	container VirtualInfrastructure project opposite images
 }
 
 class Credential {
 	id String name
 	String publicKey
+	container VirtualInfrastructure project opposite credentials
 }
 
 class Volume {
@@ -84,6 +85,7 @@ class Volume {
 	String description
 	StorageQuantity size
 	refers Image image
+	container VirtualInfrastructure project opposite volumes
 }
 
 class Subnet {
@@ -96,6 +98,7 @@ class Subnet {
 class Network {
 	id String name
 	contains Subnet[] subnets opposite network
+	container VirtualInfrastructure project opposite networks
 }
 
 class SecurityRule {
@@ -103,12 +106,14 @@ class SecurityRule {
 	int to
 	String protocol
 	String cidr
+	container SecurityGroup parent opposite rules
 }
 
 class SecurityGroup {
 	id String name
 	String description
-	refers SecurityRule[] rules
+	contains SecurityRule[] rules opposite parent
+	container VirtualInfrastructure project opposite securityGroups
 }
 
 class Instance {
@@ -118,6 +123,7 @@ class Instance {
 	refers Network[] networks
 	refers Volume[] volumes
 	refers SecurityGroup[] securityGroups
+	container VirtualInfrastructure project opposite instances
 }
 
 class UnknownResource<K, V> {
@@ -127,4 +133,5 @@ class UnknownResource<K, V> {
 	String ^type
 	String name
 	refers Dictionary<K, V> attributes
+	container VirtualInfrastructure project opposite resources
 }
