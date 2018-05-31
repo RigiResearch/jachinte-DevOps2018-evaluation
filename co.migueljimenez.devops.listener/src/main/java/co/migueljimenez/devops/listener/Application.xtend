@@ -21,22 +21,8 @@
  */
 package co.migueljimenez.devops.listener
 
-import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
-import co.migueljimenez.devops.infrastructure.model.SerializationParser
-import co.migueljimenez.devops.listener.openstack.OpenStackEvent
+import co.migueljimenez.devops.listener.openstack.OpenStackHandler
 import co.migueljimenez.devops.listener.openstack.OpenStackListener
-import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
-import com.rigiresearch.lcastane.framework.Command
-import com.rigiresearch.lcastane.primor.ManagerService
-import com.rigiresearch.lcastane.primor.RemoteService
-import java.rmi.registry.LocateRegistry
-import java.rmi.registry.Registry
-import org.apache.commons.configuration2.Configuration
-import org.apache.commons.configuration2.builder.fluent.Configurations
-import org.openstack4j.api.OSClient.OSClientV3
-import org.openstack4j.model.common.Identifier
-import org.openstack4j.model.identity.v3.Token
-import org.openstack4j.openstack.OSFactory
 import org.slf4j.LoggerFactory
 
 /**
@@ -54,63 +40,21 @@ class Application {
 	val logger = LoggerFactory.getLogger(Application)
 
 	/**
-	 * The OpenStack client.
-	 */
-	val OSClientV3 client
-
-	/**
 	 * The event listeners.
 	 */
 	val EventListener[] listeners
 
 	/**
-	 * Properties configuration for PrIMoR.
+	 * The event handlers.
 	 */
-	val Configuration primorConfig
-
-	/**
-	 * The (remote) RMI registry.
-	 */
-	val Registry registry
-
-	/**
-	 * The PrIMoR's model manager.
-	 */
-	val ManagerService models
-
-	/**
-	 * A helper to instantiate elements from the Infrastructure model.
-	 */
-	val InfrastructureModelElements i
-
-	/**
-	 * A parser to serialize Ecore objects.
-	 */
-	val SerializationParser serializationParser
+	val EventHandler[] handlers
 
 	/**
 	 * Default constructor.
 	 */
-	new(EventListener... listeners) {
+	new(EventListener[] listeners, EventHandler[] handlers) {
 		this.listeners = listeners
-		val osConf = new Configurations().properties("openstack.properties")
-		this.primorConfig = new Configurations().properties("primor.properties")
-		this.client = OSFactory.builderV3()
-			.endpoint(osConf.getString("endpoint"))
-			.credentials(
-				osConf.getString("username"),
-				osConf.getString("password"),
-				Identifier.byId(osConf.getString("domainId"))
-			)
-			.authenticate()
-		this.registry = LocateRegistry.getRegistry(
-			this.primorConfig.getString("manager-host"),
-			this.primorConfig.getInt("manager-port")
-		)
-		this.models =
-			this.registry.lookup(RemoteService.MANAGER.toString) as ManagerService
-		this.i = new InfrastructureModelElements
-		this.serializationParser = new SerializationParser
+		this.handlers = handlers
 	}
 
 	/**
@@ -120,10 +64,9 @@ class Application {
 		this.logger.info("Starting listeners")
 		this.listeners.forEach [ l |
 			l.listen [ e |
-				switch (e) {
-					OpenStackEvent: e.handle(this.client.token)
-					default: println('''Unknown event: «e»''')
-				}
+				this.handlers
+					.filter[h|h.handledType.isAssignableFrom(e.class)]
+					.forEach[h|h.handle(e)]
 			]
 		]
 	}
@@ -136,43 +79,10 @@ class Application {
 		this.listeners.forEach[l|l.stop]
 	}
 
-	/**
-	 * Handles an OpenStack event.
-	 */
-	def protected handle(OpenStackEvent e, Token token) {
-		val client = OSFactory.clientFromToken(token)
-		switch (e.eventType) {
-			case "keypair.create.end": {
-				val name = e.payload.get("key_name").asText
-				val keypair = client.compute.keypairs.get(name)
-				this.models.execute(
-					"el-modelo",
-					new Command(
-						InfrastructureModelOp.ADD_RESOURCE,
-						this.serializationParser.asXml(
-							this.i.credential(
-								name,
-								keypair.publicKey,
-								this.i.infrastructure
-							)	
-						)
-					)
-				)
-			}
-			default:
-				println('''Unknown OpenStack event: «e»''')
-		}
-	}
-
-	/**
-	 * Instantiates an OpenStack Listener.
-	 * 
-	 * TODO Translate each event into a MART command and send it to the MART
-	 * infrastructure's remote service.
-	 */
 	def static void main(String[] args) {
 		new Application(
-			new OpenStackListener("nova", "notifications.info")
+			#[new OpenStackListener("nova", "notifications.info")],
+			#[new OpenStackHandler]
 		).start()
 	}
 }

@@ -21,24 +21,47 @@
  */
 package co.migueljimenez.devops.listener
 
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.slf4j.LoggerFactory
 
 /**
- * Event listener.
+ * A simple event handler.
  * @author Miguel Jimenez (miguel@uvic.ca)
- * @date 2018-05-14
+ * @date 2018-05-31
  * @version $Id$
  * @since 0.0.1
  */
-interface EventListener {
+interface EventHandler {
 
 	/**
-	 * Starts listening for events.
+	 * Handles the given event.
 	 */
-	def void listen(Procedure1<Object> handler) throws Exception
+	def void handle(Object event)
 
 	/**
-	 * Closes any open connection or communication resource.
+	 * The type of events handled by this handler.
 	 */
-	def void stop() throws Exception
+	def Class<?> handledType()
+
+	/**
+	 * A null implementation of this interface that logs all the handled events.
+	 * @author Miguel Jimenez (miguel@uvic.ca)
+	 * @date 2018-05-31
+	 * @version $Id$
+	 * @since 0.0.1
+	 */
+	static class NullHandler implements EventHandler {
+
+		/**
+	     * The logger.
+	     */
+		val logger = LoggerFactory.getLogger(NullHandler)
+
+		override handle(Object event) {
+			this.logger.info('''«event»''')
+		}
+
+		override handledType() {
+			Object
+		}
+	}
 }
