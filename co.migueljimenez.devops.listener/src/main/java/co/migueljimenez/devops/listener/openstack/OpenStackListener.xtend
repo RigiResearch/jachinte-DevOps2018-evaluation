@@ -29,7 +29,6 @@ import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
-import java.io.File
 import java.io.IOException
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
@@ -80,9 +79,8 @@ class OpenStackListener implements EventListener {
 	 */
 	new(String exchange, String routingKey) {
 		this.logger.info("Initializing OpenStack listener")
-		val configurations = new Configurations()
-		this.configuration = configurations.properties(
-            new File("rabbitmq.properties")
+		this.configuration = new Configurations().properties(
+            "rabbitmq.properties"
         )
 		this.connection = this.factory().newConnection
 		this.channel = connection.createChannel

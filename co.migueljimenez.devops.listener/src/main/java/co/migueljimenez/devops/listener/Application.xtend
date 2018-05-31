@@ -21,15 +21,23 @@
  */
 package co.migueljimenez.devops.listener
 
+import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
+import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.listener.openstack.OpenStackEvent
 import co.migueljimenez.devops.listener.openstack.OpenStackListener
+import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
+import com.rigiresearch.lcastane.framework.Command
+import com.rigiresearch.lcastane.primor.ManagerService
+import com.rigiresearch.lcastane.primor.RemoteService
+import java.rmi.registry.LocateRegistry
+import java.rmi.registry.Registry
+import org.apache.commons.configuration2.Configuration
+import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.openstack4j.api.OSClient.OSClientV3
 import org.openstack4j.model.common.Identifier
-import org.openstack4j.openstack.OSFactory
-import org.apache.commons.configuration2.builder.fluent.Configurations
-import java.io.File
-import org.slf4j.LoggerFactory
 import org.openstack4j.model.identity.v3.Token
+import org.openstack4j.openstack.OSFactory
+import org.slf4j.LoggerFactory
 
 /**
  * The main execution entry.
@@ -56,21 +64,53 @@ class Application {
 	val EventListener[] listeners
 
 	/**
+	 * Properties configuration for PrIMoR.
+	 */
+	val Configuration primorConfig
+
+	/**
+	 * The (remote) RMI registry.
+	 */
+	val Registry registry
+
+	/**
+	 * The PrIMoR's model manager.
+	 */
+	val ManagerService models
+
+	/**
+	 * A helper to instantiate elements from the Infrastructure model.
+	 */
+	val InfrastructureModelElements i
+
+	/**
+	 * A parser to serialize Ecore objects.
+	 */
+	val SerializationParser serializationParser
+
+	/**
 	 * Default constructor.
 	 */
 	new(EventListener... listeners) {
 		this.listeners = listeners
-		val configuration = Configurations.newInstance.properties(
-			new File("openstack.properties")
-		)
+		val osConf = new Configurations().properties("openstack.properties")
+		this.primorConfig = new Configurations().properties("primor.properties")
 		this.client = OSFactory.builderV3()
-			.endpoint(configuration.getString("endpoint"))
+			.endpoint(osConf.getString("endpoint"))
 			.credentials(
-				configuration.getString("username"),
-				configuration.getString("password"),
-				Identifier.byId(configuration.getString("domainId"))
+				osConf.getString("username"),
+				osConf.getString("password"),
+				Identifier.byId(osConf.getString("domainId"))
 			)
 			.authenticate()
+		this.registry = LocateRegistry.getRegistry(
+			this.primorConfig.getString("manager-host"),
+			this.primorConfig.getInt("manager-port")
+		)
+		this.models =
+			this.registry.lookup(RemoteService.MANAGER.toString) as ManagerService
+		this.i = new InfrastructureModelElements
+		this.serializationParser = new SerializationParser
 	}
 
 	/**
@@ -105,11 +145,18 @@ class Application {
 			case "keypair.create.end": {
 				val name = e.payload.get("key_name").asText
 				val keypair = client.compute.keypairs.get(name)
-				println(
-					'''
-					name: «keypair.name»
-					public_key: «keypair.publicKey»
-					'''
+				this.models.execute(
+					"el-modelo",
+					new Command(
+						InfrastructureModelOp.ADD_RESOURCE,
+						this.serializationParser.asXml(
+							this.i.credential(
+								name,
+								keypair.publicKey,
+								this.i.infrastructure
+							)	
+						)
+					)
 				)
 			}
 			default:

@@ -34,6 +34,16 @@
 	<description>Notifications listener</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.rigiresearch</groupId>
+			<artifactId>com.rigiresearch.mart.primor</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>co.migueljimenez</groupId>
+			<artifactId>co.migueljimenez.devops.infrastructure</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<!-- Properties configuration -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
