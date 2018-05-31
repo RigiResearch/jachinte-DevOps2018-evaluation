@@ -27,7 +27,7 @@ import com.rigiresearch.lcastane.framework.Operation
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.util.List
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import java.util.Map
 
 /**
  * An abstract operation in the context of a {@link InfrastructureMart}.
@@ -36,24 +36,38 @@ import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
  * @version $Id$
  * @since 0.0.1
  */
-@FinalFieldsConstructor
 abstract class AbstractOperation implements Operation<Infrastructure> {
 
 	/**
      * This operation's validation rules.
      */
-    val List<Rule<Infrastructure>> rules
+    val Map<Rule.Type, List<Rule<Infrastructure>>> rules
 
 	/**
 	 * This operation's type.
 	 */
 	val OperationType operationType
 
+	new(OperationType operationType) {
+		this.operationType = operationType
+		this.rules = newHashMap
+	}
+
+	/**
+	 * Adds a new rule to {@code this} operation.
+	 */
+	def addRule(Rule.Type type, Rule<Infrastructure> rule) {
+		if (this.rules.containsKey(type))
+			this.rules.put(type, newArrayList)
+		this.rules.get(type).add(rule)
+		return this
+	}
+
 	override apply(Infrastructure artefact, Object... operands)
 		throws ValidationException {
-		runRules(Rule.Type.PRE, artefact, operands)
+		runRules(this.rules.get(Rule.Type.PRE), artefact, operands)
         this.applyOp(artefact, operands)
-        runRules(Rule.Type.POST, artefact, operands)
+        runRules(this.rules.get(Rule.Type.POST), artefact, operands)
 	}
 
 	override type() {
@@ -71,16 +85,17 @@ abstract class AbstractOperation implements Operation<Infrastructure> {
 
 	/**
 	 * Executes the specified set of rules.
-	 * @param type The type of rules to execute
+	 * @param rules The list of rules to run
 	 * @param artefact The artefact
 	 * @param arguments This operation's arguments
      * @throws ValidationException If there is at least one failing rule
 	 */
-	def private void runRules(Rule.Type type, Infrastructure artefact,
-		Object... arguments) throws ValidationException {
-		val filtered = this.rules
-			.filter[rule|rule.type.equals(type)]
-			.filter[rule|!rule.apply(artefact, arguments)]
+	def private void runRules(List<Rule<Infrastructure>> rules,
+		Infrastructure artefact, Object... arguments)
+			throws ValidationException {
+		if (rules === null || rules.empty)
+			return;
+		val filtered = rules.filter[rule|!rule.apply(artefact, arguments)]
             if (!filtered.empty)
                 throw new ValidationException(artefact, this, filtered.get(0))
     }

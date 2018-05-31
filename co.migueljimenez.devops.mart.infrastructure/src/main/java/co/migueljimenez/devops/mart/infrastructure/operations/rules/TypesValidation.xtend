@@ -19,51 +19,54 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.devops.mart.infrastructure.rules
+package co.migueljimenez.devops.mart.infrastructure.operations.rules
 
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.Rule
+import java.util.Arrays
 
 /**
- * Composed rule that evaluates to {@code true} if at least one of the
- * composing rules evaluates to {@code true}.
+ * Checks whether the operands passed to an operation are of the expected type.
+ * This rule applies to any {@link Node}.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-30
  * @version $Id$
  * @since 0.0.1
  */
-class AnyOf implements Rule<Infrastructure> {
+class TypesValidation implements Rule<Infrastructure> {
 
 	/**
-	 * The alternative rules.
+	 * Expected operand types.
 	 */
-	val Rule<Infrastructure>[] rules
-
-	/**
-	 * This rule's type.
-	 */
-	val Rule.Type type
+	val Class<?>[] operandTypes
 
 	/**
 	 * Default constructor.
-	 * @param type This rule's type
-	 * @param rules The composing rules
+	 * @param operandTypes The expected operand types
 	 */
-	new(Rule.Type type, Rule<Infrastructure>... rules) {
+	new(Class<?>... operandTypes) {
 		super()
-		this.rules = rules
-		this.type = type
+		this.operandTypes = operandTypes
 	}
+
+	/**
+	 * Error message in case of failure.
+	 */
+	var String message = new String()
 
 	override apply(Infrastructure artefact, Object... arguments) {
-		this.rules.map[r|r.apply(artefact, arguments)].findFirst[b|b]
+		this.message = String.format(
+			"Given arguments (%s) differ from expected (%s)",
+			Arrays.toString(arguments),
+			Arrays.toString(this.operandTypes)
+		)
+        return Arrays.equals(
+			this.operandTypes,
+			arguments.map[operand|operand.getClass()].toArray
+        )
 	}
 
-	override errorMessage() '''None of the alternative rules was successful'''
+	override errorMessage() '''«this.message»'''
 
-	override name() '''«AnyOf.simpleName»(«this.rules.map[r|r.name].join(", ")»)'''
-
-	override type() {
-		this.type
-	}
+	override name() '''«TypesValidation.simpleName»'''
 }

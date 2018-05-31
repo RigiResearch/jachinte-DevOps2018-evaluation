@@ -25,7 +25,6 @@ import co.migueljimenez.devops.infrastructure.model.ModelFactory
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.operations.AddResource
 import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
-import co.migueljimenez.devops.mart.infrastructure.operations.rules.AnyOf
 import co.migueljimenez.devops.mart.infrastructure.operations.rules.TypesValidation
 import com.rigiresearch.lcastane.framework.Artefact
 import com.rigiresearch.lcastane.framework.Command
@@ -66,11 +65,9 @@ class Infrastructure implements Artefact {
 		this.operations = <OperationType, Operation<Infrastructure>>newHashMap
 		this.operations.put(
 			InfrastructureModelOp.ADD_RESOURCE,
-			new AddResource(
-				new AnyOf(
-					Rule.Type.PRE,
-					new TypesValidation(String) // Ecore objects serialized as XMI
-				)
+			new AddResource().addRule(
+				Rule.Type.PRE,
+				new TypesValidation(String) // Ecore objects serialized as XMI
 			)
 		)
 	}

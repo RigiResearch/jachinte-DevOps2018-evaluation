@@ -30,6 +30,8 @@ import com.rigiresearch.lcastane.framework.ObservableArtefact
 import com.rigiresearch.lcastane.framework.ObservableSpecification
 import java.util.Observable
 import java.util.Observer
+import com.rigiresearch.lcastane.framework.validation.ValidationException
+import com.rigiresearch.lcastane.framework.Rule
 
 /**
  * Represents a virtual infrastructure MART.
@@ -52,6 +54,11 @@ class InfrastructureMart
 	val ObservableArtefact<Infrastructure> artefact
 
 	/**
+	 * The semantic validations associated with this MART.
+	 */
+	val Rule<Infrastructure>[] validations
+
+	/**
 	 * HCL to infrastructure parser.
 	 */
 	val Hcl2Infrastructure infrastructureParser
@@ -70,7 +77,8 @@ class InfrastructureMart
      * Default constructor.
      * @param template The template associated with this model
      */
-	new(TerraformTemplate template) {
+	new(TerraformTemplate template, Rule<Infrastructure>... validations) {
+		this.validations = validations
 		this.infrastructureParser = new Hcl2Infrastructure
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text
@@ -88,6 +96,13 @@ class InfrastructureMart
 
 	override specification() {
 		this.specification.origin
+	}
+
+	override validate() throws ValidationException {
+		this.validations.forEach [ v |
+			if (!v.apply(this.artefact.origin))
+				throw new ValidationException(this.artefact.origin, v)
+		]
 	}
 
 	override update(Observable observable, Object argument) {

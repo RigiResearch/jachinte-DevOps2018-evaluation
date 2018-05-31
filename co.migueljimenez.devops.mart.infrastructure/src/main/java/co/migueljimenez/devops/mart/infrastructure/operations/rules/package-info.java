@@ -19,5 +19,5 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-// Contains the validation rules
-package co.migueljimenez.devops.mart.infrastructure.rules;
+// Contains the pre-and-post operation validation rules
+package co.migueljimenez.devops.mart.infrastructure.operations.rules;

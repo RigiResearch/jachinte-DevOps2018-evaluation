@@ -19,58 +19,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.devops.mart.infrastructure.rules
+package co.migueljimenez.devops.mart.infrastructure.validation
 
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.Rule
-import java.util.Arrays
 
 /**
- * Checks whether the operands passed to an operation are of the expected type.
- * This rule applies to any {@link Node}.
+ * Composed rule that evaluates to {@code true} if at least one of the
+ * composing rules evaluates to {@code true}.
  * @author Miguel Jimenez (miguel@uvic.ca)
  * @date 2018-05-30
  * @version $Id$
  * @since 0.0.1
  */
-class TypesValidation implements Rule<Infrastructure> {
+class AnyOf implements Rule<Infrastructure> {
 
 	/**
-	 * Expected operand types.
+	 * The alternative rules.
 	 */
-	val Class<?>[] operandTypes
+	val Rule<Infrastructure>[] rules
 
 	/**
 	 * Default constructor.
-	 * @param operandTypes The expected operand types
+	 * @param type This rule's type
+	 * @param rules The composing rules
 	 */
-	new(Class<?>... operandTypes) {
+	new(Rule<Infrastructure>... rules) {
 		super()
-		this.operandTypes = operandTypes
+		this.rules = rules
 	}
-
-	/**
-	 * Error message in case of failure.
-	 */
-	var String message = new String()
 
 	override apply(Infrastructure artefact, Object... arguments) {
-		this.message = String.format(
-			"Given arguments (%s) differ from expected (%s)",
-			Arrays.toString(arguments),
-			Arrays.toString(this.operandTypes)
-		)
-        return Arrays.equals(
-			this.operandTypes,
-			arguments.map[operand|operand.getClass()].toArray
-        )
+		this.rules.map[r|r.apply(artefact, arguments)].findFirst[b|b]
 	}
 
-	override errorMessage() '''«this.message»'''
+	override errorMessage() '''None of the alternative rules was successful'''
 
-	override name() '''«TypesValidation.simpleName»'''
-
-	override type() {
-		Rule.Type.PRE
-	}
+	override name() '''«AnyOf.simpleName»(«this.rules.map[r|r.name].join(", ")»)'''
 }

@@ -45,11 +45,9 @@ class AddResource extends AbstractOperation {
 
 	/**
 	 * Default constructor.
-	 * @param rules The validation rules that should be applied before/after
-     *  this operation
 	 */
-	new(Rule<Infrastructure>... rules) {
-		super(rules, InfrastructureModelOp.ADD_RESOURCE)
+	new() {
+		super(InfrastructureModelOp.ADD_RESOURCE)
 		this.serializationParser = new SerializationParser
 	}
 
