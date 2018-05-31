@@ -44,6 +44,7 @@
 	</properties>
 
 	<dependencies>
+		<!-- Storage units (used in the model) -->
 		<dependency>
 			<groupId>de.xn--ho-hia.storage_units</groupId>
 			<artifactId>storage-units</artifactId>
