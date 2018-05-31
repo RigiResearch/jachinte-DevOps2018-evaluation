@@ -25,6 +25,9 @@ import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.validation.ValidationException
+import co.migueljimenez.devops.infrastructure.model.SerializationParser
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import org.eclipse.emf.ecore.EObject
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -36,23 +39,45 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 class AddResource extends AbstractOperation {
 
 	/**
+	 * A parser to serialize Ecore objects.
+	 */
+	val SerializationParser serializationParser
+
+	/**
 	 * Default constructor.
 	 * @param rules The validation rules that should be applied before/after
      *  this operation
 	 */
 	new(Rule<Infrastructure>... rules) {
 		super(rules, InfrastructureModelOp.ADD_RESOURCE)
+		this.serializationParser = new SerializationParser
 	}
 
 	override protected applyOp(Infrastructure infrastructure,
 		Object... arguments) throws ValidationException {
-		val operand = arguments.get(0)
-		// TODO support all the resource types
-		switch (operand) {
-			Credential: {
-				infrastructure.model.credentials.add(operand)
+		val xml = arguments.get(0) as String
+		val objects = this.serializationParser.asEObjects(xml)
+		objects.forEach [ o |
+			switch (o) {
+				Credential:
+					infrastructure.model.add(o)
+				default:
+					infrastructure.model.add(o)
 			}
-			default: println('''Unsupported resource type "«operand»"''')
-		}
+		]
+	}
+
+	/**
+	 * Add a {@link Credential} to the given project.
+	 */
+	def private add(VirtualInfrastructure project, Credential eObject) {
+		eObject.project = project
+	}
+
+	/**
+	 * Add the resource to the given project.
+	 */
+	def private add(VirtualInfrastructure project, EObject eObject) {
+		throw new UnsupportedOperationException('''Unsupported resource «eObject»''')
 	}
 }
