@@ -30,8 +30,8 @@
 	</parent>
 	<artifactId>co.migueljimenez.devops.mart.infrastructure</artifactId>
 
-	<name>MART Infrastructure</name>
-	<description>Runtime infrastructure to realize DevOps software round-trip engineering</description>
+	<name>Infrastructure MART</name>
+	<description>Operational Framework in the context of the infrastructure model</description>
 
 	<dependencies>
 		<dependency>
