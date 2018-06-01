@@ -72,7 +72,7 @@ class Manager implements ManagerService {
 	 */
 	override register(String modelIdentifier, Specification specification)
 		throws RemoteException {
-		this.models.put(
+		this.register(
 			modelIdentifier,
 			new InfrastructureMart(
 				specification as TerraformTemplate,
