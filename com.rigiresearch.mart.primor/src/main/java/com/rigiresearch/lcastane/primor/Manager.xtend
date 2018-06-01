@@ -21,11 +21,12 @@
  */
 package com.rigiresearch.lcastane.primor
 
-import com.rigiresearch.lcastane.framework.MART
-import java.rmi.RemoteException
 import com.rigiresearch.lcastane.framework.Command
+import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
+import java.rmi.RemoteException
 import java.util.Map
+import org.slf4j.LoggerFactory
 
 /**
  * A {@link ManagerService} implementation.
@@ -37,6 +38,14 @@ import java.util.Map
  */
 class Manager implements ManagerService {
 
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(Manager)
+
+	/**
+	 * The registered models.
+	 */
 	val Map<String, MART<?, ?>> models
 
 	/**
@@ -49,12 +58,17 @@ class Manager implements ManagerService {
 	override register(String modelIdentifier, MART<?, ?> model)
 		throws RemoteException {
 		this.models.put(modelIdentifier, model)
+		this.logger.info('''Model registered with id "«modelIdentifier»"''')
 	}
 
 	override execute(String modelIdentifier, Command command)
 		throws RemoteException, ValidationException, ModelNotFoundException {
 		this.ensureModelExists(modelIdentifier)
 		this.models.get(modelIdentifier).artefact.apply(command)
+		val s = if(command.arguments.length == 1) "" else "s"
+		this.logger.info(
+			'''Command «command.operationType» («command.arguments.length» argument«s») was applied to model "«modelIdentifier»"'''
+		)
 	}
 
 	override artefact(String modelIdentifier)
