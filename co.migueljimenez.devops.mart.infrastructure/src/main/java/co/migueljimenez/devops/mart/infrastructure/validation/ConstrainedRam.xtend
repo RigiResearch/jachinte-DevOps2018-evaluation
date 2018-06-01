@@ -53,6 +53,8 @@ class ConstrainedRam implements Rule<Infrastructure> {
 	}
 
 	override apply(Infrastructure artefact, Object... arguments) {
+		if (artefact.model.instances === null || artefact.model.instances.empty)
+			return true
 		artefact.model.instances
 			.map[i|i.flavor.ram.compareTo(this.maxRam) <= 0]
 			.reduce[b1, b2| b1 && b2]
