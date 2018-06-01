@@ -21,16 +21,10 @@
  */
 package com.rigiresearch.lcastane.primor
 
-import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
-import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
-import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
 import com.rigiresearch.lcastane.framework.Command
 import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
-import com.rigiresearch.lcastane.framework.Specification
-import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
-import de.xn__ho_hia.storage_unit.StorageUnits
 import java.io.StringReader
 import java.rmi.RemoteException
 import java.util.Map
@@ -69,26 +63,6 @@ class Manager implements ManagerService {
 		throws RemoteException {
 		this.models.put(modelIdentifier, model)
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
-	}
-
-	/**
-	 * FIXME This is a workaround.
-	 * See {@link ManagerService#register(String, Specification)
-	 */
-	override register(String modelIdentifier, Specification specification)
-		throws RemoteException {
-		this.logger.info('''Instantiating and registering model "«modelIdentifier»"''')
-		val _spec = switch (specification) {
-			TerraformTemplate: specification
-			ObservableSpecification<TerraformTemplate>: specification.origin
-		}
-		this.register(
-			modelIdentifier,
-			new InfrastructureMart(
-				_spec,
-				new ConstrainedRam(StorageUnits.gigabyte(1L))
-			)
-		)
 	}
 
 	override register(String modelIdentifier, EcoreMART<?> model) throws RemoteException {

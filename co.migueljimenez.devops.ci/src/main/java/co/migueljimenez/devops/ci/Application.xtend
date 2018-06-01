@@ -21,18 +21,21 @@
  */
 package co.migueljimenez.devops.ci
 
-import java.io.File
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
 import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
-import de.xn__ho_hia.storage_unit.StorageUnits
+import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
-import org.apache.commons.configuration2.Configuration
-import org.apache.commons.configuration2.builder.fluent.Configurations
-import java.rmi.registry.Registry
 import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
+import de.xn__ho_hia.storage_unit.StorageUnits
+import java.io.File
 import java.rmi.registry.LocateRegistry
+import java.rmi.registry.Registry
+import org.apache.commons.configuration2.Configuration
+import org.apache.commons.configuration2.builder.fluent.Configurations
 
 /**
  * The main execution entry.
@@ -68,6 +71,10 @@ class Application {
 	 */
 	val Configuration primorConfig
 
+	/**
+	 * Default constructor.
+	 * @param template The template associated with the MART's specification
+	 */
 	new(File template) {
 		this.localTemplate = template
 		this.mart = new InfrastructureMart(
@@ -83,6 +90,9 @@ class Application {
 			this.registry.lookup(RemoteService.MANAGER.toString) as ManagerService
 	}
 
+	/**
+	 * Validates the MART.
+	 */
 	def validate() {
 		try {
 			this.mart.validate()
@@ -92,8 +102,20 @@ class Application {
 		}
 	}
 
+	/**
+	 * Registers the MART on PrIMoR.
+	 */
 	def deploy() {
-		this.models.register(this.localTemplate.toString, this.mart.specification)
+		this.models.register(
+			this.localTemplate.toString,
+			new EcoreMART.Default(
+				this.mart.specification,
+				this.mart.artefact.serialize,
+				VirtualInfrastructure.canonicalName,
+				Infrastructure.canonicalName,
+				InfrastructureMart.canonicalName
+			)
+		)
 	}
 
 	def static void main(String[] args) {

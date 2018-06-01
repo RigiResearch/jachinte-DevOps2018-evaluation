@@ -22,6 +22,7 @@
 package co.migueljimenez.devops.mart.infrastructure
 
 import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
+import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.operations.AddResource
 import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
@@ -58,6 +59,11 @@ class Infrastructure implements Artefact {
     val Map<OperationType, Operation<Infrastructure>> operations
 
 	/**
+	 * A Serialization parser.
+	 */
+	val SerializationParser serializationParser
+
+	/**
 	 * Default constructor.
 	 * @param model An instance of the Infrastructure (Ecore) model
 	 */
@@ -71,6 +77,7 @@ class Infrastructure implements Artefact {
 				new TypesValidation(String) // Ecore objects serialized as XMI
 			)
 		)
+		this.serializationParser = new SerializationParser
 	}
 
 	/**
@@ -78,6 +85,13 @@ class Infrastructure implements Artefact {
 	 */
 	new() {
 		this(new InfrastructureModelElements().infrastructure)
+	}
+
+	/**
+	 * Serialize the Ecore model decorated by this artefact.
+	 */
+	def String serialize() {
+		this.serializationParser.asXml(this.model)
 	}
 
 	override apply(Command command) throws ValidationException {
