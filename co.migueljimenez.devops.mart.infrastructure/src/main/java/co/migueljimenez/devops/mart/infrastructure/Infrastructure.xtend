@@ -35,6 +35,7 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
+import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
 
 /**
  * Represents an inventory of infrastructure resources.
@@ -61,7 +62,7 @@ class Infrastructure implements Artefact {
 	 * Default constructor.
 	 */
 	new() {
-		this.model = ModelFactory.eINSTANCE.createVirtualInfrastructure
+		this.model = new InfrastructureModelElements().infrastructure
 		this.operations = <OperationType, Operation<Infrastructure>>newHashMap
 		this.operations.put(
 			InfrastructureModelOp.ADD_RESOURCE,

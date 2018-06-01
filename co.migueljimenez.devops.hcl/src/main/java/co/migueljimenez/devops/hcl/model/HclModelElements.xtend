@@ -21,6 +21,8 @@
  */
 package co.migueljimenez.devops.hcl.model
 
+import org.eclipse.emf.ecore.EcorePackage
+
 /**
  * Facilitates creating elements from the HCL model.
  * @author Miguel Jimenez (miguel@uvic.ca)
@@ -29,6 +31,14 @@ package co.migueljimenez.devops.hcl.model
  * @since 0.0.1
  */
 class HclModelElements {
+
+	/**
+	 * Default constructor.
+	 */
+	new() {
+		EcorePackage.eINSTANCE.eClass()
+		ModelPackage.eINSTANCE.eClass()
+	}
 
 	def specification(Resource... resources) {
 		val spec = ModelFactory.eINSTANCE.createSpecification

@@ -23,6 +23,7 @@ package co.migueljimenez.devops.infrastructure.model
 
 import java.util.List
 import de.xn__ho_hia.storage_unit.StorageUnit
+import org.eclipse.emf.ecore.EcorePackage
 
 /**
  * Facilitates creating elements from the Infrastructure model.
@@ -32,6 +33,14 @@ import de.xn__ho_hia.storage_unit.StorageUnit
  * @since 0.0.1
  */
 class InfrastructureModelElements {
+
+	/**
+	 * Default constructor.
+	 */
+	new() {
+		EcorePackage.eINSTANCE.eClass()
+		ModelPackage.eINSTANCE.eClass()
+	}
 
 	def infrastructure() {
 		return ModelFactory.eINSTANCE.createVirtualInfrastructure
