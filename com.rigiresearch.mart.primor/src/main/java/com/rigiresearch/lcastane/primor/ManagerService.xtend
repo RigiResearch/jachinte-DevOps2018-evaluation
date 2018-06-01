@@ -28,6 +28,7 @@ import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.rmi.Remote
 import java.rmi.RemoteException
+import com.rigiresearch.lcastane.framework.EcoreMART
 
 /**
  * A model manager.
@@ -55,6 +56,14 @@ interface ManagerService extends Remote {
 	 * @param specification The model's specification
 	 */
 	def void register(String modelIdentifier, Specification specification)
+		throws RemoteException
+
+	/**
+	 * Registers a new model to be managed.
+	 * @param modelIdentifier The model's identifier
+	 * @param model The Ecore-based model to register
+	 */
+	def void register(String modelIdentifier, EcoreMART<?> model)
 		throws RemoteException
 
 	/**

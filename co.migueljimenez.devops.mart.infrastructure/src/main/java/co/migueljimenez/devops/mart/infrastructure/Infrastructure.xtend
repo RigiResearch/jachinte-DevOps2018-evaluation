@@ -59,9 +59,10 @@ class Infrastructure implements Artefact {
 
 	/**
 	 * Default constructor.
+	 * @param model An instance of the Infrastructure (Ecore) model
 	 */
-	new() {
-		this.model = new InfrastructureModelElements().infrastructure
+	new(VirtualInfrastructure model) {
+		this.model = model
 		this.operations = <OperationType, Operation<Infrastructure>>newHashMap
 		this.operations.put(
 			InfrastructureModelOp.ADD_RESOURCE,
@@ -70,6 +71,13 @@ class Infrastructure implements Artefact {
 				new TypesValidation(String) // Ecore objects serialized as XMI
 			)
 		)
+	}
+
+	/**
+	 * Secondary constructor.
+	 */
+	new() {
+		this(new InfrastructureModelElements().infrastructure)
 	}
 
 	override apply(Command command) throws ValidationException {

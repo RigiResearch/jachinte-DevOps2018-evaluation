@@ -25,13 +25,17 @@ import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
 import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
 import com.rigiresearch.lcastane.framework.Command
+import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import de.xn__ho_hia.storage_unit.StorageUnits
+import java.io.StringReader
 import java.rmi.RemoteException
 import java.util.Map
+import org.eclipse.emf.ecore.resource.URIConverter
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
 import org.slf4j.LoggerFactory
 
 /**
@@ -85,6 +89,20 @@ class Manager implements ManagerService {
 				new ConstrainedRam(StorageUnits.gigabyte(1L))
 			)
 		)
+	}
+
+	override register(String modelIdentifier, EcoreMART<?> model) throws RemoteException {
+		val resource = new XMIResourceImpl()
+		val stream = new URIConverter.ReadableInputStream(new StringReader(model.serializedArtefact))
+		resource.load(stream, newHashMap)
+		val rootClass = Class.forName(model.modelClassName)
+		val artefactClass = Class.forName(model.decoratorClassName)
+		val martClass = Class.forName(model.martClassName)
+		val root = rootClass.cast(resource.contents.get(0))
+		val artefact = artefactClass.getDeclaredConstructor(rootClass).newInstance(root)
+		val mart = martClass.getDeclaredConstructor(model.specification.class, artefactClass)
+			.newInstance(model.specification, artefact) as MART<?, ?>
+		this.register(modelIdentifier, mart)
 	}
 
 	override execute(String modelIdentifier, Command command, String description)
