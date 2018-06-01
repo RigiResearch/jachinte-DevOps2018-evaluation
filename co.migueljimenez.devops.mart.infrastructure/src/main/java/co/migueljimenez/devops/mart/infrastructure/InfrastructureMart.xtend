@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory
  * @since 0.0.1
  */
 class InfrastructureMart
-	implements MART<TerraformTemplate, Infrastructure>, Observer {
+	implements MART<ObservableSpecification<TerraformTemplate>, ObservableArtefact<Infrastructure>>, Observer {
 
 	/**
 	 * The logger.
@@ -97,11 +97,11 @@ class InfrastructureMart
 	}
 
 	override artefact() {
-		this.artefact.origin
+		this.artefact
 	}
 
 	override specification() {
-		this.specification.origin
+		this.specification
 	}
 
 	override validate() throws ValidationException {
