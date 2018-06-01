@@ -32,6 +32,7 @@ import de.xn__ho_hia.storage_unit.StorageUnits
 import java.rmi.RemoteException
 import java.util.Map
 import org.slf4j.LoggerFactory
+import com.rigiresearch.lcastane.framework.ObservableSpecification
 
 /**
  * A {@link ManagerService} implementation.
@@ -72,10 +73,14 @@ class Manager implements ManagerService {
 	 */
 	override register(String modelIdentifier, Specification specification)
 		throws RemoteException {
+		val _spec = switch (specification) {
+			TerraformTemplate: specification
+			ObservableSpecification<TerraformTemplate>: specification.origin
+		}
 		this.register(
 			modelIdentifier,
 			new InfrastructureMart(
-				specification as TerraformTemplate,
+				_spec,
 				new ConstrainedRam(StorageUnits.gigabyte(1L))
 			)
 		)
