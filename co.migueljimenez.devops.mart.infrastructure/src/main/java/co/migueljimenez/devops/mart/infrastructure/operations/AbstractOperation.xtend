@@ -57,7 +57,7 @@ abstract class AbstractOperation implements Operation<Infrastructure> {
 	 * Adds a new rule to {@code this} operation.
 	 */
 	def addRule(Rule.Type type, Rule<Infrastructure> rule) {
-		if (this.rules.containsKey(type))
+		if (!this.rules.containsKey(type))
 			this.rules.put(type, newArrayList)
 		this.rules.get(type).add(rule)
 		return this
