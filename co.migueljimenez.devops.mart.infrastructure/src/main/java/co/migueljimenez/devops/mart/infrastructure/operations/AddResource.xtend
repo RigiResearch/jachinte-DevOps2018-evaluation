@@ -22,11 +22,10 @@
 package co.migueljimenez.devops.mart.infrastructure.operations
 
 import co.migueljimenez.devops.infrastructure.model.Credential
-import co.migueljimenez.devops.mart.infrastructure.Infrastructure
-import com.rigiresearch.lcastane.framework.Rule
-import com.rigiresearch.lcastane.framework.validation.ValidationException
 import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.mart.infrastructure.Infrastructure
+import com.rigiresearch.lcastane.framework.validation.ValidationException
 import org.eclipse.emf.ecore.EObject
 
 /**
