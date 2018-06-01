@@ -50,8 +50,6 @@ class SerializationParser {
 	def String asXml(EObject... eObjects) {
 		EcorePackage.eINSTANCE.eClass()
 		ModelPackage.eINSTANCE.eClass()
-		EPackage.Registry.INSTANCE.put(ModelPackage.eNS_URI, ModelPackage.eINSTANCE)
-		EPackage.Registry.INSTANCE.put("https:/migueljimenez.co/devops/infrastructure", ModelPackage.eINSTANCE);
 		val resourceSet = new ResourceSetImpl
 		resourceSet.getResourceFactoryRegistry()
 			.getExtensionToFactoryMap()
