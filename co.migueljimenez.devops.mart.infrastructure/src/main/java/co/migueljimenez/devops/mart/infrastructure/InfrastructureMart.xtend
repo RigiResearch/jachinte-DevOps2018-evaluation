@@ -21,10 +21,13 @@
  */
 package co.migueljimenez.devops.mart.infrastructure
 
+import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
 import co.migueljimenez.devops.transformation.Hcl2Infrastructure
 import co.migueljimenez.devops.transformation.Hcl2Text
 import co.migueljimenez.devops.transformation.Infrastructure2Hcl
 import co.migueljimenez.devops.transformation.Text2Hcl
+import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.impl.AbstractMART
 import org.slf4j.LoggerFactory
@@ -95,6 +98,17 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
      */
 	new(TerraformTemplate template, Infrastructure infrastructure) {
 		this(template, infrastructure, #[])
+	}
+
+	override export() {
+		new EcoreMART.Default(
+			this.specification,
+			this.artefact.origin.serialize,
+			ModelPackageImpl.canonicalName,
+			VirtualInfrastructure.canonicalName,
+			Infrastructure.canonicalName,
+			InfrastructureMart.canonicalName
+		)
 	}
 
 	/**

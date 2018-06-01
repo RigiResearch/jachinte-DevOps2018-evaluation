@@ -87,7 +87,7 @@ class Manager implements ManagerService {
 	override model(String modelIdentifier)
 		throws RemoteException, ModelNotFoundException {
 		this.ensureModelExists(modelIdentifier)
-		this.models.get(modelIdentifier)
+		this.models.get(modelIdentifier).export()
 	}
 
 	override execute(String modelIdentifier, Command command, String description)

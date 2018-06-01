@@ -64,4 +64,32 @@ class ManagerTest {
 		// If it doesn't throw exception everything is fine
 		manager.register("model-id", model)
 	}
+
+	@Test
+	def void exportEcoreMart() {
+		val xml = '''
+		<?xml version="1.0" encoding="ASCII"?>
+		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https:/migueljimenez.co/devops/infrastructure">
+		  <resources resourceType="variable" name="image">
+		    <attributes>
+		      <elements key="ACED000574000764656661756C74" value="ACED000574000C5562756E74752031342E3034"/>
+		    </attributes>
+		  </resources>
+		</infrastructure:VirtualInfrastructure>
+		'''
+		val id = "model-id"
+		val model = new EcoreMART.Default(
+			new TerraformTemplate(new File("src/test/resources/test.tf")),
+			xml,
+			ModelPackageImpl.canonicalName,
+			VirtualInfrastructure.canonicalName,
+			Infrastructure.canonicalName,
+			InfrastructureMart.canonicalName
+		)
+		val manager = new Manager
+		manager.register(id, model)
+		// If it doesn't throw exception everything is fine
+		val mart = manager.model(id)
+		println(mart.specification.contents)
+	}
 }
