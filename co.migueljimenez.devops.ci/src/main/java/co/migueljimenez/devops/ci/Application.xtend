@@ -93,7 +93,7 @@ class Application {
 	}
 
 	def deploy() {
-		this.models.register(this.localTemplate.toString, this.mart)
+		this.models.register(this.localTemplate.toString, this.mart.specification)
 	}
 
 	def static void main(String[] args) {

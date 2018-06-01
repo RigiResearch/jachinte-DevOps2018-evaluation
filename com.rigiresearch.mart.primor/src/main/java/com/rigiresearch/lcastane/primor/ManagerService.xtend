@@ -48,6 +48,16 @@ interface ManagerService extends Remote {
 		throws RemoteException
 
 	/**
+	 * Registers a new model to be managed.
+	 * <b>Note:</b> This is a temporary workaround. It will be removed when a
+	 * solution is found to register Ecore-based artefacts.
+	 * @param modelIdentifier The model's identifier
+	 * @param specification The model's specification
+	 */
+	def void register(String modelIdentifier, Specification specification)
+		throws RemoteException
+
+	/**
 	 * Executes the given command on the specified model.
 	 * @param modelIdentifier The model's identifier
 	 * @param command The command to execute
