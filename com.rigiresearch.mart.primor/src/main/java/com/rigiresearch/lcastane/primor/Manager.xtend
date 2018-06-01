@@ -68,7 +68,7 @@ class Manager implements ManagerService {
 
 	/**
 	 * FIXME This is a workaround.
-	 * See {@link ManagerService#register(String, String, Specification)
+	 * See {@link ManagerService#register(String, Specification)
 	 */
 	override register(String modelIdentifier, Specification specification)
 		throws RemoteException {
