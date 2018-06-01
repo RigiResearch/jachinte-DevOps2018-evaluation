@@ -84,6 +84,12 @@ class Manager implements ManagerService {
 		this.register(modelIdentifier, mart)
 	}
 
+	override model(String modelIdentifier)
+		throws RemoteException, ModelNotFoundException {
+		this.ensureModelExists(modelIdentifier)
+		this.models.get(modelIdentifier)
+	}
+
 	override execute(String modelIdentifier, Command command, String description)
 		throws RemoteException, ValidationException, ModelNotFoundException {
 		this.ensureModelExists(modelIdentifier)
@@ -92,18 +98,6 @@ class Manager implements ManagerService {
 			'''
 			Command «command.operationType» was applied to model "«modelIdentifier»". Description is: «description»'''
 		)
-	}
-
-	override artefact(String modelIdentifier)
-		throws RemoteException, ModelNotFoundException {
-		this.ensureModelExists(modelIdentifier)
-		this.models.get(modelIdentifier).artefact
-	}
-
-	override specification(String modelIdentifier)
-		throws RemoteException, ModelNotFoundException {
-		this.ensureModelExists(modelIdentifier)
-		this.models.get(modelIdentifier).specification
 	}
 
 	override modelRegistered(String modelIdentifier) throws RemoteException {

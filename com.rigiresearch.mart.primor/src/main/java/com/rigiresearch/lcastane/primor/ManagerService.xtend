@@ -21,14 +21,12 @@
  */
 package com.rigiresearch.lcastane.primor
 
-import com.rigiresearch.lcastane.framework.Artefact
 import com.rigiresearch.lcastane.framework.Command
+import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
-import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.rmi.Remote
 import java.rmi.RemoteException
-import com.rigiresearch.lcastane.framework.EcoreMART
 
 /**
  * A model manager.
@@ -57,6 +55,16 @@ interface ManagerService extends Remote {
 		throws RemoteException
 
 	/**
+	 * Returns the specified model.
+	 * @param identifier The model's identifier
+	 * @return A {@link MART}
+	 * @throws ModelNotFoundException If the model is not found
+	 * @throws RemoteException If there is a communication error
+	 */
+	def MART<?, ?> model(String modelIdentifier)
+		throws RemoteException, ModelNotFoundException
+
+	/**
 	 * Executes the given command on the specified model.
 	 * @param modelIdentifier The model's identifier
 	 * @param command The command to execute
@@ -68,26 +76,6 @@ interface ManagerService extends Remote {
 	 */
 	def void execute(String modelIdentifier, Command command, String description)
 		throws RemoteException, ValidationException, ModelNotFoundException
-
-	/**
-	 * Returns the specified model's artefact.
-	 * @param identifier The model's identifier
-	 * @return An {@link Artefact}
-	 * @throws ModelNotFoundException If the model is not found
-	 * @throws RemoteException If there is a communication error
-	 */
-	def Artefact artefact(String modelIdentifier)
-		throws RemoteException, ModelNotFoundException
-
-	/**
-	 * Returns the specification associated with the specified model.
-	 * @param modelIdentifier The model's identifier
-	 * @return A {@link Notation}
-	 * @throws ModelNotFoundException If the model is not found
-	 * @throws RemoteException If there is a communication error
-	 */
-    def Specification specification(String modelIdentifier)
-        throws RemoteException, ModelNotFoundException
 
 	/**
      * Whether the specified model is registered.
