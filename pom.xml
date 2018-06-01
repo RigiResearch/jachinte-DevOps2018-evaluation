@@ -75,6 +75,7 @@
 		<module>com.rigiresearch.mart.framework</module>
 		<module>co.migueljimenez.devops.mart.infrastructure</module>
 		<module>com.rigiresearch.mart.primor</module>
+		<module>co.migueljimenez.devops.ci</module>
 	</modules>
 
 	<profiles>
