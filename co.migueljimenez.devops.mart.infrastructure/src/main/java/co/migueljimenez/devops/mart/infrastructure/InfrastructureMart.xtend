@@ -25,13 +25,8 @@ import co.migueljimenez.devops.transformation.Hcl2Infrastructure
 import co.migueljimenez.devops.transformation.Hcl2Text
 import co.migueljimenez.devops.transformation.Infrastructure2Hcl
 import co.migueljimenez.devops.transformation.Text2Hcl
-import com.rigiresearch.lcastane.framework.MART
-import com.rigiresearch.lcastane.framework.ObservableArtefact
-import com.rigiresearch.lcastane.framework.ObservableSpecification
-import java.util.Observable
-import java.util.Observer
-import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.framework.Rule
+import com.rigiresearch.lcastane.framework.impl.AbstractMART
 import org.slf4j.LoggerFactory
 
 /**
@@ -41,28 +36,12 @@ import org.slf4j.LoggerFactory
  * @version $Id$
  * @since 0.0.1
  */
-class InfrastructureMart
-	implements MART<ObservableSpecification<TerraformTemplate>, ObservableArtefact<Infrastructure>>, Observer {
+class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure> {
 
 	/**
 	 * The logger.
 	 */
 	val logger = LoggerFactory.getLogger(InfrastructureMart)
-
-	/**
-	 * The specification associated with this model.
-	 */
-	val ObservableSpecification<TerraformTemplate> specification
-
-	/**
-	 * This MARTS's artefact.
-	 */
-	val ObservableArtefact<Infrastructure> artefact
-
-	/**
-	 * The semantic validations associated with this MART.
-	 */
-	val Rule<Infrastructure>[] validations
 
 	/**
 	 * HCL to infrastructure parser.
@@ -80,57 +59,58 @@ class InfrastructureMart
 	val Hcl2Text textParser
 
 	/**
-     * Default constructor.
+     * Primary constructor.
      * @param template The template associated with this model
+     * @param infrastructure The artefact associated with this model
+     * @param validations The semantic validations associated with this model
      */
-	new(TerraformTemplate template, Rule<Infrastructure>... validations) {
-		this.validations = validations
+	new(TerraformTemplate template, Infrastructure infrastructure,
+		Rule<Infrastructure>... validations) {
+		super(template, infrastructure, validations)
 		this.infrastructureParser = new Hcl2Infrastructure
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text
-		this.specification = new ObservableSpecification(template)
-		this.specification.addObserver(this)
-		this.artefact = new ObservableArtefact(new Infrastructure)
-		this.artefact.addObserver(this)
-		// Trigger a synthetic update to synchronize the models
+		this.configureSync()
+		this.logger.info(
+			"Triggering synthetic update to synchronize the artefact and the specification"
+		)
 		this.update(specification, template)
 	}
 
-	override artefact() {
-		this.artefact
+	/**
+     * Secondary constructor constructor.
+     * @param template The template associated with this model
+     * @param validations The semantic validations associated with this model
+     */
+	new(TerraformTemplate template, Rule<Infrastructure>... validations) {
+		this(template, new Infrastructure, validations)
 	}
 
-	override specification() {
-		this.specification
+	/**
+     * Secondary constructor constructor.
+     * @param template The template associated with this model
+     * @param infrastructure The artefact associated with this model
+     */
+	new(TerraformTemplate template, Infrastructure infrastructure) {
+		this(template, infrastructure, #[])
 	}
 
-	override validate() throws ValidationException {
-		this.validations.forEach [ v |
-			if (!v.apply(this.artefact.origin))
-				throw new ValidationException(this.artefact.origin, v)
+	/**
+	 * Sets the procedures to update both artefact and specification in case
+	 * any of them changes.
+	 */
+	def private void configureSync() {
+		super.updateSpecification = [
+			this.specification.origin.update(
+				this.textParser.source(
+					this.hclParser.specification(this.artefact.origin.model)
+				)
+			)
 		]
-	}
-
-	override update(Observable observable, Object argument) {
-		// Update the observed object directly to avoid an infinite loop
-		switch (observable) {
-			ObservableArtefact<Infrastructure>: {
-				this.logger.info('''The «observable.name» artefact was updated''')
-				this.specification.origin.update(
-					this.textParser.source(
-						this.hclParser.specification(observable.origin.model)
-					)
-				)
-			}
-			ObservableSpecification<TerraformTemplate>: {
-				this.logger.info('''The «observable.name» specification was updated''')
-				// TODO Implement a diff mechanism to update the model
-				this.artefact.origin.model = this.infrastructureParser.model(
-					new Text2Hcl(observable.contents).model
-				)
-			}
-			default:
-				this.logger.info('''Unknown observable «observable» was updated''')
-		}
+		super.updateArtefact = [
+			this.artefact.origin.model = this.infrastructureParser.model(
+				new Text2Hcl(this.specification.contents).model
+			)
+		]
 	}
 }
