@@ -19,8 +19,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package com.rigiresearch.lcastane.framework;
+package com.rigiresearch.lcastane.framework.impl;
 
+import com.rigiresearch.lcastane.framework.Artefact;
+import com.rigiresearch.lcastane.framework.Command;
+import com.rigiresearch.lcastane.framework.validation.ValidationException;
 import java.util.Observable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,31 +31,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * Adds observability to a {@link Notation}.
+ * Adds observability to an {@link Artefact}.
  * @author Lorena Castaneda - Initial contribution and API
- * @date 2017-06-13
+ * @date 2018-02-25
  * @version $Id$
  * @since 0.0.1
  */
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
-public final class ObservableSpecification<T extends Specification>
-    extends Observable implements Specification {
+public final class ObservableArtefact<T extends Artefact>
+    extends Observable implements Artefact {
 
     /**
      * Serial version UID.
      */
-    private static final long serialVersionUID = -3665582160942806595L;
+    private static final long serialVersionUID = -601037744088572225L;
 
     /**
-     * The decorated notation.
+     * The decorated artefact.
      */
     @Getter
     private final T origin;
 
     /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Specification#name()
+     * @see com.rigiresearch.lcastane.framework.Artefact#name()
      */
     @Override
     public String name() {
@@ -60,21 +63,13 @@ public final class ObservableSpecification<T extends Specification>
     }
 
     /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Specification#contents()
+     * @see com.rigiresearch.lcastane.framework.Artefact
+     *  #apply(com.rigiresearch.lcastane.framework.Command)
      */
     @Override
-    public String contents() {
-        return this.origin.contents();
-    }
-
-    /* (non-Javadoc)
-     * @see com.rigiresearch.lcastane.framework.Specification
-     *  #update(java.lang.String)
-     */
-    @Override
-    public void update(String contents) {
-        this.origin.update(contents);
+    public void apply(Command command) throws ValidationException {
+        this.origin.apply(command);
         this.setChanged();
-        this.notifyObservers(contents);
+        this.notifyObservers(command);
     }
 }

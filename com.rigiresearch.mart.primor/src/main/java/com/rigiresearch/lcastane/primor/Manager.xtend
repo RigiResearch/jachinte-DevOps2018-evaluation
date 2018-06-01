@@ -27,12 +27,12 @@ import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
 import com.rigiresearch.lcastane.framework.Command
 import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.Specification
+import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import de.xn__ho_hia.storage_unit.StorageUnits
 import java.rmi.RemoteException
 import java.util.Map
 import org.slf4j.LoggerFactory
-import com.rigiresearch.lcastane.framework.ObservableSpecification
 
 /**
  * A {@link ManagerService} implementation.
