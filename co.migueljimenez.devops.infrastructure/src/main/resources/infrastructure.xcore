@@ -40,7 +40,7 @@ class KeyValuePair<K, V> {
 }
 
 class Dictionary<K, V> {
-	refers KeyValuePair<K, V>[] elements
+	contains KeyValuePair<K, V>[] elements
 }
 
 // Entities
@@ -132,6 +132,6 @@ class UnknownResource<K, V> {
 	// The specific OpenStack type
 	String ^type
 	String name
-	refers Dictionary<K, V> attributes
+	contains Dictionary<K, V> attributes
 	container VirtualInfrastructure project opposite resources
 }
