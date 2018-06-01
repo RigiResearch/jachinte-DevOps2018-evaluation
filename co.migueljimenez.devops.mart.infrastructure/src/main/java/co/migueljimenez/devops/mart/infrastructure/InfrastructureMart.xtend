@@ -60,6 +60,7 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
 
 	/**
      * Primary constructor.
+     * The infrastructure and the associated template are supposed to be in sync already.
      * @param template The template associated with this model
      * @param infrastructure The artefact associated with this model
      * @param validations The semantic validations associated with this model
@@ -71,10 +72,6 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text
 		this.configureSync()
-		this.logger.info(
-			"Triggering synthetic update to synchronize the artefact and the specification"
-		)
-		this.update(specification, template)
 	}
 
 	/**
@@ -84,10 +81,15 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
      */
 	new(TerraformTemplate template, Rule<Infrastructure>... validations) {
 		this(template, new Infrastructure, validations)
+		this.logger.info(
+			"Triggering synthetic update to synchronize the artefact and the specification"
+		)
+		this.update(specification, template)
 	}
 
 	/**
      * Secondary constructor constructor.
+     * The infrastructure and the associated template are supposed to be in sync already.
      * @param template The template associated with this model
      * @param infrastructure The artefact associated with this model
      */
