@@ -47,7 +47,7 @@ import lombok.Setter;
  * @since 0.0.1
  */
 public abstract class AbstractMART<S extends Specification, A extends Artefact>
-	implements MART<S, A>, Observer {
+	implements MART<ObservableSpecification<S>, ObservableArtefact<A>>, Observer {
 
 	/**
 	 * Serial version UID.
@@ -132,16 +132,16 @@ public abstract class AbstractMART<S extends Specification, A extends Artefact>
 	 * @see com.rigiresearch.lcastane.framework.MART#artefact()
 	 */
 	@Override
-	public A artefact() {
-		return this.artefact.origin();
+	public ObservableArtefact<A> artefact() {
+		return this.artefact;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.rigiresearch.lcastane.framework.MART#specification()
 	 */
 	@Override
-	public S specification() {
-		return this.specification.origin();
+	public ObservableSpecification<S> specification() {
+		return this.specification;
 	}
 
 	/* (non-Javadoc)

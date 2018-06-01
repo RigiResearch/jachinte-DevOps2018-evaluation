@@ -110,8 +110,8 @@ class Application {
 		this.models.register(
 			this.localTemplate.toString,
 			new EcoreMART.Default(
-				this.mart.specification,
-				this.mart.artefact.serialize,
+				this.mart.specification.origin,
+				this.mart.artefact.origin.serialize,
 				ModelPackageImpl.canonicalName,
 				VirtualInfrastructure.canonicalName,
 				Infrastructure.canonicalName,
