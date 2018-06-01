@@ -21,7 +21,7 @@
  */
 package co.migueljimenez.devops.mart.infrastructure
 
-import co.migueljimenez.devops.infrastructure.model.ModelFactory
+import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.operations.AddResource
 import co.migueljimenez.devops.mart.infrastructure.operations.InfrastructureModelOp
@@ -35,7 +35,6 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
-import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
 
 /**
  * Represents an inventory of infrastructure resources.
