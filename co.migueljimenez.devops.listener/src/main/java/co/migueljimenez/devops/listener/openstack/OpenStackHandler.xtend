@@ -135,7 +135,7 @@ class OpenStackHandler implements EventHandler {
 					)
 			}
 			default:
-				println('''Unknown OpenStack event: «event»''')
+				println('''Unknown OpenStack event: «event.eventType»''')
 		}
 	}
 }

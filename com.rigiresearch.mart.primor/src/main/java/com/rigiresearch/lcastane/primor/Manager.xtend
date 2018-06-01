@@ -90,9 +90,8 @@ class Manager implements ManagerService {
 		throws RemoteException, ValidationException, ModelNotFoundException {
 		this.ensureModelExists(modelIdentifier)
 		this.models.get(modelIdentifier).artefact.apply(command)
-		val s = if(command.arguments.length == 1) "" else "s"
 		this.logger.info(
-			'''Command «command.operationType» («command.arguments.length» argument«s») was applied to model "«modelIdentifier»"'''
+			'''Command «command.operationType» was applied to model "«modelIdentifier»"'''
 		)
 	}
 
