@@ -32,6 +32,7 @@ import java.util.Observable
 import java.util.Observer
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.framework.Rule
+import org.slf4j.LoggerFactory
 
 /**
  * Represents a virtual infrastructure MART.
@@ -42,6 +43,11 @@ import com.rigiresearch.lcastane.framework.Rule
  */
 class InfrastructureMart
 	implements MART<TerraformTemplate, Infrastructure>, Observer {
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(InfrastructureMart)
 
 	/**
 	 * The specification associated with this model.
@@ -106,7 +112,7 @@ class InfrastructureMart
 	}
 
 	override update(Observable observable, Object argument) {
-		println('''Infrastructure MART was notified of an update on «argument»''')
+		this.logger.info('''Infrastructure MART was notified of an update on «observable»''')
 		// Update the observed object directly to avoid an infinite loop
 		switch (observable) {
 			ObservableArtefact<Infrastructure>: {
@@ -123,7 +129,7 @@ class InfrastructureMart
 				)
 			}
 			default:
-				println('''Unknown observable «observable»''')
+				this.logger.info('''Unknown observable «observable»''')
 		}
 	}
 }

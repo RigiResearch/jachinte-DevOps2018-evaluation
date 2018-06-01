@@ -27,6 +27,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
+import org.slf4j.LoggerFactory
 
 /**
  * Represents a physical file compliant with Terraform template.
@@ -38,6 +39,11 @@ import org.eclipse.xtend.lib.annotations.ToString
 @Accessors
 @ToString
 class TerraformTemplate implements Specification {
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(TerraformTemplate)
 
 	/**
 	 * The physical file represented by this specification.
@@ -67,8 +73,8 @@ class TerraformTemplate implements Specification {
 	 * @param contents The terraform template text
 	 */
 	override update(String contents) {
-		println('''Saving specification to disk. File path is «this.file.absolutePath»''')
-		println(contents)
+		this.logger.info('''Saving specification to disk. File path is «this.file.absolutePath»''')
+		this.logger.info(contents)
 		Files.write(
 			Paths.get(this.file.toURI),
 			contents.bytes
