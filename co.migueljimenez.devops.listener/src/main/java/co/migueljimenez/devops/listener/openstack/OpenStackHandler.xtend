@@ -131,7 +131,8 @@ class OpenStackHandler implements EventHandler {
 									this.i.infrastructure
 								)	
 							)
-						)
+						),
+						event.description
 					)
 			}
 			default:

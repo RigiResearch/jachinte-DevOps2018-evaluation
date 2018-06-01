@@ -76,4 +76,16 @@ class OpenStackEvent {
 	 * Empty constructor.
 	 */
 	new() {}
+
+	/**
+	 * A descriptive message of this event.
+	 */
+	def String description() '''
+		User «this.user» from project «this.projectName» updated this file on «this.timestamp»
+		More information:
+		- User domain is «this.projectDomain»
+		- Project domain is «this.projectDomain»
+		- The notification type is «this.eventType», with priority «this.priority»
+		- The message id is «this.messageId»
+	'''
 }

@@ -61,12 +61,13 @@ interface ManagerService extends Remote {
 	 * Executes the given command on the specified model.
 	 * @param modelIdentifier The model's identifier
 	 * @param command The command to execute
+	 * @param description A descriptive message associated with the command
 	 * @throws ValidationException If the sentence is not compliant with the
 	 *  corresponding operation
 	 * @throws ModelNotFoundException If the model is not found
 	 * @throws RemoteException If there is a communication error
 	 */
-	def void execute(String modelIdentifier, Command command)
+	def void execute(String modelIdentifier, Command command, String description)
 		throws RemoteException, ValidationException, ModelNotFoundException
 
 	/**
