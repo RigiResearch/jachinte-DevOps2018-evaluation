@@ -22,16 +22,17 @@
 package co.migueljimenez.devops.infrastructure.model
 
 import java.io.ByteArrayOutputStream
+import java.io.StringReader
 import java.nio.charset.StandardCharsets
+import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.EcorePackage
+import org.eclipse.emf.ecore.resource.URIConverter
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
-import org.eclipse.emf.ecore.resource.URIConverter
-import java.io.StringReader
-import org.eclipse.emf.common.util.EList
 
 /**
  * Parser to serialize and deserialize Ecore objects.
@@ -49,6 +50,8 @@ class SerializationParser {
 	def String asXml(EObject... eObjects) {
 		EcorePackage.eINSTANCE.eClass()
 		ModelPackage.eINSTANCE.eClass()
+		EPackage.Registry.INSTANCE.put(ModelPackage.eNS_URI, ModelPackage.eINSTANCE)
+		EPackage.Registry.INSTANCE.put("https:/migueljimenez.co/devops/infrastructure", ModelPackage.eINSTANCE);
 		val resourceSet = new ResourceSetImpl
 		resourceSet.getResourceFactoryRegistry()
 			.getExtensionToFactoryMap()
