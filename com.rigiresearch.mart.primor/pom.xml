@@ -40,6 +40,9 @@
 			<artifactId>com.rigiresearch.mart.framework</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
+	<!-- The Infrastructure MART. It must be added as dependency because PrIMoR 
+		must know the models it supports at runtime, otherwise when the model instance 
+		is registered there would be a ClassNotFoundException. -->
 		<dependency>
 			<groupId>co.migueljimenez</groupId>
 			<artifactId>co.migueljimenez.devops.mart.infrastructure</artifactId>
