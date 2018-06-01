@@ -54,14 +54,14 @@ class AddResource extends AbstractOperation {
 		Object... arguments) throws ValidationException {
 		val xml = arguments.get(0) as String
 		val objects = this.serializationParser.asEObjects(xml)
-		objects.forEach [ o |
-			switch (o) {
-				Credential:
-					infrastructure.model.add(o)
-				default:
-					infrastructure.model.add(o)
-			}
-		]
+		// FIXME assume there's only one object while I fix the ConcurrentModificationException
+		val o = objects.get(0)
+		switch (o) {
+			Credential:
+				infrastructure.model.add(o)
+			default:
+				infrastructure.model.add(o)
+		}
 	}
 
 	/**
