@@ -64,7 +64,7 @@ class Manager implements ManagerService {
 	override register(String modelIdentifier, MART<?, ?> model)
 		throws RemoteException {
 		this.models.put(modelIdentifier, model)
-		this.logger.info('''Model registered with id "«modelIdentifier»"''')
+		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
 
 	/**
@@ -73,6 +73,7 @@ class Manager implements ManagerService {
 	 */
 	override register(String modelIdentifier, Specification specification)
 		throws RemoteException {
+		this.logger.info('''Instantiating and registering model "«modelIdentifier»"''')
 		val _spec = switch (specification) {
 			TerraformTemplate: specification
 			ObservableSpecification<TerraformTemplate>: specification.origin
@@ -92,8 +93,7 @@ class Manager implements ManagerService {
 		this.models.get(modelIdentifier).artefact.apply(command)
 		this.logger.info(
 			'''
-			Command «command.operationType» was applied to model "«modelIdentifier»"
-			Description is: «description»'''
+			Command «command.operationType» was applied to model "«modelIdentifier»". Description is: «description»'''
 		)
 	}
 
