@@ -67,6 +67,8 @@ class TerraformTemplate implements Specification {
 	 * @param contents The terraform template text
 	 */
 	override update(String contents) {
+		println('''Saving specification to disk. File path is «this.file.absolutePath»''')
+		println(contents)
 		Files.write(
 			Paths.get(this.file.toURI),
 			contents.bytes
