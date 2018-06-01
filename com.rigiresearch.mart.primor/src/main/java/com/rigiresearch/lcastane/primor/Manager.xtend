@@ -31,6 +31,7 @@ import java.util.Map
 import org.eclipse.emf.ecore.resource.URIConverter
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
 import org.slf4j.LoggerFactory
+import org.eclipse.emf.ecore.EcorePackage
 
 /**
  * A {@link ManagerService} implementation.
@@ -66,6 +67,10 @@ class Manager implements ManagerService {
 	}
 
 	override register(String modelIdentifier, EcoreMART<?> model) throws RemoteException {
+		// Register the Ecore package
+		EcorePackage.eINSTANCE.eClass()
+		Class.forName(model.packageImplClassName).getMethod("init").invoke(null)
+		// Load the resource and instantiate the corresponding classes
 		val resource = new XMIResourceImpl()
 		val stream = new URIConverter.ReadableInputStream(new StringReader(model.serializedArtefact))
 		resource.load(stream, newHashMap)

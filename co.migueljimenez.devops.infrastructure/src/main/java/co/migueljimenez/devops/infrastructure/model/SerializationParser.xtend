@@ -43,12 +43,18 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
 class SerializationParser {
 
 	/**
+	 * Default constructor.
+	 */
+	new() {
+		EcorePackage.eINSTANCE.eClass()
+		ModelPackage.eINSTANCE.eClass()
+	}
+
+	/**
 	 * Serializes an {@link EObject} to a String.
 	 * Adapted from https://stackoverflow.com/a/43974978/738968
 	 */
 	def String asXml(EObject... eObjects) {
-		EcorePackage.eINSTANCE.eClass()
-		ModelPackage.eINSTANCE.eClass()
 		val resourceSet = new ResourceSetImpl
 		resourceSet.getResourceFactoryRegistry()
 			.getExtensionToFactoryMap()

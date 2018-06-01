@@ -21,9 +21,8 @@
  */
 package com.rigiresearch.mart.primor
 
-import co.migueljimenez.devops.infrastructure.model.InfrastructureModelElements
-import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
 import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
@@ -43,19 +42,20 @@ class ManagerTest {
 
 	@Test
 	def void ecoreMart() {
-		val i = new InfrastructureModelElements
-		val parser = new SerializationParser
-		val project = i.infrastructure
-		i.unknownResource(
-			"variable",
-			null,
-			"image",
-			#[i.entry("default", "Ubuntu 14.04")],
-			project
-		)
+		val xml = '''
+		<?xml version="1.0" encoding="ASCII"?>
+		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https:/migueljimenez.co/devops/infrastructure">
+		  <resources resourceType="variable" name="image">
+		    <attributes>
+		      <elements key="ACED000574000764656661756C74" value="ACED000574000C5562756E74752031342E3034"/>
+		    </attributes>
+		  </resources>
+		</infrastructure:VirtualInfrastructure>
+		'''
 		val model = new EcoreMART.Default(
 			new TerraformTemplate(new File("src/test/resources/test.tf")),
-			parser.asXml(project),
+			xml,
+			ModelPackageImpl.canonicalName,
 			VirtualInfrastructure.canonicalName,
 			Infrastructure.canonicalName,
 			InfrastructureMart.canonicalName

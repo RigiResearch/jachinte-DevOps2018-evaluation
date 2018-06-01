@@ -47,6 +47,13 @@ public interface EcoreMART<S extends Specification>
 	public String serializedArtefact();
 
 	/**
+	 * Class name of the Ecore package. <b>Notice</b> that the class name should
+	 * refer to the package implementation instead of the interface.
+	 * @return A fully qualified class name
+	 */
+	public String packageImplClassName();
+
+	/**
 	 * Class name of the Ecore model (the root class).
 	 * @return A fully qualified class name
 	 */
@@ -95,6 +102,12 @@ public interface EcoreMART<S extends Specification>
 		private final String serializedArtefact;
 
 		/**
+		 * Class name of the Ecore package. <b>Notice</b> that the class name should
+		 * refer to the package implementation instead of the interface.
+		 */
+		private final String packageImplClassName;
+
+		/**
 		 * Class name of the Ecore model (the root class).
 		 */
 		private final String modelClassName;
@@ -139,6 +152,14 @@ public interface EcoreMART<S extends Specification>
 		@Override
 		public String serializedArtefact() {
 			return this.serializedArtefact;
+		}
+
+		/* (non-Javadoc)
+		 * @see com.rigiresearch.lcastane.framework.EcoreMART#packageClassName()
+		 */
+		@Override
+		public String packageImplClassName() {
+			return this.packageImplClassName;
 		}
 
 		/* (non-Javadoc)

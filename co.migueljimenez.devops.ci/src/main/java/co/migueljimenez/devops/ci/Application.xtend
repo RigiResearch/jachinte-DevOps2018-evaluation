@@ -22,6 +22,7 @@
 package co.migueljimenez.devops.ci
 
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
+import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
 import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
@@ -111,6 +112,7 @@ class Application {
 			new EcoreMART.Default(
 				this.mart.specification,
 				this.mart.artefact.serialize,
+				ModelPackageImpl.canonicalName,
 				VirtualInfrastructure.canonicalName,
 				Infrastructure.canonicalName,
 				InfrastructureMart.canonicalName
