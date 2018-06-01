@@ -37,8 +37,8 @@ import lombok.RequiredArgsConstructor;
  * @version $Id$
  * @since 0.0.1
  */
-public interface EcoreMART<S extends Specification>
-	extends MART<S, EcoreMART.NullArtefact> {
+public interface EcoreMART<S extends Specification, A extends Artefact>
+	extends MART<S, A> {
 
 	/**
 	 * The Ecore-based artefact serialized as XMI.
@@ -79,7 +79,8 @@ public interface EcoreMART<S extends Specification>
 	 * @since 0.0.1
 	 */
 	@RequiredArgsConstructor
-	public static class Default implements EcoreMART<Specification> {
+	public static class Default<S extends Specification, A extends Artefact>
+		implements EcoreMART<S, A> {
 
 		/**
 		 * Serial version UID.
@@ -87,14 +88,9 @@ public interface EcoreMART<S extends Specification>
 		private static final long serialVersionUID = -357931850145435897L;
 
 		/**
-		 * A null artefact that does nothing.
-		 */
-		private final NullArtefact artefact = new NullArtefact();
-
-		/**
 		 * The {@link Serializable} specification.
 		 */
-		private final Specification specification;
+		private final S specification;
 
 		/**
 		 * The artefact serialized as XMI.
@@ -126,15 +122,15 @@ public interface EcoreMART<S extends Specification>
 		 * @see com.rigiresearch.lcastane.framework.MART#artefact()
 		 */
 		@Override
-		public NullArtefact artefact() {
-			return this.artefact;
+		public A artefact() {
+			return null;
 		}
 
 		/* (non-Javadoc)
 		 * @see com.rigiresearch.lcastane.framework.MART#specification()
 		 */
 		@Override
-		public Specification specification() {
+		public S specification() {
 			return this.specification;
 		}
 
@@ -185,37 +181,13 @@ public interface EcoreMART<S extends Specification>
 		public String martClassName() {
 			return this.martClassName;
 		}
-	}
-
-	/**
-	 * A null implementation of {@link Artefact}. It does nothing.
-	 * @author Miguel Jimenez (miguel@uvic.ca)
-	 * @date 2018-06-01
-	 * @version $Id$
-	 * @since 0.0.1
-	 */
-	public static class NullArtefact implements Artefact {
-
-		/**
-		 * Serial version UID.
-		 */
-		private static final long serialVersionUID = 7930442776002900809L;
 
 		/* (non-Javadoc)
-		 * @see com.rigiresearch.lcastane.framework.Artefact#name()
+		 * @see com.rigiresearch.lcastane.framework.MART#export()
 		 */
 		@Override
-		public String name() {
-			return NullArtefact.class.getSimpleName();
-		}
-
-		/* (non-Javadoc)
-		 * @see com.rigiresearch.lcastane.framework.Artefact
-		 *  #apply(com.rigiresearch.lcastane.framework.Command)
-		 */
-		@Override
-		public void apply(Command command) throws ValidationException {
-			// Do nothing
+		public MART<S, A> export() {
+			return this;
 		}
 	}
 }

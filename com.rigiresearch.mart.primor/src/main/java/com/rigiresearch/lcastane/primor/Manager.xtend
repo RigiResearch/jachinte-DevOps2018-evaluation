@@ -66,7 +66,7 @@ class Manager implements ManagerService {
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
 
-	override register(String modelIdentifier, EcoreMART<?> model) throws RemoteException {
+	override register(String modelIdentifier, EcoreMART<?, ?> model) throws RemoteException {
 		// Register the Ecore package
 		EcorePackage.eINSTANCE.eClass()
 		Class.forName(model.packageImplClassName).getMethod("init").invoke(null)

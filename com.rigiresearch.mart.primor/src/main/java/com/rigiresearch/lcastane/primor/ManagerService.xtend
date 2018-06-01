@@ -51,7 +51,7 @@ interface ManagerService extends Remote {
 	 * @param modelIdentifier The model's identifier
 	 * @param model The Ecore-based model to register
 	 */
-	def void register(String modelIdentifier, EcoreMART<?> model)
+	def void register(String modelIdentifier, EcoreMART<?, ?> model)
 		throws RemoteException
 
 	/**
