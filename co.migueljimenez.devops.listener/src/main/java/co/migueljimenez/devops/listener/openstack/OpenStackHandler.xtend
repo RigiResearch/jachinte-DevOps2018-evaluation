@@ -30,12 +30,14 @@ import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
 import java.rmi.registry.LocateRegistry
 import java.rmi.registry.Registry
+import java.util.Map
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.openstack4j.api.OSClient.OSClientV3
 import org.openstack4j.model.common.Identifier
 import org.openstack4j.model.identity.v3.Token
 import org.openstack4j.openstack.OSFactory
+import org.slf4j.LoggerFactory
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -45,6 +47,11 @@ import org.openstack4j.openstack.OSFactory
  * @since 0.0.1
  */
 class OpenStackHandler implements EventHandler {
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(OpenStackHandler)
 
 	/**
 	 * The OpenStack client.
@@ -112,28 +119,38 @@ class OpenStackHandler implements EventHandler {
 	 * Handles an OpenStack event.
 	 */
 	def protected void handle(OpenStackEvent event, Token token) {
-		val client = OSFactory.clientFromToken(token)
 		val modelId = this.primorConfig.getString("model-id")
+		if (!this.models.modelRegistered(modelId)) {
+			this.logger.info(
+				'''OpenStack event was not further handled because the model "«modelId»" hasn't been registered yet'''
+			)
+			return
+		}
+		val client = OSFactory.clientFromToken(token)
+		val Map<String, Object> context = #{
+			"author" -> event.user,
+			"email" -> '''«event.user»@openstack''',
+			"message" -> event.description
+		}
 		switch (event.eventType) {
 			case "keypair.create.end": {
 				val name = event.payload.get("key_name").asText
 				val keypair = client.compute.keypairs.get(name)
-				// TODO handle race conditions and validation exceptions
-				if (this.models.modelRegistered(modelId))
-					this.models.execute(
-						modelId,
-						new Command(
-							InfrastructureModelOp.ADD_RESOURCE,
-							this.serializationParser.asXml(
-								this.i.credential(
-									name,
-									keypair.publicKey,
-									this.i.infrastructure
-								)	
+				this.models.execute(
+					modelId,
+					new Command(
+						InfrastructureModelOp.ADD_RESOURCE,
+						context,
+						this.serializationParser.asXml(
+							this.i.credential(
+								name,
+								keypair.publicKey,
+								this.i.infrastructure
 							)
-						),
-						event.description
-					)
+						)
+					),
+					event.description
+				)
 			}
 			default:
 				println('''Unknown OpenStack event: «event.eventType»''')

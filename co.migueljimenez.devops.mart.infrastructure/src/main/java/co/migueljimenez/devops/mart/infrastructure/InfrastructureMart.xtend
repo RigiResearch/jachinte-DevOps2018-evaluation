@@ -31,8 +31,8 @@ import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.impl.AbstractMART
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
-import com.rigiresearch.lcastane.framework.impl.GitSpecification
 import org.slf4j.LoggerFactory
+import com.rigiresearch.lcastane.framework.impl.GithubSpecification
 
 /**
  * Represents a virtual infrastructure MART.
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory
  * @version $Id$
  * @since 0.0.1
  */
-class InfrastructureMart extends AbstractMART<GitSpecification, Infrastructure> {
+class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructure> {
 
 	/**
 	 * The logger.
@@ -72,7 +72,7 @@ class InfrastructureMart extends AbstractMART<GitSpecification, Infrastructure> 
      */
 	new(FileSpecification template, Infrastructure infrastructure,
 		Rule<Infrastructure>... validations) {
-		super(new GitSpecification(template), infrastructure, validations)
+		super(new GithubSpecification(template), infrastructure, validations)
 		this.infrastructureParser = new Hcl2Infrastructure
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text
@@ -80,7 +80,7 @@ class InfrastructureMart extends AbstractMART<GitSpecification, Infrastructure> 
 	}
 
 	/**
-     * Secondary constructor constructor.
+     * Secondary constructor.
      * @param template The template associated with this model
      * @param validations The semantic validations associated with this model
      */
@@ -119,14 +119,15 @@ class InfrastructureMart extends AbstractMART<GitSpecification, Infrastructure> 
 	 */
 	def private void configureSync() {
 		// Use the non-observable elements to avoid infinite update loop
-		super.updateSpecification = [
+		super.updateSpecification = [ context |
 			this.specification.origin.update(
 				this.textParser.source(
 					this.hclParser.specification(this.artefact.origin.model)
-				)
+				),
+				context
 			)
 		]
-		super.updateArtefact = [
+		super.updateArtefact = [ context |
 			this.artefact.origin.model = this.infrastructureParser.model(
 				new Text2Hcl(this.specification.contents).model
 			)

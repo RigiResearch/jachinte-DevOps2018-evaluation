@@ -60,6 +60,17 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>4.11.0.201803080745-r</version>
 		</dependency>
+		<!-- Properties configuration -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-configuration2</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.3</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

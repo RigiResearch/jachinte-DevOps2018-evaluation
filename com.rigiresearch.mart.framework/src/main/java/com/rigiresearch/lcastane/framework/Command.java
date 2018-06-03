@@ -21,12 +21,14 @@
  */
 package com.rigiresearch.lcastane.framework;
 
-import com.rigiresearch.lcastane.framework.Operation.OperationType;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Map;
+
+import com.rigiresearch.lcastane.framework.Operation.OperationType;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
@@ -54,17 +56,23 @@ public final class Command implements Serializable {
     /**
      * The operation's required operands.
      */
-    @Setter
-    private Object[] arguments;
+    private final Object[] arguments;
+
+    /**
+     * Context information associated with this command.
+     */
+    private final Map<String, Object> context;
 
     /**
      * Default constructor.
      * @param operationType The operation type
+     * @param context Context information associated with this command
      * @param arguments The operation's required operands
      */
-    public Command(final OperationType operationType,
+    public Command(final OperationType operationType, Map<String, Object> context,
         final Object... arguments) {
         this.operationType = operationType;
+        this.context = context;
         this.arguments = arguments;
     }
 

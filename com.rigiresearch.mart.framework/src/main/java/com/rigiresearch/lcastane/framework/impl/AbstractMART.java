@@ -22,14 +22,16 @@
 package com.rigiresearch.lcastane.framework.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure0;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rigiresearch.lcastane.framework.Artefact;
+import com.rigiresearch.lcastane.framework.Command;
 import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.Rule;
 import com.rigiresearch.lcastane.framework.Specification;
@@ -73,13 +75,13 @@ public abstract class AbstractMART<S extends Specification, A extends Artefact>
 	 * The procedure to apply when the artefact changes.
 	 */
 	@Setter
-	protected Procedure0 updateSpecification;
+	protected Procedure1<Map<String, Object>> updateSpecification;
 
 	/**
 	 * The procedure to apply when the specification changes.
 	 */
 	@Setter
-	protected Procedure0 updateArtefact;
+	protected Procedure1<Map<String, Object>> updateArtefact;
 
 	/**
 	 * The semantic validations associated with this MART.
@@ -107,18 +109,19 @@ public abstract class AbstractMART<S extends Specification, A extends Artefact>
 	@Override
 	@SuppressWarnings("unchecked")
 	public void update(Observable observable, Object argument) {
+		Command command = (Command) argument;
 		if (observable instanceof ObservableArtefact<?>) {
 			ObservableArtefact<A> a = (ObservableArtefact<A>) observable;
 			this.logger.info(
 				String.format("The %s artefact was updated", a.name())
 			);
-			this.updateSpecification.apply();
+			this.updateSpecification.apply(command.context());
 		} else if (observable instanceof ObservableSpecification<?>) {
 			ObservableSpecification<S> s = (ObservableSpecification<S>) observable;
 			this.logger.info(
 				String.format("The %s specification was updated", s.name())
 			);
-			this.updateArtefact.apply();
+			this.updateArtefact.apply(command.context());
 		} else {
 			// Should not happen as this MART should only observe its artefact and
 			// specification
