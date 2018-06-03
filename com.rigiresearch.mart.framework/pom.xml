@@ -54,5 +54,18 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.5.6</version>
 		</dependency>
+		<!-- jGit -->
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>4.11.0.201803080745-r</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jgit-repository</id>
+			<url>https://repo.eclipse.org/content/groups/releases/</url>
+		</repository>
+	</repositories>
 </project>
