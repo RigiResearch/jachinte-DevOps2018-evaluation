@@ -54,7 +54,7 @@ public interface MART<S extends Specification, A extends Artefact>
      * Exports {@code this} {@link MART} to be sent over the network.
      * @return this {@link MART} or an equivalent {@link EcoreMART}.
      */
-    MART<S, A> export();
+    MART<?, ?> export();
 
     /**
      * Runs the semantic validations associated with this MART.
