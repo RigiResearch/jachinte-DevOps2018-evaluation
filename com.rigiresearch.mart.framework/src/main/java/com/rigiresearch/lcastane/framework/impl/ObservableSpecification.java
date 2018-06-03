@@ -21,6 +21,7 @@
  */
 package com.rigiresearch.lcastane.framework.impl;
 
+import java.util.Map;
 import java.util.Observable;
 
 import com.rigiresearch.lcastane.framework.Specification;
@@ -76,8 +77,19 @@ public final class ObservableSpecification<T extends Specification>
      */
     @Override
     public void update(String contents) {
-        this.origin.update(contents);
+    	this.origin.update(contents);
         this.setChanged();
         this.notifyObservers(contents);
     }
+
+	/* (non-Javadoc)
+	 * @see com.rigiresearch.lcastane.framework.Specification
+	 *  #update(java.lang.String, java.util.Map)
+	 */
+	@Override
+	public void update(String contents, Map<String, Object> data) {
+		this.origin.update(contents, data);
+        this.setChanged();
+        this.notifyObservers(contents);
+	}
 }
