@@ -22,6 +22,7 @@
 package com.rigiresearch.lcastane.framework;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Represents the basic behavior of a textual specification.
@@ -49,4 +50,11 @@ public interface Specification extends Serializable {
      * @param contents The new contents
      */
     void update(String contents);
+
+    /**
+     * Updates this notation's content.
+     * @param contents The new contents
+     * @param data Information that provides context and describes the change
+     */
+    void update(String contents, Map<String, Object> data);
 }
