@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rigiresearch.lcastane.framework.Artefact;
-import com.rigiresearch.lcastane.framework.Command;
 import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.Rule;
 import com.rigiresearch.lcastane.framework.Specification;
@@ -109,19 +108,19 @@ public abstract class AbstractMART<S extends Specification, A extends Artefact>
 	@Override
 	@SuppressWarnings("unchecked")
 	public void update(Observable observable, Object argument) {
-		Command command = (Command) argument;
+		Map<String, Object> context = (Map<String, Object>) argument;
 		if (observable instanceof ObservableArtefact<?>) {
 			ObservableArtefact<A> a = (ObservableArtefact<A>) observable;
 			this.logger.info(
 				String.format("The %s artefact was updated", a.name())
 			);
-			this.updateSpecification.apply(command.context());
+			this.updateSpecification.apply(context);
 		} else if (observable instanceof ObservableSpecification<?>) {
 			ObservableSpecification<S> s = (ObservableSpecification<S>) observable;
 			this.logger.info(
 				String.format("The %s specification was updated", s.name())
 			);
-			this.updateArtefact.apply(command.context());
+			this.updateArtefact.apply(context);
 		} else {
 			// Should not happen as this MART should only observe its artefact and
 			// specification

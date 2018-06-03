@@ -87,9 +87,9 @@ public final class ObservableSpecification<T extends Specification>
 	 *  #update(java.lang.String, java.util.Map)
 	 */
 	@Override
-	public void update(String contents, Map<String, Object> data) {
-		this.origin.update(contents, data);
+	public void update(String contents, Map<String, Object> context) {
+		this.origin.update(contents, context);
         this.setChanged();
-        this.notifyObservers(contents);
+        this.notifyObservers(context);
 	}
 }
