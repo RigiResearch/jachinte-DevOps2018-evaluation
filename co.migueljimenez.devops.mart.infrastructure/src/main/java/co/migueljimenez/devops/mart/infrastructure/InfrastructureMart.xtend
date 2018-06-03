@@ -31,8 +31,9 @@ import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.impl.AbstractMART
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
-import org.slf4j.LoggerFactory
 import com.rigiresearch.lcastane.framework.impl.GithubSpecification
+import java.util.HashMap
+import org.slf4j.LoggerFactory
 
 /**
  * Represents a virtual infrastructure MART.
@@ -89,7 +90,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 		this.logger.info(
 			"Triggering synthetic update to synchronize the artefact and the specification"
 		)
-		this.update(specification, #{})
+		this.update(specification, new HashMap<String, Object>())
 	}
 
 	/**
