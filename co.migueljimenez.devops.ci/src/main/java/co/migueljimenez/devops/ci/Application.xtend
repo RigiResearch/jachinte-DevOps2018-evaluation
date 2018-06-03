@@ -21,13 +21,8 @@
  */
 package co.migueljimenez.devops.ci
 
-import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
-import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
-import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
-import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
-import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
@@ -107,17 +102,7 @@ class Application {
 	 * Registers the MART on PrIMoR.
 	 */
 	def deploy() {
-		this.models.register(
-			this.localTemplate.toString,
-			new EcoreMART.Default(
-				this.mart.specification.origin,
-				this.mart.artefact.origin.serialize,
-				ModelPackageImpl.canonicalName,
-				VirtualInfrastructure.canonicalName,
-				Infrastructure.canonicalName,
-				InfrastructureMart.canonicalName
-			)
-		)
+		this.models.register(this.localTemplate.toString, this.mart.export)
 	}
 
 	def static void main(String[] args) {
