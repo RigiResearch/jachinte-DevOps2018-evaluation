@@ -30,6 +30,8 @@ import co.migueljimenez.devops.transformation.Text2Hcl
 import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.impl.AbstractMART
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
+import com.rigiresearch.lcastane.framework.impl.GitSpecification
 import org.slf4j.LoggerFactory
 
 /**
@@ -39,7 +41,7 @@ import org.slf4j.LoggerFactory
  * @version $Id$
  * @since 0.0.1
  */
-class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure> {
+class InfrastructureMart extends AbstractMART<GitSpecification, Infrastructure> {
 
 	/**
 	 * The logger.
@@ -68,9 +70,9 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
      * @param infrastructure The artefact associated with this model
      * @param validations The semantic validations associated with this model
      */
-	new(TerraformTemplate template, Infrastructure infrastructure,
+	new(FileSpecification template, Infrastructure infrastructure,
 		Rule<Infrastructure>... validations) {
-		super(template, infrastructure, validations)
+		super(new GitSpecification(template), infrastructure, validations)
 		this.infrastructureParser = new Hcl2Infrastructure
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text
@@ -82,7 +84,7 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
      * @param template The template associated with this model
      * @param validations The semantic validations associated with this model
      */
-	new(TerraformTemplate template, Rule<Infrastructure>... validations) {
+	new(FileSpecification template, Rule<Infrastructure>... validations) {
 		this(template, new Infrastructure, validations)
 		this.logger.info(
 			"Triggering synthetic update to synchronize the artefact and the specification"
@@ -96,13 +98,13 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
      * @param template The template associated with this model
      * @param infrastructure The artefact associated with this model
      */
-	new(TerraformTemplate template, Infrastructure infrastructure) {
+	new(FileSpecification template, Infrastructure infrastructure) {
 		this(template, infrastructure, #[])
 	}
 
 	override export() {
 		new EcoreMART.Default(
-			this.specification,
+			this.specification.origin.origin,
 			this.artefact.origin.serialize,
 			ModelPackageImpl.canonicalName,
 			VirtualInfrastructure.canonicalName,
@@ -116,6 +118,7 @@ class InfrastructureMart extends AbstractMART<TerraformTemplate, Infrastructure>
 	 * any of them changes.
 	 */
 	def private void configureSync() {
+		// Use the non-observable elements to avoid infinite update loop
 		super.updateSpecification = [
 			this.specification.origin.update(
 				this.textParser.source(

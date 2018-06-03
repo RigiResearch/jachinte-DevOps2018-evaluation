@@ -23,6 +23,7 @@ package co.migueljimenez.devops.ci
 
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
@@ -74,7 +75,7 @@ class Application {
 	new(File template) {
 		this.localTemplate = template
 		this.mart = new InfrastructureMart(
-			new TerraformTemplate(template),
+			new FileSpecification(template),
 			new ConstrainedRam(StorageUnits.gigabyte(1L))
 		)
 		this.primorConfig = new Configurations().properties("primor.properties")

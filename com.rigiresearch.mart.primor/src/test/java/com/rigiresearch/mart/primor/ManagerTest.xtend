@@ -25,8 +25,8 @@ import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
-import co.migueljimenez.devops.mart.infrastructure.TerraformTemplate
 import com.rigiresearch.lcastane.framework.EcoreMART
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.primor.Manager
 import java.io.File
 import org.junit.Test
@@ -53,7 +53,7 @@ class ManagerTest {
 		</infrastructure:VirtualInfrastructure>
 		'''
 		val model = new EcoreMART.Default(
-			new TerraformTemplate(new File("src/test/resources/test.tf")),
+			new FileSpecification(new File("src/test/resources/test.tf")),
 			xml,
 			ModelPackageImpl.canonicalName,
 			VirtualInfrastructure.canonicalName,
@@ -79,7 +79,7 @@ class ManagerTest {
 		'''
 		val id = "model-id"
 		val model = new EcoreMART.Default(
-			new TerraformTemplate(new File("src/test/resources/test.tf")),
+			new FileSpecification(new File("src/test/resources/test.tf")),
 			xml,
 			ModelPackageImpl.canonicalName,
 			VirtualInfrastructure.canonicalName,
