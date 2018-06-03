@@ -90,13 +90,13 @@ class Manager implements ManagerService {
 		this.models.get(modelIdentifier).export()
 	}
 
-	override execute(String modelIdentifier, Command command, String description)
+	override execute(String modelIdentifier, Command command)
 		throws RemoteException, ValidationException, ModelNotFoundException {
 		this.ensureModelExists(modelIdentifier)
 		this.models.get(modelIdentifier).artefact.apply(command)
 		this.logger.info(
 			'''
-			Command «command.operationType» was applied to model "«modelIdentifier»". Description is: «description»'''
+			Command «command.operationType» was applied to model "«modelIdentifier»"'''
 		)
 	}
 
