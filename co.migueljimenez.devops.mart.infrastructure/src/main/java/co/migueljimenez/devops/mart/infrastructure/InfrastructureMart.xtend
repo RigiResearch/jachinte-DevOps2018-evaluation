@@ -89,7 +89,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 		this.logger.info(
 			"Triggering synthetic update to synchronize the artefact and the specification"
 		)
-		this.update(specification, template)
+		this.update(specification, #{})
 	}
 
 	/**
