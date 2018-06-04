@@ -26,11 +26,10 @@ import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.validation.ValidationException
-import java.net.URI
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.eclipse.emf.ecore.EObject
-import java.io.File
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -73,9 +72,9 @@ class AddResource extends AbstractOperation {
 	 */
 	def private add(VirtualInfrastructure project, Credential eObject,
 		File specificationFile) {
-		val file = '''«specificationFile.parentFile.name»«File.separator»«eObject.name».pub'''
-		Files.write(Paths.get(new URI(file)), eObject.publicKey.bytes)
-		eObject.publicKey = '''${file("«file»")}"'''
+		val file = new File(specificationFile.parentFile, '''«eObject.name».pub''')
+		Files.write(Paths.get(file.toURI), eObject.publicKey.bytes)
+		eObject.publicKey = '''${file("«file.parentFile.name»/«file.name»")}"'''
 		eObject.project = project
 	}
 
