@@ -138,6 +138,8 @@ public class GithubSpecification implements Specification {
 				.setUpdate(true)
 				.addFilepattern(".")
 				.call();
+			if (git.status().call().isClean())
+				return;
 			git.commit()
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
 				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
