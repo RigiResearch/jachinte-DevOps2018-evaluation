@@ -74,7 +74,7 @@ class AddResource extends AbstractOperation {
 		File specificationFile) {
 		val file = new File(specificationFile.parentFile, '''«eObject.name».pub''')
 		Files.write(Paths.get(file.toURI), eObject.publicKey.bytes)
-		eObject.publicKey = '''${file("«file.parentFile.name»/«file.name»")}"'''
+		eObject.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
 		eObject.project = project
 	}
 
