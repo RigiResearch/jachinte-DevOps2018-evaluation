@@ -89,7 +89,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 		this.logger.info(
 			"Triggering synthetic update to synchronize the artefact and the specification"
 		)
-		this.update(this.specification, newHashMap)
+		this.update(this.specification, <String, Object>newHashMap)
 	}
 
 	/**
@@ -103,7 +103,13 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 		this.logger.info(
 			"Triggering synthetic update to synchronize the local specification file"
 		)
-		this.update(this.artefact, newHashMap)
+		this.update(
+			this.artefact,
+			<String, Object>newHashMap(
+				"author" -> "Infrastructure-MART",
+				"email" -> "Infrastructure-MART@PrIMoR"
+			)
+		)
 	}
 
 	override export() {
