@@ -129,7 +129,7 @@ public class GithubSpecification implements Specification {
 			git.commit()
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
 				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
-				.setMessage((String) data.get("message")) 
+				.setMessage(String.format("Update %s", this.origin.file().getName())) 
 				.call();
 			git.push()
 				.setCredentialsProvider(credentialsProvider)

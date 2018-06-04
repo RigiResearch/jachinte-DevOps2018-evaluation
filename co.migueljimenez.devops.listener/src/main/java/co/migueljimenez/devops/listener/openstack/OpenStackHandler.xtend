@@ -129,8 +129,7 @@ class OpenStackHandler implements EventHandler {
 		val client = OSFactory.clientFromToken(token)
 		val Map<String, Object> context = #{
 			"author" -> event.user,
-			"email" -> '''«event.user»@openstack''',
-			"message" -> event.description
+			"email" -> '''«event.user»@openstack'''
 		}
 		switch (event.eventType) {
 			case "keypair.create.end": {
