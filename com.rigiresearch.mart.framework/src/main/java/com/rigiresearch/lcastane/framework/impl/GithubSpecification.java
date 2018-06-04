@@ -66,11 +66,6 @@ public class GithubSpecification implements Specification {
 	private final CredentialsProvider credentialsProvider;
 
 	/**
-	 * The remote (Github) repository URL.
-	 */
-	private final String remoteGitUrl;
-
-	/**
 	 * Default constructor.
 	 * 
 	 * FIXME Find a way to setup Github per MART. As of now, PrIMoR will assume
@@ -89,12 +84,6 @@ public class GithubSpecification implements Specification {
 		this.credentialsProvider = new UsernamePasswordCredentialsProvider(
 			config.getString("authentication-token"),
 			new String()
-		);
-		this.remoteGitUrl = String.format(
-			"https://%s@github.com/%s/%s.git",
-			config.getString("authentication-token"),
-			config.getString("repository-owner"),
-			config.getString("repository-name")
 		);
 	}
 
@@ -132,17 +121,17 @@ public class GithubSpecification implements Specification {
 		try(Git git = Git.open(this.origin.file().getParentFile())) {
 			InetAddress ia = InetAddress.getLocalHost();
 			git.pull()
-				.setRemote(this.remoteGitUrl)
 				.setCredentialsProvider(credentialsProvider)
 				.call();
 			this.origin.update(contents);
+			git.add()
+				.addFilepattern(this.origin.file().getName());
 			git.commit()
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
 				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
 				.setMessage((String) data.get("message")) 
 				.call();
 			git.push()
-				.setRemote(this.remoteGitUrl)
 				.setCredentialsProvider(credentialsProvider)
 				.call();
 		} catch (IOException | GitAPIException e) {
