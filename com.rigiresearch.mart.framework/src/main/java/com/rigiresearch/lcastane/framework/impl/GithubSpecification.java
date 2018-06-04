@@ -131,7 +131,10 @@ public class GithubSpecification implements Specification {
 	public void update(String contents, Map<String, Object> data) {
 		try(Git git = Git.open(this.origin.file().getParentFile())) {
 			InetAddress ia = InetAddress.getLocalHost();
-			git.pull().call();
+			git.pull()
+				.setRemote(this.remoteGitUrl)
+				.setCredentialsProvider(credentialsProvider)
+				.call();
 			this.origin.update(contents);
 			git.commit()
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
