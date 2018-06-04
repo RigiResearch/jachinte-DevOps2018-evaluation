@@ -33,6 +33,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rigiresearch.lcastane.framework.Specification;
 
@@ -53,6 +55,11 @@ public class GithubSpecification implements Specification {
 	 * Serial version UID.
 	 */
 	private static final long serialVersionUID = -1195173764888520896L;
+
+	/**
+	 * The logger.
+	 */
+	private final Logger logger = LoggerFactory.getLogger(GithubSpecification.class);
 
 	/**
 	 * The decorated specification.
@@ -123,7 +130,7 @@ public class GithubSpecification implements Specification {
 			git.pull()
 				.setCredentialsProvider(credentialsProvider)
 				.call();
-			this.origin.update(contents);
+			this.origin.update(contents, data);
 			git.commit()
 				.setAll(true)
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
@@ -133,6 +140,12 @@ public class GithubSpecification implements Specification {
 			git.push()
 				.setCredentialsProvider(credentialsProvider)
 				.call();
+			this.logger.info(
+				String.format(
+					"The changes were pushed to Github. Context is %s",
+					data
+				)
+			);
 		} catch (IOException | GitAPIException e) {
 			e.printStackTrace();
 		}		

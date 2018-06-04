@@ -106,15 +106,15 @@ public class FileSpecification implements Specification {
 	 */
 	@Override
 	public void update(String contents, Map<String, Object> data) {
-		this.logger.info(
-			String.format(
-				"Saving specification to disk \"%s\". Context is %s",
-				this.file,
-				data
-			)
-		);
 		try {
 			Files.write(Paths.get(this.file.toURI()), contents.getBytes());
+			this.logger.info(
+				String.format(
+					"The specification file (%s) was updated. Context is %s",
+					this.file,
+					data
+				)
+			);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
