@@ -23,6 +23,8 @@ package co.migueljimenez.devops.mart.infrastructure.operations;
 
 import com.rigiresearch.lcastane.framework.Operation.OperationType;
 
+import co.migueljimenez.devops.infrastructure.model.Credential;
+
 /**
  * The type of operations supported by the infrastructure model.
  * @author Miguel Jimenez (miguel@uvic.ca)
@@ -32,7 +34,7 @@ import com.rigiresearch.lcastane.framework.Operation.OperationType;
  */
 public enum InfrastructureModelOp implements OperationType {
 	/**
-	 * Adds a new resource to the infrastructure model.
+	 * Adds a new {@link Credential} to the infrastructure model.
 	 */
-	ADD_RESOURCE
+	ADD_CREDENTIAL
 }

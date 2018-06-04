@@ -38,6 +38,7 @@ import org.openstack4j.model.common.Identifier
 import org.openstack4j.model.identity.v3.Token
 import org.openstack4j.openstack.OSFactory
 import org.slf4j.LoggerFactory
+import java.io.File
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -138,7 +139,7 @@ class OpenStackHandler implements EventHandler {
 				this.models.execute(
 					modelId,
 					new Command(
-						InfrastructureModelOp.ADD_RESOURCE,
+						InfrastructureModelOp.ADD_CREDENTIAL,
 						context,
 						this.serializationParser.asXml(
 							this.i.credential(
@@ -146,7 +147,8 @@ class OpenStackHandler implements EventHandler {
 								keypair.publicKey,
 								this.i.infrastructure
 							)
-						)
+						),
+						new File(modelId)
 					)
 				)
 			}

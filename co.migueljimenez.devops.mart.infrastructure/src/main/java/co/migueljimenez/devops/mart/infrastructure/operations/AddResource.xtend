@@ -26,7 +26,11 @@ import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.validation.ValidationException
+import java.net.URI
+import java.nio.file.Files
+import java.nio.file.Paths
 import org.eclipse.emf.ecore.EObject
+import java.io.File
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -46,7 +50,7 @@ class AddResource extends AbstractOperation {
 	 * Default constructor.
 	 */
 	new() {
-		super(InfrastructureModelOp.ADD_RESOURCE)
+		super(InfrastructureModelOp.ADD_CREDENTIAL)
 		this.serializationParser = new SerializationParser
 	}
 
@@ -57,8 +61,8 @@ class AddResource extends AbstractOperation {
 		// FIXME assume there's only one object while I fix the ConcurrentModificationException
 		val o = objects.get(0)
 		switch (o) {
-			Credential:
-				infrastructure.model.add(o)
+			Credential: // arguments: credential, specification file
+				infrastructure.model.add(o, arguments.get(1) as File)
 			default:
 				infrastructure.model.add(o)
 		}
@@ -67,7 +71,11 @@ class AddResource extends AbstractOperation {
 	/**
 	 * Add a {@link Credential} to the given project.
 	 */
-	def private add(VirtualInfrastructure project, Credential eObject) {
+	def private add(VirtualInfrastructure project, Credential eObject,
+		File specificationFile) {
+		val file = '''«specificationFile.parentFile.name»«File.separator»«eObject.name».pub'''
+		Files.write(Paths.get(new URI(file)), eObject.publicKey.bytes)
+		eObject.publicKey = '''${file("«file»")}"'''
 		eObject.project = project
 	}
 
