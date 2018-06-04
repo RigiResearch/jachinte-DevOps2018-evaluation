@@ -124,9 +124,8 @@ public class GithubSpecification implements Specification {
 				.setCredentialsProvider(credentialsProvider)
 				.call();
 			this.origin.update(contents);
-			git.add()
-				.addFilepattern(this.origin.file().getName());
 			git.commit()
+				.setAll(true)
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
 				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
 				.setMessage(String.format("Update %s", this.origin.file().getName())) 
