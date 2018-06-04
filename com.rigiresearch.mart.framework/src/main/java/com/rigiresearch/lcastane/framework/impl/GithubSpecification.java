@@ -31,6 +31,7 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -128,6 +129,7 @@ public class GithubSpecification implements Specification {
 		try(Git git = Git.open(this.origin.file().getParentFile())) {
 			InetAddress ia = InetAddress.getLocalHost();
 			git.pull()
+				.setStrategy(MergeStrategy.THEIRS)
 				.setCredentialsProvider(credentialsProvider)
 				.call();
 			this.origin.update(contents, data);
