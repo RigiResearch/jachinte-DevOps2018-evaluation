@@ -22,7 +22,6 @@
 package com.rigiresearch.lcastane.primor
 
 import com.rigiresearch.lcastane.framework.Command
-import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.rmi.Remote
@@ -44,14 +43,6 @@ interface ManagerService extends Remote {
 	 * @param model The model to register
 	 */
 	def void register(String modelIdentifier, MART<?, ?> model)
-		throws RemoteException
-
-	/**
-	 * Registers a new model to be managed.
-	 * @param modelIdentifier The model's identifier
-	 * @param model The Ecore-based model to register
-	 */
-	def void register(String modelIdentifier, EcoreMART<?, ?> model)
 		throws RemoteException
 
 	/**

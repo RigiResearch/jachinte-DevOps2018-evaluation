@@ -62,11 +62,15 @@ class Manager implements ManagerService {
 
 	override register(String modelIdentifier, MART<?, ?> model)
 		throws RemoteException {
-		this.models.put(modelIdentifier, model)
+		val instance = switch (model) {
+			EcoreMART<?, ?>: this.instantiate(model)
+			default: model
+		}
+		this.models.put(modelIdentifier, instance)
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
 
-	override register(String modelIdentifier, EcoreMART<?, ?> model) throws RemoteException {
+	def private instantiate(EcoreMART<?, ?> model) {
 		// Register the Ecore package
 		EcorePackage.eINSTANCE.eClass()
 		Class.forName(model.packageImplClassName).getMethod("init").invoke(null)
@@ -81,7 +85,7 @@ class Manager implements ManagerService {
 		val artefact = artefactClass.getDeclaredConstructor(rootClass).newInstance(root)
 		val mart = martClass.getDeclaredConstructor(model.specification.class, artefactClass)
 			.newInstance(model.specification, artefact) as MART<?, ?>
-		this.register(modelIdentifier, mart)
+		return mart
 	}
 
 	override model(String modelIdentifier)
