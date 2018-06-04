@@ -32,7 +32,6 @@ import com.rigiresearch.lcastane.framework.Rule
 import com.rigiresearch.lcastane.framework.impl.AbstractMART
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.impl.GithubSpecification
-import java.util.HashMap
 import org.slf4j.LoggerFactory
 
 /**
@@ -90,7 +89,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 		this.logger.info(
 			"Triggering synthetic update to synchronize the artefact and the specification"
 		)
-		this.update(specification, new HashMap<String, Object>())
+		this.update(this.specification, newHashMap)
 	}
 
 	/**
@@ -101,6 +100,10 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
      */
 	new(FileSpecification template, Infrastructure infrastructure) {
 		this(template, infrastructure, #[])
+		this.logger.info(
+			"Triggering synthetic update to synchronize the local specification file"
+		)
+		this.update(this.artefact, newHashMap)
 	}
 
 	override export() {
