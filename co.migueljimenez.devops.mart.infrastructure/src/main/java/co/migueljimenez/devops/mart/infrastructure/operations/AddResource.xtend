@@ -73,6 +73,7 @@ class AddResource extends AbstractOperation {
 	def private add(VirtualInfrastructure project, Credential eObject,
 		File specificationFile) {
 		val file = new File(specificationFile.parentFile, '''files/«eObject.name».pub''')
+		file.parentFile.mkdir // create the "files" directory in case it doesn't exist
 		Files.write(Paths.get(file.toURI), eObject.publicKey.bytes)
 		eObject.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
 		eObject.project = project
