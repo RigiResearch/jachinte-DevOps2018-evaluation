@@ -44,7 +44,7 @@ class ManagerTest {
 	def void ecoreMart() {
 		val xml = '''
 		<?xml version="1.0" encoding="ASCII"?>
-		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https:/migueljimenez.co/devops/infrastructure">
+		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https://migueljimenez.co/devops/infrastructure">
 		  <resources resourceType="variable" name="image">
 		    <attributes>
 		      <elements key="ACED000574000764656661756C74" value="ACED000574000C5562756E74752031342E3034"/>
@@ -69,7 +69,7 @@ class ManagerTest {
 	def void exportEcoreMart() {
 		val xml = '''
 		<?xml version="1.0" encoding="ASCII"?>
-		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https:/migueljimenez.co/devops/infrastructure">
+		<infrastructure:VirtualInfrastructure xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:infrastructure="https://migueljimenez.co/devops/infrastructure">
 		  <resources resourceType="variable" name="image">
 		    <attributes>
 		      <elements key="ACED000574000764656661756C74" value="ACED000574000C5562756E74752031342E3034"/>

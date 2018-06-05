@@ -1,4 +1,4 @@
-@Ecore(nsPrefix="hcl", nsURI="https:/migueljimenez.co/devops/hcl")
+@Ecore(nsPrefix="hcl", nsURI="https://migueljimenez.co/devops/hcl")
 @GenModel(
     bundleManifest="false",
     modelDirectory="co.migueljimenez.devops.hcl/src/main/java-gen",
