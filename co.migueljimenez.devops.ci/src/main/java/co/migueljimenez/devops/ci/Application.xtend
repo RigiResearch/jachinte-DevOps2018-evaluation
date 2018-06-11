@@ -33,6 +33,7 @@ import java.rmi.registry.LocateRegistry
 import java.rmi.registry.Registry
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
+import java.util.List
 
 /**
  * The main execution entry.
@@ -44,14 +45,14 @@ import org.apache.commons.configuration2.builder.fluent.Configurations
 class Application {
 
 	/**
-	 * The local template file.
+	 * The local Git repository.
 	 */
-	val File localTemplate
+	val File localRepository
 
 	/**
-	 * The MART instance associated with the input template.
+	 * The MART instances associated with the Terraform templates.
 	 */
-	val InfrastructureMart mart
+	val List<InfrastructureMart> marts
 
 	/**
 	 * The (remote) RMI registry.
@@ -72,12 +73,9 @@ class Application {
 	 * Default constructor.
 	 * @param template The template associated with the MART's specification
 	 */
-	new(File template) {
-		this.localTemplate = template
-		this.mart = new InfrastructureMart(
-			new FileSpecification(template),
-			new ConstrainedRam(StorageUnits.gigabyte(1L))
-		)
+	new(File repository) {
+		this.localRepository = repository
+		this.marts = newArrayList
 		this.primorConfig = new Configurations().properties("primor.properties")
 		this.registry = LocateRegistry.getRegistry(
 			this.primorConfig.getString("manager-host"),
@@ -85,30 +83,54 @@ class Application {
 		)
 		this.models =
 			this.registry.lookup(RemoteService.MANAGER.toString) as ManagerService
+		this.instantiateMarts(this.localRepository)
+	}
+
+	/**
+	 * Looks for Terraform templates in the given directory, recursively, and
+	 * instantiates a MART per each of them.
+	 */
+	def private void instantiateMarts(File directory) {
+		directory.listFiles.forEach [ f |
+			if (f.directory) {
+				this.instantiateMarts(f)
+			} else if (f.name.endsWith(".tf")) {
+				this.marts.add(
+					new InfrastructureMart(
+						new FileSpecification(f),
+						new ConstrainedRam(StorageUnits.gigabyte(1L))
+					)
+				)
+			}
+		]
 	}
 
 	/**
 	 * Validates the MART.
 	 */
 	def validate() {
-		try {
-			this.mart.validate()
-		} catch (ValidationException e) {
-			System.err.println(e.message)
-			System.exit(1)
-		}
+		this.marts.forEach[ mart |
+			try {
+				mart.validate()
+			} catch (ValidationException e) {
+				System.err.println(e.message)
+				System.exit(1)
+			}	
+		]
 	}
 
 	/**
 	 * Registers the MART on PrIMoR.
 	 */
 	def deploy() {
-		this.models.register(this.localTemplate.toString, this.mart.export)
+		this.marts.forEach [ mart |
+			this.models.register(this.localRepository.toString, mart.export)
+		]
 	}
 
 	def static void main(String[] args) {
 		if (args.length != 1)
-			throw new IllegalArgumentException("A Terraform file path is expected")
+			throw new IllegalArgumentException("A Terraform repository path is expected")
 		val app = new Application(new File(args.get(0)))
 		app.validate
 		app.deploy
