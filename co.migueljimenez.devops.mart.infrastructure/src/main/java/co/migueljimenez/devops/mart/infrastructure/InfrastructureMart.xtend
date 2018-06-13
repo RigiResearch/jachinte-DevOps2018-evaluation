@@ -72,7 +72,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
      */
 	new(FileSpecification template, Infrastructure infrastructure,
 		Rule<Infrastructure>... validations) {
-		super(new GithubSpecification(template), infrastructure, validations)
+		super(new GithubSpecification(template, true), infrastructure, validations)
 		this.infrastructureParser = new Hcl2Infrastructure
 		this.hclParser = new Infrastructure2Hcl
 		this.textParser = new Hcl2Text

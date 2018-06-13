@@ -74,15 +74,22 @@ public class GithubSpecification implements Specification {
 	private final CredentialsProvider credentialsProvider;
 
 	/**
+	 * Whether CI build should be skipped.
+	 */
+	private final boolean skipCi;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * FIXME Find a way to setup Github per MART. As of now, PrIMoR will assume
 	 * that all MART use the same credentials specified in github.properties
 	 * 
 	 * @param origin The decorated specification
+	 * @param skipCi Whether to skip CI
 	 */
-	public GithubSpecification(final FileSpecification origin) {
+	public GithubSpecification(final FileSpecification origin, final boolean skipCi) {
 		this.origin = origin;
+		this.skipCi = skipCi;
 		Configuration config = null;
 		try {
 			config = new Configurations().properties("github.properties");
@@ -93,6 +100,15 @@ public class GithubSpecification implements Specification {
 			config.getString("authentication-token"),
 			new String()
 		);
+	}
+
+	/**
+	 * Secondary constructor.
+	 * 
+	 * @param origin The decorated specification
+	 */
+	public GithubSpecification(final FileSpecification origin) {
+		this(origin, false);
 	}
 
 	/* (non-Javadoc)
@@ -145,7 +161,13 @@ public class GithubSpecification implements Specification {
 			git.commit()
 				.setAuthor((String) data.get("author"), (String) data.get("email"))
 				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
-				.setMessage(String.format("Update %s", this.origin.file().getName())) 
+				.setMessage(
+					String.format(
+						"Update %s%s",
+						this.origin.file().getName(),
+						this.skipCi ? " [skip ci]" : ""
+					)
+				)
 				.call();
 			git.push()
 				.setCredentialsProvider(credentialsProvider)
