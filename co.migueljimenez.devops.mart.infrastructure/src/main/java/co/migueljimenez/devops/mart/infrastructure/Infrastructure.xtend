@@ -36,7 +36,6 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
-import java.io.File
 
 /**
  * Represents an inventory of infrastructure resources.
@@ -75,8 +74,8 @@ class Infrastructure implements Artefact {
 			InfrastructureModelOp.ADD_CREDENTIAL,
 			new AddResource().addRule(
 				Rule.Type.PRE,
-				// Ecore objects serialized as XMI, specification file
-				new TypesValidation(String, File)
+				// Ecore objects serialized as XMI, specification file path
+				new TypesValidation(String, String)
 			)
 		)
 		this.serializationParser = new SerializationParser

@@ -38,7 +38,6 @@ import org.openstack4j.model.common.Identifier
 import org.openstack4j.model.identity.v3.Token
 import org.openstack4j.openstack.OSFactory
 import org.slf4j.LoggerFactory
-import java.io.File
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -148,7 +147,7 @@ class OpenStackHandler implements EventHandler {
 								this.i.infrastructure
 							)
 						),
-						new File(modelId)
+						modelId
 					)
 				)
 			}

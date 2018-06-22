@@ -55,13 +55,15 @@ class AddResource extends AbstractOperation {
 
 	override protected applyOp(Infrastructure infrastructure,
 		Object... arguments) throws ValidationException {
+		// arguments: Ecore model XML, specification file
 		val xml = arguments.get(0) as String
+		val file = new File(arguments.get(1) as String)
 		val objects = this.serializationParser.asEObjects(xml)
 		// FIXME assume there's only one object while I fix the ConcurrentModificationException
 		val o = objects.get(0)
 		switch (o) {
-			Credential: // arguments: credential, specification file
-				infrastructure.model.add(o, arguments.get(1) as File)
+			Credential:
+				infrastructure.model.add(o, file)
 			default:
 				infrastructure.model.add(o)
 		}
