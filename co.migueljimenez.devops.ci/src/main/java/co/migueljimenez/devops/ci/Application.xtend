@@ -22,7 +22,7 @@
 package co.migueljimenez.devops.ci
 
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
-import co.migueljimenez.devops.mart.infrastructure.TerraformSpecification
+import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecification
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.primor.ManagerService
