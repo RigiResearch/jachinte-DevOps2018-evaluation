@@ -87,7 +87,8 @@ public class GithubSpecification implements Specification {
 	 * @param origin The decorated specification
 	 * @param skipCi Whether to skip CI
 	 */
-	public GithubSpecification(final FileSpecification origin, final boolean skipCi) {
+	public GithubSpecification(final FileSpecification origin,
+		final boolean skipCi) {
 		this.origin = origin;
 		this.skipCi = skipCi;
 		Configuration config = null;
