@@ -27,8 +27,6 @@ import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 import org.eclipse.emf.ecore.EObject
 
 /**
@@ -46,11 +44,24 @@ class AddResource extends AbstractOperation {
 	val SerializationParser serializationParser
 
 	/**
+	 * Notation-specific preprocessor.
+	 */
+	val SpecificationPreprocessor preprocessor
+
+	/**
 	 * Default constructor.
 	 */
-	new() {
+	new(SpecificationPreprocessor preprocessor) {
 		super(InfrastructureModelOp.ADD_CREDENTIAL)
 		this.serializationParser = new SerializationParser
+		this.preprocessor = preprocessor
+	}
+
+	/**
+	 * Secondary constructor.
+	 */
+	new() {
+		this(new SpecificationPreprocessor.NullImpl)
 	}
 
 	override protected applyOp(Infrastructure infrastructure,
@@ -74,10 +85,7 @@ class AddResource extends AbstractOperation {
 	 */
 	def private add(VirtualInfrastructure project, Credential eObject,
 		File specificationFile) {
-		val file = new File(specificationFile.parentFile, '''.keys/«eObject.name».pub''')
-		file.parentFile.mkdir // create the ".keys" directory in case it doesn't exist
-		Files.write(Paths.get(file.toURI), eObject.publicKey.bytes)
-		eObject.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
+		this.preprocessor.preprocess(eObject, specificationFile)
 		eObject.project = project
 	}
 
