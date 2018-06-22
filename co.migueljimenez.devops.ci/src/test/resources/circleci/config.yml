@@ -1,0 +1,46 @@
+version: 2
+
+jobs:
+  validate_terraform:
+    docker:
+      - image: hashicorp/terraform
+    steps:
+      - checkout
+      - run:
+          name: Validate Terraform Formatting
+          command: "[ -z \"$(terraform fmt -write=false)\" ] || { terraform fmt -write=false -diff; exit 1; }"
+
+  deploy:
+    docker:
+      - image: hashicorp/terraform
+    steps:
+      - checkout
+      - run:
+          name: Install Alpine dependencies
+          command: apk add bash jq
+      - run:
+          name: Initialize Terraform
+          command: terraform init -input=false
+      - run:
+          name: Deploy
+          command: .circleci/do-exclusively.sh --branch master terraform apply -input=false -auto-approve
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - validate_terraform
+
+      - deploy:
+          requires:
+            - validate_terraform
+          filters:
+            branches:
+              only: master
+
+      - test:
+          requires:
+            - deploy
+          filters:
+            branches:
+only: master
