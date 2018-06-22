@@ -22,8 +22,8 @@
 package co.migueljimenez.devops.ci
 
 import co.migueljimenez.devops.mart.infrastructure.InfrastructureMart
+import co.migueljimenez.devops.mart.infrastructure.TerraformSpecification
 import co.migueljimenez.devops.mart.infrastructure.validation.ConstrainedRam
-import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
@@ -31,9 +31,9 @@ import de.xn__ho_hia.storage_unit.StorageUnits
 import java.io.File
 import java.rmi.registry.LocateRegistry
 import java.rmi.registry.Registry
+import java.util.Map
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
-import java.util.List
 
 /**
  * The main execution entry.
@@ -52,7 +52,7 @@ class Application {
 	/**
 	 * The MART instances associated with the Terraform templates.
 	 */
-	val List<InfrastructureMart> marts
+	val Map<File, InfrastructureMart> marts
 
 	/**
 	 * The (remote) RMI registry.
@@ -75,7 +75,7 @@ class Application {
 	 */
 	new(File repository) {
 		this.localRepository = repository
-		this.marts = newArrayList
+		this.marts = newHashMap
 		this.primorConfig = new Configurations().properties("primor.properties")
 		this.registry = LocateRegistry.getRegistry(
 			this.primorConfig.getString("manager-host"),
@@ -95,9 +95,10 @@ class Application {
 			if (f.directory) {
 				this.instantiateMarts(f)
 			} else if (f.name.endsWith(".tf")) {
-				this.marts.add(
+				this.marts.put(
+					f,
 					new InfrastructureMart(
-						new FileSpecification(f),
+						new TerraformSpecification(f),
 						new ConstrainedRam(StorageUnits.gigabyte(1L))
 					)
 				)
@@ -109,7 +110,7 @@ class Application {
 	 * Validates the MART.
 	 */
 	def validate() {
-		this.marts.forEach[ mart |
+		this.marts.values.forEach[ mart |
 			try {
 				mart.validate()
 			} catch (ValidationException e) {
@@ -123,8 +124,8 @@ class Application {
 	 * Registers the MART on PrIMoR.
 	 */
 	def deploy() {
-		this.marts.forEach [ mart |
-			this.models.register(this.localRepository.toString, mart.export)
+		this.marts.entrySet.forEach [ entry |
+			this.models.register(entry.key.toString, entry.value.export)
 		]
 	}
 
