@@ -54,8 +54,9 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 		Files.write(Paths.get(file.toURI), element.publicKey.bytes)
 		element.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
 		// Defer the resource import until the specification is updated
-		TerraformSpecification.IMPORTS
-			.get(specificationFile)
-			.add(new TerraformImport("openstack_compute_keypair_v2", element.name))
+		TerraformSpecification.deferImport(
+			specificationFile,
+			new TerraformImport("openstack_compute_keypair_v2", element.name)
+		)
 	}
 }

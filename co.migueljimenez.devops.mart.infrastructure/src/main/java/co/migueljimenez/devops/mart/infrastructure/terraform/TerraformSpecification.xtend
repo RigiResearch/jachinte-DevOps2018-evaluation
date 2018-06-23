@@ -66,7 +66,7 @@ class TerraformSpecification extends FileSpecification {
 	/**
 	 * Pending imports per specification file.
 	 */
-	public val static Map<File, List<TerraformImport>> IMPORTS = newHashMap
+	val static Map<File, List<TerraformImport>> IMPORTS = newHashMap
 
 	/**
 	 * Default constructor.
@@ -74,7 +74,6 @@ class TerraformSpecification extends FileSpecification {
 	 */
 	new(File file) {
 		super(file)
-		IMPORTS.put(file, newArrayList)
 	}
 
 	override void update(String contents) {
@@ -84,6 +83,8 @@ class TerraformSpecification extends FileSpecification {
 	override void update(String contents, Map<String, Object> data) {
 		super.update(contents, data)
 		this.execute("terraform fmt -write=true")
+		if (!TerraformSpecification.IMPORTS.containsKey(this.file))
+			TerraformSpecification.IMPORTS.put(this.file, newArrayList)
 		val imports = TerraformSpecification.IMPORTS.get(this.file)
 		synchronized(imports) {
 			imports.forEach [ i |
@@ -99,5 +100,13 @@ class TerraformSpecification extends FileSpecification {
 			System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''],
 			this.file.parentFile
 		)
+	}
+
+	def static deferImport(File specificationFile, TerraformImport ^import) {
+		if (!TerraformSpecification.IMPORTS.containsKey(specificationFile))
+			TerraformSpecification.IMPORTS.put(specificationFile, newArrayList)
+		TerraformSpecification.IMPORTS
+			.get(specificationFile)
+			.add(^import)
 	}
 }
