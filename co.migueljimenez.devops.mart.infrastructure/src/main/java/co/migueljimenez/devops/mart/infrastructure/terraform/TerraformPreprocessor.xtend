@@ -49,7 +49,7 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 	}
 
 	def protected preprocess(Credential element, File specificationFile) {
-		val file = new File(specificationFile.parentFile, '''.keys/«element.name».pub''')
+		val file = new File(specificationFile.parentFile, '''.keys/«element.name».pem''')
 		file.parentFile.mkdir // create the ".keys" directory in case it doesn't exist
 		Files.write(Paths.get(file.toURI), element.publicKey.bytes)
 		element.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
