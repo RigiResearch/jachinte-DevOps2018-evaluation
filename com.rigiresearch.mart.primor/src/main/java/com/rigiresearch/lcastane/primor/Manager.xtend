@@ -26,12 +26,17 @@ import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.io.StringReader
+import java.net.URL
 import java.rmi.RemoteException
 import java.util.Map
+import org.apache.commons.configuration2.builder.fluent.Configurations
+import org.eclipse.emf.ecore.EcorePackage
 import org.eclipse.emf.ecore.resource.URIConverter
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.transport.CredentialsProvider
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
-import org.eclipse.emf.ecore.EcorePackage
 
 /**
  * A {@link ManagerService} implementation.
@@ -54,20 +59,45 @@ class Manager implements ManagerService {
 	val Map<String, MART<?, ?>> models
 
 	/**
+	 * The Github credentials provider.
+	 */
+	val CredentialsProvider credentialsProvider
+
+	/**
 	 * Default constructor.
 	 */
 	new() {
 		this.models = newHashMap
+		val config = new Configurations().properties("github.properties");
+		this.credentialsProvider = new UsernamePasswordCredentialsProvider(
+			config.getString("authentication-token"),
+			new String()
+		);
 	}
 
 	override register(String modelIdentifier, MART<?, ?> model)
+		throws RemoteException {
+		this.register(modelIdentifier, model, null)
+	}
+
+	override register(String modelIdentifier, MART<?, ?> model, URL repository)
 		throws RemoteException {
 		val instance = switch (model) {
 			EcoreMART<?, ?>: this.instantiate(model)
 			default: model
 		}
+		if (repository !== null)
+			this.cloneRepository(repository)
 		this.models.put(modelIdentifier, instance)
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
+	}
+
+	def private cloneRepository(URL remote) {
+		Git.cloneRepository
+			.setURI(remote.toString)
+			.setCredentialsProvider(this.credentialsProvider)
+			.call
+		this.logger.info('''Repository «remote» has been cloned''')
 	}
 
 	def private instantiate(EcoreMART<?, ?> model) {

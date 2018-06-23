@@ -29,11 +29,13 @@ import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
 import de.xn__ho_hia.storage_unit.StorageUnits
 import java.io.File
+import java.net.URL
 import java.rmi.registry.LocateRegistry
 import java.rmi.registry.Registry
 import java.util.Map
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 
 /**
  * The main execution entry.
@@ -124,8 +126,14 @@ class Application {
 	 * Registers the MART on PrIMoR.
 	 */
 	def deploy() {
+		val repositoryBuilder = new FileRepositoryBuilder
+		repositoryBuilder.setMustExist(true)
+		repositoryBuilder.setGitDir(this.localRepository)
+		val repository = repositoryBuilder.build
+		// From: https://stackoverflow.com/a/38062680/738968
+		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
-			this.models.register(entry.key.toString, entry.value.export)
+			this.models.register(entry.key.toString, entry.value.export, remote)
 		]
 	}
 
