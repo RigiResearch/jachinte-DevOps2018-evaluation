@@ -123,7 +123,9 @@ class Application {
 	}
 
 	/**
-	 * Registers the MART on PrIMoR.
+	 * Registers the MARTs on PrIMoR.
+	 * If a model has been already registered, it is deployed without cloning
+	 * the associated repository.
 	 */
 	def deploy() {
 		val repository = new FileRepositoryBuilder()
@@ -133,7 +135,10 @@ class Application {
 		// From: https://stackoverflow.com/a/38062680/738968
 		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
-			this.models.register(entry.key.toString, entry.value.export, remote)
+			if (!this.models.modelRegistered(entry.key.toString))
+				this.models.register(entry.key.toString, entry.value.export, remote)
+			else
+				this.models.register(entry.key.toString, entry.value.export)
 		]
 	}
 
