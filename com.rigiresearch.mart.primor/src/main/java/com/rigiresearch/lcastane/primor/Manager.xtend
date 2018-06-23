@@ -82,12 +82,12 @@ class Manager implements ManagerService {
 
 	override register(String modelIdentifier, MART<?, ?> model, URL repository)
 		throws RemoteException {
+		if (repository !== null)
+			this.cloneRepository(repository)
 		val instance = switch (model) {
 			EcoreMART<?, ?>: this.instantiate(model)
 			default: model
 		}
-		if (repository !== null)
-			this.cloneRepository(repository)
 		this.models.put(modelIdentifier, instance)
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
