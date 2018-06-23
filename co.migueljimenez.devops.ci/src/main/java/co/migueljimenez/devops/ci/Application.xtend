@@ -126,10 +126,10 @@ class Application {
 	 * Registers the MART on PrIMoR.
 	 */
 	def deploy() {
-		val repositoryBuilder = new FileRepositoryBuilder
-		repositoryBuilder.setMustExist(true)
-		repositoryBuilder.setGitDir(this.localRepository)
-		val repository = repositoryBuilder.build
+		val repository = new FileRepositoryBuilder()
+			.setMustExist(true)
+			.setGitDir(new File(this.localRepository, ".git"))
+			.build
 		// From: https://stackoverflow.com/a/38062680/738968
 		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
