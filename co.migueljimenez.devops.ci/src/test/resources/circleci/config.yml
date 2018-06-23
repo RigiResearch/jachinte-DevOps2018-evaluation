@@ -10,6 +10,15 @@ jobs:
           name: Validate Terraform Formatting
           command: "[ -z \"$(terraform fmt -write=false)\" ] || { terraform fmt -write=false -diff; exit 1; }"
 
+  deploy_models:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - run:
+          name: Validate and deploy Infrastructure models
+          command: java -jar .circleci/mart-deployer.jar .
+
   deploy:
     docker:
       - image: hashicorp/terraform
@@ -31,9 +40,17 @@ workflows:
     jobs:
       - validate_terraform
 
+      - deploy_models:
+        requires:
+          - validate_terraform
+        filters:
+            branches:
+              only: master
+
       - deploy:
           requires:
             - validate_terraform
+            - deploy_models
           filters:
             branches:
               only: master
@@ -43,4 +60,4 @@ workflows:
             - deploy
           filters:
             branches:
-only: master
+              only: master
