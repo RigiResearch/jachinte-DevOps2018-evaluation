@@ -23,6 +23,7 @@ package co.migueljimenez.devops.mart.infrastructure
 
 import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.infrastructure.model.impl.ModelPackageImpl
+import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecification
 import co.migueljimenez.devops.transformation.Hcl2Infrastructure
 import co.migueljimenez.devops.transformation.Hcl2Text
 import co.migueljimenez.devops.transformation.Infrastructure2Hcl
@@ -110,6 +111,13 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 				"email" -> "Infrastructure-MART@PrIMoR"
 			)
 		)
+	}
+
+	/**
+	 * FIXME I'm adding this constructor to avoid any instantiation problem in PriMoR.
+	 */
+	new(TerraformSpecification template, Infrastructure infrastructure) {
+		this(template as FileSpecification, infrastructure)
 	}
 
 	override export() {
