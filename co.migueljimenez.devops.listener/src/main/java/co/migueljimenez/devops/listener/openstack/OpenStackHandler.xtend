@@ -98,7 +98,7 @@ class OpenStackHandler implements EventHandler {
 			)
 			.scopeToProject(
 				Identifier.byName(osConf.getString("project-name")),
-				Identifier.byName(osConf.getString("domain-name"))
+				Identifier.byName(osConf.getString("user-domain-name"))
 			)
 			.authenticate()
 		this.registry = LocateRegistry.getRegistry(
