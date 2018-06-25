@@ -72,7 +72,7 @@ class TerraformSpecification extends FileSpecification {
 	/**
 	 * The environment variables to execute Terraform commands.
 	 */
-	val List<String> environment;
+	val List<String> environment = newArrayList
 
 	/**
 	 * Default constructor.
@@ -80,8 +80,13 @@ class TerraformSpecification extends FileSpecification {
 	 */
 	new(File file) {
 		super(file)
+		this.initialise
+	}
+
+	def private initialise() {
+		if (!TerraformSpecification.IMPORTS.containsKey(this.file))
+			TerraformSpecification.IMPORTS.put(this.file, newArrayList)
 		val osConf = new Configurations().properties("openstack.properties")
-		this.environment = newArrayList
 		this.environment.add('''OS_USERNAME=«osConf.getString("username")»''')
 		this.environment.add('''OS_PASSWORD=«osConf.getString("password")»''')
 		this.environment.add('''OS_AUTH_URL=«osConf.getString("endpoint")»''')
@@ -97,9 +102,8 @@ class TerraformSpecification extends FileSpecification {
 
 	override void update(String contents, Map<String, Object> data) {
 		super.update(contents, data)
+		this.initialise
 		this.execute("terraform fmt -write=true")
-		if (!TerraformSpecification.IMPORTS.containsKey(this.file))
-			TerraformSpecification.IMPORTS.put(this.file, newArrayList)
 		val imports = TerraformSpecification.IMPORTS.get(this.file)
 		synchronized(imports) {
 			imports.forEach [ i |
