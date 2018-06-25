@@ -27,6 +27,7 @@ import java.util.List
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import org.apache.commons.configuration2.builder.fluent.Configurations
 
 /**
  * File-based specification that executes Terraform to format the specification
@@ -69,11 +70,25 @@ class TerraformSpecification extends FileSpecification {
 	val static Map<File, List<TerraformImport>> IMPORTS = newHashMap
 
 	/**
+	 * The environment variables to execute Terraform commands.
+	 */
+	val List<String> environment;
+
+	/**
 	 * Default constructor.
 	 * @param file The physical file represented by this specification
 	 */
 	new(File file) {
 		super(file)
+		val osConf = new Configurations().properties("openstack.properties")
+		this.environment = newArrayList
+		this.environment.add('''OS_USERNAME=«osConf.getString("username")»''')
+		this.environment.add('''OS_PASSWORD=«osConf.getString("password")»''')
+		this.environment.add('''OS_AUTH_URL=«osConf.getString("endpoint")»''')
+		this.environment.add('''OS_PROJECT_NAME=«osConf.getString("project-name")»''')
+		this.environment.add('''OS_USER_DOMAIN_NAME=«osConf.getString("user-domain-name")»''')
+		this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
+		this.execute("terraform init")
 	}
 
 	override void update(String contents) {
@@ -97,7 +112,7 @@ class TerraformSpecification extends FileSpecification {
 	def private execute(String terraformCommand) {
 		Runtime.runtime.exec(
 			terraformCommand,
-			System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''],
+			this.environment,
 			this.file.parentFile
 		)
 	}
