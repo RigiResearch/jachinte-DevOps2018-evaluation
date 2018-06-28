@@ -25,9 +25,11 @@ import com.rigiresearch.lcastane.framework.Command
 import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
+import java.io.File
 import java.io.StringReader
 import java.net.URL
 import java.rmi.RemoteException
+import java.util.List
 import java.util.Map
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.emf.ecore.EcorePackage
@@ -37,6 +39,8 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * A {@link ManagerService} implementation.
@@ -59,6 +63,11 @@ class Manager implements ManagerService {
 	val Map<String, MART<?, ?>> models
 
 	/**
+	 * The list of local directories associated with cloned repositories.
+	 */
+	val List<File> clonedRepositories
+
+	/**
 	 * The Github credentials provider.
 	 */
 	val CredentialsProvider credentialsProvider
@@ -68,11 +77,18 @@ class Manager implements ManagerService {
 	 */
 	new() {
 		this.models = newHashMap
+		this.clonedRepositories = newArrayList
 		val config = new Configurations().properties("github.properties");
 		this.credentialsProvider = new UsernamePasswordCredentialsProvider(
 			config.getString("authentication-token"),
 			new String()
-		);
+		)
+		Runtime.runtime.addShutdownHook(new Thread()[
+			this.clonedRepositories.forEach [ d |
+				Files.delete(Paths.get(d.canonicalPath))
+				this.logger.info('''Local repository «d.name» has been deleted''')
+			]
+		])
 	}
 
 	override register(String modelIdentifier, MART<?, ?> model)
@@ -93,11 +109,14 @@ class Manager implements ManagerService {
 	}
 
 	def private cloneRepository(URL remote) {
-		Git.cloneRepository
+		val repository = Git.cloneRepository
 			.setURI(remote.toString)
 			.setCredentialsProvider(this.credentialsProvider)
 			.call
-		this.logger.info('''Repository «remote» has been cloned''')
+			.repository
+		this.logger.info('''Repository «remote» has been cloned to directory «repository.directory.name»''')
+		this.clonedRepositories.add(repository.directory)
+		repository.close
 	}
 
 	def private instantiate(EcoreMART<?, ?> model) {
