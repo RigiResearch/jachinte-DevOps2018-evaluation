@@ -74,11 +74,12 @@ class Server {
 	 * @param manager The manager service instance to publish
 	 */
 	new(ManagerService manager) {
+		this.manager = manager
 		this.configuration = new Configurations().properties("primor.properties")
+		this.exportedManager = UnicastRemoteObject.exportObject(this.manager, 0)
 		this.registry = LocateRegistry.createRegistry(
 			this.configuration.getInt("manager-port")
 		)
-		this.manager = manager
 	}
 
 	/**
@@ -87,7 +88,6 @@ class Server {
 	 * @throws AlreadyBoundException If an instance of primor is already running
 	 */
 	def void bindServices() throws IOException, AlreadyBoundException {
-		this.exportedManager = UnicastRemoteObject.exportObject(this.manager, 0)
 		// Bind the remote object's stub in the registry
 		this.registry.bind(RemoteService.MANAGER.toString(), this.exportedManager)
 		this.logger.info("PrIMoR services have been started")
