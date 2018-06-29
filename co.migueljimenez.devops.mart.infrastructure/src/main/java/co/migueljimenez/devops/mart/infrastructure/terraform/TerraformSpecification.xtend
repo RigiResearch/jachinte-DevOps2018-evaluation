@@ -126,6 +126,7 @@ class TerraformSpecification extends FileSpecification {
 			this.environment,
 			this.file.parentFile
 		)
+		process.waitFor
 		this.logger.info('''Executed "«terraformCommand»" (dir: «this.file.parentFile»)''')
 		if (process.exitValue != 0)
 			this.logger.error(
