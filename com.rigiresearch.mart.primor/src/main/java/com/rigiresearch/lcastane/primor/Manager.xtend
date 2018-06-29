@@ -32,7 +32,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.rmi.RemoteException
 import java.util.Comparator
-import java.util.List
 import java.util.Map
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.emf.ecore.EcorePackage
@@ -64,9 +63,9 @@ class Manager implements ManagerService {
 	val Map<String, MART<?, ?>> models
 
 	/**
-	 * The list of local directories associated with cloned repositories.
+	 * The local repositories associated with MARTs.
 	 */
-	val List<File> clonedRepositories
+	val Map<String, File> clonedRepositories
 
 	/**
 	 * The Github credentials provider.
@@ -78,20 +77,19 @@ class Manager implements ManagerService {
 	 */
 	new() {
 		this.models = newHashMap
-		this.clonedRepositories = newArrayList
+		this.clonedRepositories = newHashMap
 		val config = new Configurations().properties("github.properties");
 		this.credentialsProvider = new UsernamePasswordCredentialsProvider(
 			config.getString("authentication-token"),
 			new String()
 		)
 		Runtime.runtime.addShutdownHook(new Thread()[
-			this.clonedRepositories.forEach [ d |
-				// d is the .git directory
-				Files.walk(Paths.get(d.parent))
+			this.clonedRepositories.keySet.forEach [ id |
+				Files.walk(Paths.get(this.clonedRepositories.get(id).canonicalPath))
 				    .sorted(Comparator.reverseOrder)
 				    .map(p|p.toFile)
 				    .forEach[f|f.delete]
-				this.logger.info('''Local repository «d.parentFile.name» has been deleted''')
+				this.logger.info('''Local repository for model "«id»" has been deleted''')
 			]
 		])
 	}
@@ -104,7 +102,7 @@ class Manager implements ManagerService {
 	override register(String modelIdentifier, MART<?, ?> model, URL repository)
 		throws RemoteException {
 		if (repository !== null)
-			this.cloneRepository(repository)
+			this.cloneRepository(modelIdentifier, repository)
 		val instance = switch (model) {
 			EcoreMART<?, ?>: this.instantiate(model)
 			default: model
@@ -113,15 +111,15 @@ class Manager implements ManagerService {
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
 
-	def private cloneRepository(URL remote) {
+	def private cloneRepository(String modelIdentifier, URL remote) {
 		val repository = Git.cloneRepository
 			.setURI(remote.toString)
 			.setDirectory(Files.createTempDirectory("").toFile)
 			.setCredentialsProvider(this.credentialsProvider)
 			.call
 			.repository
-		this.logger.info('''Repository «remote» has been cloned''')
-		this.clonedRepositories.add(repository.directory)
+		this.logger.info('''Repository "«remote»" has been cloned''')
+		this.clonedRepositories.put(modelIdentifier, repository.directory.parentFile)
 		repository.close
 	}
 
