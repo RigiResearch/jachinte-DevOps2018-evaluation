@@ -86,7 +86,7 @@ class Manager implements ManagerService {
 		)
 		Runtime.runtime.addShutdownHook(new Thread()[
 			this.clonedRepositories.forEach [ d |
-				// repository is the .git directory
+				// d is the .git directory
 				Files.walk(Paths.get(d.parent))
 				    .sorted(Comparator.reverseOrder)
 				    .map(p|p.toFile)
