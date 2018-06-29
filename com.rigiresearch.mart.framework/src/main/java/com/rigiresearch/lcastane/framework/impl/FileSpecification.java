@@ -33,8 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import com.rigiresearch.lcastane.framework.Specification;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
@@ -46,7 +47,7 @@ import lombok.experimental.Accessors;
  * @since 0.0.1
  */
 @Accessors(fluent = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
 @ToString
 public class FileSpecification implements Specification {
 
@@ -64,7 +65,8 @@ public class FileSpecification implements Specification {
 	 * The physical file represented by this specification.
 	 */
 	@Getter
-	private final File file;
+	@Setter
+	private File file;
 
 	/* (non-Javadoc)
 	 * @see com.rigiresearch.lcastane.framework.Specification#name()
