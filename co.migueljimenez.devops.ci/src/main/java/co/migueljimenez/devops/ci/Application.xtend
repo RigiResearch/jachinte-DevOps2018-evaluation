@@ -97,10 +97,14 @@ class Application {
 			if (f.directory) {
 				this.instantiateMarts(f)
 			} else if (f.name.endsWith(".tf")) {
+				// A relative file path so it works on a remote machine
+				val relativeFile = new File(
+					this.localRepository.toURI.relativize(f.toURI).getPath
+				)
 				this.marts.put(
-					f,
+					relativeFile,
 					new InfrastructureMart(
-						new TerraformSpecification(f),
+						new TerraformSpecification(relativeFile),
 						new ConstrainedRam(StorageUnits.gigabyte(1L))
 					)
 				)
