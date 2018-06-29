@@ -106,7 +106,7 @@ class OpenStackHandler implements EventHandler {
 	 */
 	def private openStackClient() {
 		val osConf = new Configurations().properties("openstack.properties")
-		val method = osConf.getString("authtentication-method")
+		val method = osConf.getString("authentication-method")
 		var client = OSFactory.builderV3()
 			.endpoint(osConf.getString("OS_AUTH_URL"))
 		switch (method) {
