@@ -13,6 +13,7 @@ jobs:
   deploy_models:
     docker:
       - image: circleci/openjdk:8-jdk
+      - image: hashicorp/terraform
     steps:
       - checkout
       - run:
