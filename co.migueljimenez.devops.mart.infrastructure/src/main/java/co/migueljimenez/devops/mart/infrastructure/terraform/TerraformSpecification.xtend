@@ -29,6 +29,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 
 /**
  * File-based specification that executes Terraform to format the specification
@@ -120,12 +121,16 @@ class TerraformSpecification extends FileSpecification {
 	}
 
 	def private execute(String terraformCommand) {
-		Runtime.runtime.exec(
+		val process = Runtime.runtime.exec(
 			terraformCommand,
 			this.environment,
 			this.file.parentFile
 		)
-		this.logger.info('''Executed "«terraformCommand»"''')
+		this.logger.info('''Executed "«terraformCommand»" (dir: «this.file.parentFile»)''')
+		if (process.exitValue != 0)
+			this.logger.error(
+				'''Exit value is «process.exitValue». Error output is: «process.errorStream.convertToString»'''
+			)
 	}
 
 	def static deferImport(File specificationFile, TerraformImport ^import) {
@@ -134,5 +139,13 @@ class TerraformSpecification extends FileSpecification {
 		TerraformSpecification.IMPORTS
 			.get(specificationFile)
 			.add(^import)
+	}
+
+	def String convertToString(InputStream is) {
+	    val s = new java.util.Scanner(is).useDelimiter("\\A")
+	    if (s.hasNext())
+	    	s.next
+	    else
+	    	""
 	}
 }
