@@ -76,10 +76,10 @@ class Server {
 	new(ManagerService manager) {
 		this.manager = manager
 		this.configuration = new Configurations().properties("primor.properties")
-		this.exportedManager = UnicastRemoteObject.exportObject(this.manager, 0)
-		this.registry = LocateRegistry.createRegistry(
-			this.configuration.getInt("manager-port")
-		)
+		val port = this.configuration.getInt("manager-port")
+		// Use the same port to avoid any extra configuration
+		this.exportedManager = UnicastRemoteObject.exportObject(this.manager, port)
+		this.registry = LocateRegistry.createRegistry(port)
 	}
 
 	/**
