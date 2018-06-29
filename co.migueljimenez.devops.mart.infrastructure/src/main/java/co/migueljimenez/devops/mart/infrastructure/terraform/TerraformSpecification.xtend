@@ -94,11 +94,7 @@ class TerraformSpecification extends FileSpecification {
 		if (!TerraformSpecification.IMPORTS.containsKey(this.file))
 			TerraformSpecification.IMPORTS.put(this.file, newArrayList)
 		val osConf = new Configurations().properties("openstack.properties")
-		this.environment.add('''OS_USERNAME=«osConf.getString("username")»''')
-		this.environment.add('''OS_PASSWORD=«osConf.getString("password")»''')
-		this.environment.add('''OS_AUTH_URL=«osConf.getString("endpoint")»''')
-		this.environment.add('''OS_PROJECT_NAME=«osConf.getString("project-name")»''')
-		this.environment.add('''OS_USER_DOMAIN_NAME=«osConf.getString("user-domain-name")»''')
+		osConf.keys.forEach[k|this.environment.add('''«k»=«osConf.getString(k)»''')]
 		this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
 		this.execute("terraform init")
 	}

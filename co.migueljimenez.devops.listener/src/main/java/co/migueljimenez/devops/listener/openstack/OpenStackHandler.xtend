@@ -87,20 +87,8 @@ class OpenStackHandler implements EventHandler {
 	 * Default constructor.
 	 */
 	new() {
-		val osConf = new Configurations().properties("openstack.properties")
 		this.primorConfig = new Configurations().properties("primor.properties")
-		this.client = OSFactory.builderV3()
-			.endpoint(osConf.getString("endpoint"))
-			.credentials(
-				osConf.getString("username"),
-				osConf.getString("password"),
-				Identifier.byName(osConf.getString("user-domain-name"))
-			)
-			.scopeToProject(
-				Identifier.byName(osConf.getString("project-name")),
-				Identifier.byName(osConf.getString("user-domain-name"))
-			)
-			.authenticate()
+		this.client = this.openStackClient
 		this.registry = LocateRegistry.getRegistry(
 			this.primorConfig.getString("manager-host"),
 			this.primorConfig.getInt("manager-port")
@@ -109,6 +97,43 @@ class OpenStackHandler implements EventHandler {
 			this.registry.lookup(RemoteService.MANAGER.toString) as ManagerService
 		this.i = new InfrastructureModelElements
 		this.serializationParser = new SerializationParser
+	}
+
+	/**
+	 * Authentication based on the
+	 * <a href="http://www.openstack4j.com/learn/getting-started/#authenticate">OpenStack4j</a>
+	 * documentation
+	 */
+	def private openStackClient() {
+		val osConf = new Configurations().properties("openstack.properties")
+		val method = osConf.getString("authtentication-method")
+		var client = OSFactory.builderV3()
+			.endpoint(osConf.getString("OS_AUTH_URL"))
+		switch (method) {
+			case "UNSCOPED": {
+				client = client.credentials(
+					osConf.getString("OS_USERNAME"),
+					osConf.getString("OS_PASSWORD"),
+					Identifier.byId(osConf.getString("OS_PROJECT_DOMAIN_ID"))
+				)
+			}
+			case "PROJECT-SCOPED": {
+				client = client.credentials(
+						osConf.getString("OS_USERNAME"),
+						osConf.getString("OS_PASSWORD"),
+						Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
+					)
+                    .scopeToProject(
+                    	Identifier.byId(osConf.getString("OS_PROJECT_ID"))
+                    )
+			}
+			case "DOMAIN-SCOPED": {
+				// TODO
+			}
+			default:
+				throw new IllegalArgumentException('''Unknown value "«method»"''')
+		}
+		return client.authenticate
 	}
 
 	override handle(Object event) {
