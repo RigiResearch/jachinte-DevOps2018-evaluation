@@ -18,7 +18,7 @@ jobs:
       - checkout
       - run:
           name: Validate and deploy Infrastructure models
-          command: java -jar .circleci/mart-deployer.jar .
+          command: java -jar .circleci/co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar .
 
   deploy:
     docker:
