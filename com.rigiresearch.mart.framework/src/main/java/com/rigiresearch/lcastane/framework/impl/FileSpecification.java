@@ -110,9 +110,8 @@ public class FileSpecification implements Specification {
 			Files.write(Paths.get(this.file.toURI()), contents.getBytes());
 			this.logger.info(
 				String.format(
-					"The specification file (%s) was updated. Context is %s",
-					this.file,
-					data
+					"The specification file (%s) was updated",
+					this.file
 				)
 			);
 		} catch (IOException e) {

@@ -173,12 +173,7 @@ public class GithubSpecification implements Specification {
 			git.push()
 				.setCredentialsProvider(credentialsProvider)
 				.call();
-			this.logger.info(
-				String.format(
-					"The changes were pushed to Github. Context is %s",
-					data
-				)
-			);
+			this.logger.info("The changes were pushed to Github");
 		} catch (IOException | GitAPIException e) {
 			e.printStackTrace();
 		}		
