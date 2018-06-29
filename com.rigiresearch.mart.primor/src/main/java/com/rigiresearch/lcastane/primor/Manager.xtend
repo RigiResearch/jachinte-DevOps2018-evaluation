@@ -116,11 +116,11 @@ class Manager implements ManagerService {
 	def private cloneRepository(URL remote) {
 		val repository = Git.cloneRepository
 			.setURI(remote.toString)
+			.setDirectory(Files.createTempDirectory("").toFile)
 			.setCredentialsProvider(this.credentialsProvider)
 			.call
 			.repository
-		val name = repository.directory.parentFile.name
-		this.logger.info('''Repository «remote» has been cloned to directory «name»''')
+		this.logger.info('''Repository «remote» has been cloned''')
 		this.clonedRepositories.add(repository.directory)
 		repository.close
 	}

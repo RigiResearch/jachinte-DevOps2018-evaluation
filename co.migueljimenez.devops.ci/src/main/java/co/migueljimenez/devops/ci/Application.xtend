@@ -136,8 +136,6 @@ class Application {
 		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
 			if (!this.models.modelRegistered(entry.key.toString))
-				// FIXME this will fail when there are more than one
-				// specification files in the same repository
 				this.models.register(entry.key.toString, entry.value.export, remote)
 			else
 				this.models.register(entry.key.toString, entry.value.export)
