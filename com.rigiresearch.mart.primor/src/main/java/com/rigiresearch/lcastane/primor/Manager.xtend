@@ -28,7 +28,10 @@ import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.io.File
 import java.io.StringReader
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.rmi.RemoteException
+import java.util.Comparator
 import java.util.List
 import java.util.Map
 import org.apache.commons.configuration2.builder.fluent.Configurations
@@ -39,8 +42,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
-import java.nio.file.Files
-import java.nio.file.Paths
 
 /**
  * A {@link ManagerService} implementation.
@@ -85,8 +86,12 @@ class Manager implements ManagerService {
 		)
 		Runtime.runtime.addShutdownHook(new Thread()[
 			this.clonedRepositories.forEach [ d |
-				Files.delete(Paths.get(d.canonicalPath))
-				this.logger.info('''Local repository «d.name» has been deleted''')
+				// repository is the .git directory
+				Files.walk(Paths.get(d.parent))
+				    .sorted(Comparator.reverseOrder)
+				    .map(p|p.toFile)
+				    .forEach[f|f.delete]
+				this.logger.info('''Local repository «d.parentFile.name» has been deleted''')
 			]
 		])
 	}
@@ -114,7 +119,8 @@ class Manager implements ManagerService {
 			.setCredentialsProvider(this.credentialsProvider)
 			.call
 			.repository
-		this.logger.info('''Repository «remote» has been cloned to directory «repository.directory.name»''')
+		val name = repository.directory.parentFile.name
+		this.logger.info('''Repository «remote» has been cloned to directory «name»''')
 		this.clonedRepositories.add(repository.directory)
 		repository.close
 	}
