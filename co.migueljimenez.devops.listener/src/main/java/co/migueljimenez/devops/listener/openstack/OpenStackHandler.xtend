@@ -128,7 +128,13 @@ class OpenStackHandler implements EventHandler {
                     )
 			}
 			case "DOMAIN-SCOPED": {
-				// TODO
+				client = client.credentials(
+						osConf.getString("OS_USER_ID"),
+						osConf.getString("OS_PASSWORD")
+					)
+                    .scopeToDomain(
+                    	Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
+                    )
 			}
 			default:
 				throw new IllegalArgumentException('''Unknown value "«method»"''')
