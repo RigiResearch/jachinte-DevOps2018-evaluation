@@ -41,6 +41,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
 
 /**
  * A {@link ManagerService} implementation.
@@ -103,6 +104,17 @@ class Manager implements ManagerService {
 		throws RemoteException {
 		if (repository !== null)
 			this.cloneRepository(modelIdentifier, repository)
+		val spec = model.specification
+		switch (spec) {
+			FileSpecification: {
+				spec.file(
+					new File(
+						this.clonedRepositories.get(modelIdentifier),
+						spec.file.toString
+					)
+				)
+			}
+		}
 		val instance = switch (model) {
 			EcoreMART<?, ?>: this.instantiate(model)
 			default: model
