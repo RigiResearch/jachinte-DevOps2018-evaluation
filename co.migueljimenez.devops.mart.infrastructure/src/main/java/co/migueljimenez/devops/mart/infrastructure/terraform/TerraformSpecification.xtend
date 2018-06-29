@@ -28,6 +28,7 @@ import java.util.Map
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.apache.commons.configuration2.builder.fluent.Configurations
+import org.slf4j.LoggerFactory
 
 /**
  * File-based specification that executes Terraform to format the specification
@@ -63,6 +64,11 @@ class TerraformSpecification extends FileSpecification {
 		 */
 		val String name
 	}
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(TerraformSpecification)
 
 	/**
 	 * Pending imports per specification file.
@@ -119,6 +125,7 @@ class TerraformSpecification extends FileSpecification {
 			this.environment,
 			this.file.parentFile
 		)
+		this.logger.info('''Executed "«terraformCommand»"''')
 	}
 
 	def static deferImport(File specificationFile, TerraformImport ^import) {
