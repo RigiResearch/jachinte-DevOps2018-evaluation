@@ -139,10 +139,11 @@ class Application {
 		// From: https://stackoverflow.com/a/38062680/738968
 		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
-			if (!this.models.modelRegistered(entry.key.toString))
-				this.models.register(entry.key.toString, entry.value.export, remote)
+			val key = '''«remote»/«entry.key.toString»'''
+			if (!this.models.modelRegistered(key))
+				this.models.register(key, entry.value.export, remote)
 			else
-				this.models.register(entry.key.toString, entry.value.export)
+				this.models.register(key, entry.value.export)
 		]
 	}
 
