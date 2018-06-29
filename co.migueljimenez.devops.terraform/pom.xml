@@ -46,6 +46,13 @@
 			<artifactId>org.eclipse.xtext.xbase.testing</artifactId>
 			<version>${xtextVersion}</version>
 			<scope>test</scope>
+			<exclusions>
+				<!-- Workaround eclipse/xtext/#1231 -->
+				<exclusion>
+					<groupId>org.eclipse.platform</groupId>
+					<artifactId>org.eclipse.core.runtime</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.xtext</groupId>
@@ -101,8 +108,15 @@
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<!-- Workaround eclipse/xtext/#1231 -->
+						<groupId>org.eclipse.platform</groupId>
+						<artifactId>org.eclipse.equinox.common</artifactId>
+						<version>3.10.0</version>
+					</dependency>
+				</dependencies>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
