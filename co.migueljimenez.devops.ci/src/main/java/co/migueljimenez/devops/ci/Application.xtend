@@ -132,19 +132,22 @@ class Application {
 			.setMustExist(true)
 			.setGitDir(new File(this.localRepository, ".git"))
 			.build
-		// From: https://stackoverflow.com/a/38062680/738968
-		val r = new URIish(repository.config.getString("remote", "origin", "url"))
 		// FIXME Force the use of https (add a credentials provider for SSH sessions)
-		val remote = new URIish('''https://«r.host»/«r.user»/«r.rawPath»''')
+		val remote = repository.config.getString("remote", "origin", "url")
+		val r = new URIish(remote)
+		val uri = if (!remote.startsWith("https"))
+				new URIish('''https://«r.host»/«r.rawPath»''')
+			else
+				r
 		this.marts.entrySet.forEach [ entry |
 			// A relative file path so it works on a remote machine
 			val f = new File(
 				this.localRepository.toURI.relativize(entry.key.toURI).getPath
 			)
 			entry.value.specification.origin.origin.file(f)
-			val key = '''«remote»/«f.toString»'''
+			val key = '''«uri»/«f.toString»'''
 			if (!this.models.modelRegistered(key))
-				this.models.register(key, entry.value.export, remote)
+				this.models.register(key, entry.value.export, uri)
 			else
 				this.models.register(key, entry.value.export)
 		]
