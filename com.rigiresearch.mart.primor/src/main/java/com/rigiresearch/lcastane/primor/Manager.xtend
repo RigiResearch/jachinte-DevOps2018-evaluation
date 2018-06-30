@@ -42,6 +42,8 @@ import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
+import org.eclipse.jgit.transport.CredentialItem
+import org.eclipse.jgit.errors.UnsupportedCredentialItem
 
 /**
  * A {@link ManagerService} implementation.
@@ -52,6 +54,58 @@ import org.slf4j.LoggerFactory
  * @since 0.0.1
  */
 class Manager implements ManagerService {
+
+	static class MyCredentialsProvider extends UsernamePasswordCredentialsProvider {
+		/**
+		 * The Github token.
+		 */
+		val String token
+
+		new(String token) {
+			super(token, "".toCharArray)
+			this.token = token
+		}
+
+		override get(URIish uri, CredentialItem... items) throws UnsupportedCredentialItem {
+			for (item : items) {
+				switch (item) {
+					CredentialItem.YesNoType: {
+						item.value = true
+						return true
+					}
+					CredentialItem.Username: {
+						item.value = this.token
+					}
+					CredentialItem.Password: {
+						item.value = "".toCharArray
+					}
+					CredentialItem.StringType: {
+						if (item.getPromptText().equals("Password: "))
+							item.setValue("")
+					}
+				}
+			}
+			return false
+		}
+
+		override isInteractive() {
+			false
+		}
+
+		override supports(CredentialItem... items) {
+			for (item : items) {
+				val b = switch (item) {
+					CredentialItem.YesNoType: true
+					CredentialItem.Username: true
+					CredentialItem.Password: true
+					default: false
+				}
+				if (!b)
+					return false
+			}
+			return true
+		}
+	}
 
 	/**
 	 * The logger.
@@ -80,9 +134,8 @@ class Manager implements ManagerService {
 		this.models = newHashMap
 		this.clonedRepositories = newHashMap
 		val config = new Configurations().properties("github.properties");
-		this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-			config.getString("authentication-token"),
-			new String()
+		this.credentialsProvider = new MyCredentialsProvider(
+			config.getString("authentication-token")
 		)
 		Runtime.runtime.addShutdownHook(new Thread()[
 			this.clonedRepositories.keySet.forEach [ id |
