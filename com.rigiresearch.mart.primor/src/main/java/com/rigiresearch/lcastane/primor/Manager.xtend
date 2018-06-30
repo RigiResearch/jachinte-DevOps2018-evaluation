@@ -24,10 +24,10 @@ package com.rigiresearch.lcastane.primor
 import com.rigiresearch.lcastane.framework.Command
 import com.rigiresearch.lcastane.framework.EcoreMART
 import com.rigiresearch.lcastane.framework.MART
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.io.File
 import java.io.StringReader
-import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.rmi.RemoteException
@@ -39,9 +39,9 @@ import org.eclipse.emf.ecore.resource.URIConverter
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.CredentialsProvider
+import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
-import com.rigiresearch.lcastane.framework.impl.FileSpecification
 
 /**
  * A {@link ManagerService} implementation.
@@ -100,7 +100,7 @@ class Manager implements ManagerService {
 		this.register(modelIdentifier, model, null)
 	}
 
-	override register(String modelIdentifier, MART<?, ?> model, URL repository)
+	override register(String modelIdentifier, MART<?, ?> model, URIish repository)
 		throws RemoteException {
 		if (repository !== null)
 			this.cloneRepository(modelIdentifier, repository)
@@ -123,7 +123,7 @@ class Manager implements ManagerService {
 		this.logger.info('''Model "«modelIdentifier»" was registered''')
 	}
 
-	def private cloneRepository(String modelIdentifier, URL remote) {
+	def private cloneRepository(String modelIdentifier, URIish remote) {
 		val repository = Git.cloneRepository
 			.setURI(remote.toString)
 			.setDirectory(Files.createTempDirectory("").toFile)

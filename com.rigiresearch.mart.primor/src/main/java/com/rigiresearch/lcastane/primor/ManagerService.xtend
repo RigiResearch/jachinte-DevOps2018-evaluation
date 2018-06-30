@@ -26,7 +26,7 @@ import com.rigiresearch.lcastane.framework.MART
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import java.rmi.Remote
 import java.rmi.RemoteException
-import java.net.URL
+import org.eclipse.jgit.transport.URIish
 
 /**
  * A model manager.
@@ -52,7 +52,7 @@ interface ManagerService extends Remote {
 	 * @param model The model to register
 	 * @param repository A remote repository associated with the MART
 	 */
-	def void register(String modelIdentifier, MART<?, ?> model, URL repository)
+	def void register(String modelIdentifier, MART<?, ?> model, URIish repository)
 		throws RemoteException
 
 	/**

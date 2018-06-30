@@ -29,13 +29,13 @@ import com.rigiresearch.lcastane.primor.ManagerService
 import com.rigiresearch.lcastane.primor.RemoteService
 import de.xn__ho_hia.storage_unit.StorageUnits
 import java.io.File
-import java.net.URL
 import java.rmi.registry.LocateRegistry
 import java.rmi.registry.Registry
 import java.util.Map
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.transport.URIish
 
 /**
  * The main execution entry.
@@ -133,7 +133,7 @@ class Application {
 			.setGitDir(new File(this.localRepository, ".git"))
 			.build
 		// From: https://stackoverflow.com/a/38062680/738968
-		val remote = new URL(repository.config.getString("remote", "origin", "url"))
+		val remote = new URIish(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
 			// A relative file path so it works on a remote machine
 			val f = new File(
