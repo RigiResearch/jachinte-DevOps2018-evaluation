@@ -31,9 +31,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.Specification;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -47,7 +47,6 @@ import lombok.experimental.Accessors;
  * @since 0.0.1
  */
 @Accessors(fluent = true)
-@AllArgsConstructor
 @ToString
 public class FileSpecification implements Specification {
 
@@ -67,6 +66,17 @@ public class FileSpecification implements Specification {
 	@Getter
 	@Setter
 	private File file;
+
+	@Getter
+	private MART<?, ?> parent;
+
+	/**
+	 * default constructor.
+	 * @param file The physical file represented by this specification.
+	 */
+	public FileSpecification(final File file) {
+		this.file = file;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.rigiresearch.lcastane.framework.Specification#name()
@@ -119,5 +129,10 @@ public class FileSpecification implements Specification {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void setMart(MART<?, ?> parent) {
+		this.parent = parent;
 	}
 }

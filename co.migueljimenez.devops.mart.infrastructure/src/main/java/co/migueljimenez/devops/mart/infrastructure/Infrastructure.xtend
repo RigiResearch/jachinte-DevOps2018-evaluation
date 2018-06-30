@@ -37,6 +37,7 @@ import java.util.Map
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
 import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformPreprocessor
+import com.rigiresearch.lcastane.framework.MART
 
 /**
  * Represents an inventory of infrastructure resources.
@@ -65,6 +66,12 @@ class Infrastructure implements Artefact {
 	val SerializationParser serializationParser
 
 	/**
+	 * This artefact's parent.
+	 */
+	@Accessors
+	var MART<?, ?> parent
+
+	/**
 	 * Default constructor.
 	 * @param model An instance of the Infrastructure (Ecore) model
 	 */
@@ -76,8 +83,8 @@ class Infrastructure implements Artefact {
 			new AddResource(new TerraformPreprocessor)
 				.addRule(
 					Rule.Type.PRE,
-					// Ecore objects serialized as XMI, specification file path
-					new TypesValidation(String, String)
+					// Ecore objects serialized as XMI
+					new TypesValidation(String)
 				)
 		)
 		this.serializationParser = new SerializationParser
@@ -104,4 +111,8 @@ class Infrastructure implements Artefact {
 	}
 
 	override name() '''«Infrastructure.simpleName»'''
+	
+	override setMart(MART<?, ?> parent) {
+		this.parent = parent
+	}
 }

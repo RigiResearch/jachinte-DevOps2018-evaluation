@@ -121,6 +121,7 @@ class InfrastructureMart extends AbstractMART<GithubSpecification, Infrastructur
 	}
 
 	override export() {
+		this.specification.origin.origin.mart = null
 		new EcoreMART.Default(
 			this.specification.origin.origin,
 			this.artefact.origin.serialize,

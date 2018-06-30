@@ -45,4 +45,11 @@ public interface Artefact extends Serializable {
      * @throws ValidationException If the operation cannot be performed
      */
     void apply(Command command) throws ValidationException;
+
+    /**
+     * Sets the MART instance associated with this artefact.
+     * This is added for facilitating traversing from specification to artefact
+     * and vice versa.
+     */
+    void setMart(MART<?, ?> parent);
 }

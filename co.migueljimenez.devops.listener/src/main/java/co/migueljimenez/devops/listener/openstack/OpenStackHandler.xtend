@@ -181,8 +181,7 @@ class OpenStackHandler implements EventHandler {
 								keypair.publicKey,
 								this.i.infrastructure
 							)
-						),
-						modelId
+						)
 					)
 				)
 			}

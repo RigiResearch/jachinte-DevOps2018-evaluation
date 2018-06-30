@@ -23,10 +23,9 @@ package co.migueljimenez.devops.mart.infrastructure.operations
 
 import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.infrastructure.model.SerializationParser
-import co.migueljimenez.devops.infrastructure.model.VirtualInfrastructure
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
-import java.io.File
 import org.eclipse.emf.ecore.EObject
 
 /**
@@ -66,33 +65,36 @@ class AddResource extends AbstractOperation {
 
 	override protected applyOp(Infrastructure infrastructure,
 		Object... arguments) throws ValidationException {
-		// arguments: Ecore model XML, specification file
+		// arguments: Ecore model XML
 		val xml = arguments.get(0) as String
-		val file = new File(arguments.get(1) as String)
 		val objects = this.serializationParser.asEObjects(xml)
 		// FIXME assume there's only one object while I fix the ConcurrentModificationException
 		val o = objects.get(0)
 		switch (o) {
 			Credential:
-				infrastructure.model.add(o, file)
+				infrastructure.add(o)
 			default:
-				infrastructure.model.add(o)
+				infrastructure.add(o)
 		}
 	}
 
 	/**
 	 * Add a {@link Credential} to the given project.
 	 */
-	def private add(VirtualInfrastructure project, Credential eObject,
-		File specificationFile) {
-		this.preprocessor.preprocess(eObject, specificationFile)
-		eObject.project = project
+	def private add(Infrastructure infrastructure, Credential eObject) {
+		val spec = infrastructure.parent.specification
+		switch (spec) {
+			FileSpecification: {				
+				this.preprocessor.preprocess(eObject, spec.file)
+			}
+		}
+		eObject.project = infrastructure.model
 	}
 
 	/**
 	 * Add the resource to the given project.
 	 */
-	def private add(VirtualInfrastructure project, EObject eObject) {
+	def private add(Infrastructure infrastructure, EObject eObject) {
 		throw new UnsupportedOperationException('''Unsupported resource «eObject»''')
 	}
 }

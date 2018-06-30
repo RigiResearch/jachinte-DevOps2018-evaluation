@@ -95,6 +95,8 @@ public abstract class AbstractMART<S extends Specification, A extends Artefact>
 	 */
 	public AbstractMART(final S specification, final A artefact,
 		final List<Rule<A>> validations) {
+		specification.setMart(this);
+		artefact.setMart(this);
 		this.specification = new ObservableSpecification<S>(specification);
 		this.specification.addObserver(this);
 		this.artefact = new ObservableArtefact<A>(artefact);

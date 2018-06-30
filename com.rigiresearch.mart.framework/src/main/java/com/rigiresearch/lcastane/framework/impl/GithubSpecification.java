@@ -37,6 +37,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.Specification;
 
 import lombok.Getter;
@@ -177,5 +178,15 @@ public class GithubSpecification implements Specification {
 		} catch (IOException | GitAPIException e) {
 			e.printStackTrace();
 		}		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.rigiresearch.lcastane.framework.Specification
+	 *  #setMart(com.rigiresearch.lcastane.framework.MART)
+	 */
+	@Override
+	public void setMart(MART<?, ?> parent) {
+		this.origin.setMart(parent);
 	}
 }

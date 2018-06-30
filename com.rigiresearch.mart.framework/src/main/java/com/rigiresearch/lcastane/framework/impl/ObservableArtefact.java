@@ -23,6 +23,7 @@ package com.rigiresearch.lcastane.framework.impl;
 
 import com.rigiresearch.lcastane.framework.Artefact;
 import com.rigiresearch.lcastane.framework.Command;
+import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.validation.ValidationException;
 import java.util.Observable;
 import lombok.EqualsAndHashCode;
@@ -72,4 +73,14 @@ public final class ObservableArtefact<T extends Artefact>
         this.setChanged();
         this.notifyObservers(command.context());
     }
+
+    /*
+     * (non-Javadoc)
+     * @see com.rigiresearch.lcastane.framework.Artefact
+     *  #setMart(com.rigiresearch.lcastane.framework.MART)
+     */
+	@Override
+	public void setMart(MART<?, ?> parent) {
+		this.origin.setMart(parent);
+	}
 }

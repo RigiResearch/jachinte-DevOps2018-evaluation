@@ -72,7 +72,7 @@ class TerraformSpecification extends FileSpecification {
 	val logger = LoggerFactory.getLogger(TerraformSpecification)
 
 	/**
-	 * Pending imports per specification file.
+	 * Pending imports per model (specification file).
 	 */
 	val static Map<File, List<TerraformImport>> IMPORTS = newHashMap
 
@@ -90,13 +90,24 @@ class TerraformSpecification extends FileSpecification {
 		this.initialise
 	}
 
+	/**
+	 * Sets the specification file.
+	 */
+	override file(File file) {
+		if (IMPORTS.containsKey(this.file)) {
+			IMPORTS.put(file, IMPORTS.remove(this.file))
+		}
+		super.file(file)
+	}
+
 	def private initialise() {
-		if (!TerraformSpecification.IMPORTS.containsKey(this.file))
-			TerraformSpecification.IMPORTS.put(this.file, newArrayList)
-		val osConf = new Configurations().properties("openstack.properties")
-		osConf.keys.forEach[k|this.environment.add('''«k»=«osConf.getString(k)»''')]
-		this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
-		this.execute("terraform init")
+		if (!IMPORTS.containsKey(this.file)) {
+			IMPORTS.put(this.file, newArrayList)
+			val osConf = new Configurations().properties("openstack.properties")
+			osConf.keys.forEach[k|this.environment.add('''«k»=«osConf.getString(k)»''')]
+			this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
+			this.execute("terraform init")
+		}
 	}
 
 	override void update(String contents) {
@@ -131,8 +142,8 @@ class TerraformSpecification extends FileSpecification {
 	}
 
 	def static deferImport(File specificationFile, TerraformImport ^import) {
-		if (!TerraformSpecification.IMPORTS.containsKey(specificationFile))
-			TerraformSpecification.IMPORTS.put(specificationFile, newArrayList)
+		if (!IMPORTS.containsKey(specificationFile))
+			IMPORTS.put(specificationFile, newArrayList)
 		TerraformSpecification.IMPORTS
 			.get(specificationFile)
 			.add(^import)

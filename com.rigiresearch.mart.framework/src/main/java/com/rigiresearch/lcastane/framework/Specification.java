@@ -57,4 +57,11 @@ public interface Specification extends Serializable {
      * @param data Information that provides context and describes the change
      */
     void update(String contents, Map<String, Object> data);
+
+    /**
+     * Sets the MART instance associated with this specification.
+     * This is added for facilitating traversing from specification to artefact
+     * and vice versa.
+     */
+    void setMart(MART<?, ?> parent);
 }

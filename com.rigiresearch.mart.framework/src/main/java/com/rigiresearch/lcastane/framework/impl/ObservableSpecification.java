@@ -24,6 +24,7 @@ package com.rigiresearch.lcastane.framework.impl;
 import java.util.Map;
 import java.util.Observable;
 
+import com.rigiresearch.lcastane.framework.MART;
 import com.rigiresearch.lcastane.framework.Specification;
 
 import lombok.EqualsAndHashCode;
@@ -91,5 +92,15 @@ public final class ObservableSpecification<T extends Specification>
 		this.origin.update(contents, context);
         this.setChanged();
         this.notifyObservers(context);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.rigiresearch.lcastane.framework.Specification
+	 *  #setMart(com.rigiresearch.lcastane.framework.MART)
+	 */
+	@Override
+	public void setMart(MART<?, ?> parent) {
+		this.origin.setMart(parent);
 	}
 }
