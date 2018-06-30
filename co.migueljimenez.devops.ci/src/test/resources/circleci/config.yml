@@ -1,64 +1,47 @@
 version: 2
-
 jobs:
   validate_terraform:
     docker:
       - image: hashicorp/terraform
     steps:
       - checkout
-      - run:
-          name: Validate Terraform Formatting
-          command: "[ -z \"$(terraform fmt -write=false)\" ] || { terraform fmt -write=false -diff; exit 1; }"
-
+      - run: "[ -z \"$(terraform fmt -write=false)\" ] || { terraform fmt -write=false -diff; exit 1; }"
   deploy_models:
     docker:
       - image: circleci/openjdk:8-jdk
-      - image: hashicorp/terraform
     steps:
       - checkout
-      - run:
-          name: Validate and deploy Infrastructure models
-          command: java -jar .circleci/co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar .
-
+      - run: |
+          wget https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
+          unzip terraform_0.11.7_linux_amd64.zip
+          rm terraform_0.11.7_linux_amd64.zip
+          sudo mkdir /opt/terraform && sudo mkdir /opt/terraform/bin
+          sudo mv terraform /opt/terraform/bin
+          sudo chown -R root:root /opt/terraform
+          echo 'export PATH=$PATH:/opt/terraform/bin' | sudo tee -a /etc/profile
+          source /etc/profile;
+          cd .circleci;
+          java -jar co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar ..
   deploy:
     docker:
       - image: hashicorp/terraform
     steps:
       - checkout
-      - run:
-          name: Install Alpine dependencies
-          command: apk add bash jq
-      - run:
-          name: Initialize Terraform
-          command: terraform init -input=false
-      - run:
-          name: Deploy
-          command: .circleci/do-exclusively.sh --branch master terraform apply -input=false -auto-approve
-
+      - run: apk add bash jq
+      - run: terraform init -input=false
+      - run: .circleci/do-exclusively.sh --branch master terraform apply -input=false -auto-approve
 workflows:
   version: 2
   deploy:
     jobs:
       - validate_terraform
-
       - deploy_models:
-        requires:
-          - validate_terraform
-        filters:
-            branches:
-              only: master
-
+          requires:
+            - validate_terraform
       - deploy:
           requires:
             - validate_terraform
             - deploy_models
-          filters:
-            branches:
-              only: master
-
       - test:
           requires:
             - deploy
-          filters:
-            branches:
-              only: master
