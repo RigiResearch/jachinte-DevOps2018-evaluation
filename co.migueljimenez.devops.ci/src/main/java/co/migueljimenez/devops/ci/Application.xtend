@@ -133,7 +133,9 @@ class Application {
 			.setGitDir(new File(this.localRepository, ".git"))
 			.build
 		// From: https://stackoverflow.com/a/38062680/738968
-		val remote = new URIish(repository.config.getString("remote", "origin", "url"))
+		val r = new URIish(repository.config.getString("remote", "origin", "url"))
+		// FIXME Force the use of https (add a credentials provider for SSH sessions)
+		val remote = new URIish('''https://«r.host»/«r.user»/«r.rawPath»''')
 		this.marts.entrySet.forEach [ entry |
 			// A relative file path so it works on a remote machine
 			val f = new File(
