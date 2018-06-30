@@ -97,14 +97,10 @@ class Application {
 			if (f.directory) {
 				this.instantiateMarts(f)
 			} else if (f.name.endsWith(".tf")) {
-				// A relative file path so it works on a remote machine
-				val relativeFile = new File(
-					this.localRepository.toURI.relativize(f.toURI).getPath
-				)
 				this.marts.put(
-					relativeFile,
+					f,
 					new InfrastructureMart(
-						new TerraformSpecification(relativeFile),
+						new TerraformSpecification(f),
 						new ConstrainedRam(StorageUnits.gigabyte(1L))
 					)
 				)
@@ -139,7 +135,12 @@ class Application {
 		// From: https://stackoverflow.com/a/38062680/738968
 		val remote = new URL(repository.config.getString("remote", "origin", "url"))
 		this.marts.entrySet.forEach [ entry |
-			val key = '''«remote»/«entry.key.toString»'''
+			// A relative file path so it works on a remote machine
+			val f = new File(
+				this.localRepository.toURI.relativize(entry.key.toURI).getPath
+			)
+			entry.value.specification.origin.origin.file(f)
+			val key = '''«remote»/«f.toString»'''
 			if (!this.models.modelRegistered(key))
 				this.models.register(key, entry.value.export, remote)
 			else
