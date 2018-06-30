@@ -106,7 +106,7 @@ class TerraformSpecification extends FileSpecification {
 			val osConf = new Configurations().properties("openstack.properties")
 			osConf.keys.forEach[k|this.environment.add('''«k»=«osConf.getString(k)»''')]
 			this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
-			this.execute("terraform init")
+			this.execute("terraform init -input=false")
 		}
 	}
 
