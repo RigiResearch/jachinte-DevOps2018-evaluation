@@ -27,6 +27,9 @@ import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import org.eclipse.emf.ecore.EObject
+import com.rigiresearch.lcastane.framework.impl.GithubSpecification
+import com.rigiresearch.lcastane.framework.Specification
+import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -82,13 +85,24 @@ class AddResource extends AbstractOperation {
 	 * Add a {@link Credential} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Credential eObject) {
-		val spec = infrastructure.parent.specification
+		val spec = this.getFileSpec(infrastructure.parent.specification)
+		if (spec !== null)
+			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
+		eObject.project = infrastructure.model
+	}
+
+	def private Specification getFileSpec(Specification spec) {
 		switch (spec) {
-			FileSpecification: {				
-				this.preprocessor.preprocess(eObject, spec.file)
+			ObservableSpecification<?>: {
+				getFileSpec(spec.origin)
+			}
+			GithubSpecification: {				
+				spec.origin
+			}
+			FileSpecification: {
+				spec
 			}
 		}
-		eObject.project = infrastructure.model
 	}
 
 	/**
