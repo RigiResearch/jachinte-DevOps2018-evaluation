@@ -42,17 +42,17 @@ interface ManagerService extends Remote {
 	 * Registers a new model to be managed.
 	 * @param modelIdentifier The model's identifier
 	 * @param model The model to register
-	 */
-	def void register(String modelIdentifier, MART<?, ?> model)
-		throws RemoteException
-
-		/**
-	 * Registers a new model to be managed.
-	 * @param modelIdentifier The model's identifier
-	 * @param model The model to register
 	 * @param repository A remote repository associated with the MART
 	 */
 	def void register(String modelIdentifier, MART<?, ?> model, URIish repository)
+		throws RemoteException
+
+	/**
+	 * Updates an existing model.
+	 * @param modelIdentifier The model's identifier
+	 * @param model The model to update
+	 */
+	def void update(String modelIdentifier, MART<?, ?> model)
 		throws RemoteException
 
 	/**

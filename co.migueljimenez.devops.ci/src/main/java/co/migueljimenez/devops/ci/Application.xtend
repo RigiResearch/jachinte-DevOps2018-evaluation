@@ -149,7 +149,7 @@ class Application {
 			if (!this.models.modelRegistered(key))
 				this.models.register(key, entry.value.export, uri)
 			else
-				this.models.register(key, entry.value.export)
+				this.models.update(key, entry.value.export)
 		]
 	}
 

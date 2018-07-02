@@ -42,6 +42,7 @@ import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
+import org.eclipse.jgit.merge.MergeStrategy
 
 /**
  * A {@link ManagerService} implementation.
@@ -95,15 +96,13 @@ class Manager implements ManagerService {
 		])
 	}
 
-	override register(String modelIdentifier, MART<?, ?> model)
-		throws RemoteException {
-		this.register(modelIdentifier, model, null)
-	}
-
 	override register(String modelIdentifier, MART<?, ?> model, URIish repository)
 		throws RemoteException {
-		if (repository !== null)
+		var action = "registered"
+		if (repository !== null) {
 			this.cloneRepository(modelIdentifier, repository)
+			action = "updated"	
+		}
 		val spec = model.specification
 		switch (spec) {
 			FileSpecification: {
@@ -120,7 +119,21 @@ class Manager implements ManagerService {
 			default: model
 		}
 		this.models.put(modelIdentifier, instance)
-		this.logger.info('''Model "«modelIdentifier»" was registered''')
+		this.logger.info('''Model "«modelIdentifier»" was «action»''')
+	}
+
+	override update(String modelIdentifier, MART<?, ?> model)
+		throws RemoteException {
+		this.ensureModelExists(modelIdentifier)
+		val directory = new File(this.clonedRepositories.get(modelIdentifier), ".git")
+		val git = Git.open(directory)
+		git.pull()
+			.setStrategy(MergeStrategy.THEIRS)
+			.setCredentialsProvider(credentialsProvider)
+			.call()
+		git.close
+		this.logger.info('''Remote changes for model "«modelIdentifier»" have been pulled''')
+		this.register(modelIdentifier, model, null)
 	}
 
 	def private cloneRepository(String modelIdentifier, URIish remote) {
