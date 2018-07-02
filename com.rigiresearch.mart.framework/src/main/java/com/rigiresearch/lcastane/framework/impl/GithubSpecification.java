@@ -178,7 +178,7 @@ public class GithubSpecification implements Specification {
 			git.add().addFilepattern(file).call();
 			this.commit(git, data, String.format("Update %s", file));
 		}
-		for (String file : git.status().call().getRemoved()) {
+		for (String file : git.status().call().getMissing()) {
 			git.add().addFilepattern(file).call();
 			this.commit(git, data, String.format("Remove %s", file));
 		}
