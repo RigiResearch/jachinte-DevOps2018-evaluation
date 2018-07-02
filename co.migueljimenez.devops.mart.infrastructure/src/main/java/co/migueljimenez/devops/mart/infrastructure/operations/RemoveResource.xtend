@@ -24,6 +24,11 @@ package co.migueljimenez.devops.mart.infrastructure.operations
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import org.eclipse.emf.ecore.util.EcoreUtil
+import com.rigiresearch.lcastane.framework.Specification
+import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
+import com.rigiresearch.lcastane.framework.impl.GithubSpecification
+import com.rigiresearch.lcastane.framework.impl.FileSpecification
+import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecification
 
 /**
  * Removes an existing resource from the {@link Infrastructure}.
@@ -46,9 +51,32 @@ class RemoveResource extends AbstractOperation {
 		// Arguments: the credential's name
 		val name = arguments.get(0) as String
 		val credential = infrastructure.model.credentials.findFirst[c|c.name.equals(name)]
-		if (credential !== null)
+		if (credential !== null) {
 			// Credentials may be associated with instances, however, OpenStack
 			// won't remove the credential if such link exists.
 			EcoreUtil.remove(credential)
+			val spec = this.getFileSpec(infrastructure.parent.specification)
+			if (spec !== null)
+				// FIXME move this terraform-specific code somewhere else
+				// Defer the resource removal until the specification is updated
+				TerraformSpecification.deferCommand(
+					(spec as FileSpecification).file,
+					'''terraform state rm openstack_compute_keypair_v2.«name»'''
+				)
+		}
+	}
+
+	def private Specification getFileSpec(Specification spec) {
+		switch (spec) {
+			ObservableSpecification<?>: {
+				getFileSpec(spec.origin)
+			}
+			GithubSpecification: {				
+				spec.origin
+			}
+			FileSpecification: {
+				spec
+			}
+		}
 	}
 }

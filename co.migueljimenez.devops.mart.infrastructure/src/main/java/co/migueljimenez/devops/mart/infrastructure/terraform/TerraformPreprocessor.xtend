@@ -23,7 +23,6 @@ package co.migueljimenez.devops.mart.infrastructure.terraform
 
 import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.mart.infrastructure.operations.SpecificationPreprocessor
-import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecification.TerraformImport
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -54,9 +53,9 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 		Files.write(Paths.get(file.toURI), element.publicKey.bytes)
 		element.publicKey = '''${file("«file.parentFile.name»/«file.name»")}'''
 		// Defer the resource import until the specification is updated
-		TerraformSpecification.deferImport(
+		TerraformSpecification.deferCommand(
 			specificationFile,
-			new TerraformImport("openstack_compute_keypair_v2", element.name)
+			'''terraform import openstack_compute_keypair_v2.«element.name» «element.name»'''
 		)
 	}
 }

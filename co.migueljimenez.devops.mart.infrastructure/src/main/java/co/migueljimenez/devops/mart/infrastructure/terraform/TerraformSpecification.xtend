@@ -23,13 +23,12 @@ package co.migueljimenez.devops.mart.infrastructure.terraform
 
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import java.io.File
+import java.io.InputStream
 import java.util.List
 import java.util.Map
-import org.eclipse.xtend.lib.annotations.Data
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import java.util.Scanner
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 
 /**
  * File-based specification that executes Terraform to format the specification
@@ -42,39 +41,14 @@ import java.io.InputStream
 class TerraformSpecification extends FileSpecification {
 
 	/**
-	 * Represents a (simple) Terraform import.
-	 * <p>
-	 * This implementation, as well as the Terraform facilities implemented in
-	 * this project, assume that the resource name is the same as the
-	 * <code>name</code> attribute.
-	 * @author Miguel Jimenez (miguel@uvic.ca)
-	 * @date 2018-06-22
-	 * @version $Id$
-	 * @since 0.0.1
-	 */
-	@Data
-	@FinalFieldsConstructor
-	static class TerraformImport {
-		/**
-		 * The resource type.
-		 */
-		val String type
-
-		/**
-		 * The resource name.
-		 */
-		val String name
-	}
-
-	/**
 	 * The logger.
 	 */
 	val logger = LoggerFactory.getLogger(TerraformSpecification)
 
 	/**
-	 * Pending imports per model (specification file).
+	 * Pending commands per model (specification file).
 	 */
-	val static Map<File, List<TerraformImport>> IMPORTS = newHashMap
+	val static Map<File, List<String>> COMMANDS = newHashMap
 
 	/**
 	 * The environment variables to execute Terraform commands.
@@ -94,15 +68,15 @@ class TerraformSpecification extends FileSpecification {
 	 * Sets the specification file.
 	 */
 	override file(File file) {
-		if (IMPORTS.containsKey(this.file)) {
-			IMPORTS.put(file, IMPORTS.remove(this.file))
+		if (COMMANDS.containsKey(this.file)) {
+			COMMANDS.put(file, COMMANDS.remove(this.file))
 		}
 		super.file(file)
 	}
 
 	def private initialise() {
-		if (!IMPORTS.containsKey(this.file)) {
-			IMPORTS.put(this.file, newArrayList)
+		if (!COMMANDS.containsKey(this.file)) {
+			COMMANDS.put(this.file, newArrayList)
 			val osConf = new Configurations().properties("openstack.properties")
 			osConf.keys.forEach[k|this.environment.add('''«k»=«osConf.getString(k)»''')]
 			this.environment.addAll(System.getenv.entrySet.map[e|'''«e.key»=«e.value»'''])
@@ -118,12 +92,10 @@ class TerraformSpecification extends FileSpecification {
 		super.update(contents, data)
 		this.initialise
 		this.execute("terraform fmt -write=true")
-		val imports = TerraformSpecification.IMPORTS.get(this.file)
-		synchronized(imports) {
-			imports.forEach [ i |
-				this.execute('''terraform import «i.type».«i.name» «i.name»''')
-			]
-			imports.clear
+		val commands = TerraformSpecification.COMMANDS.get(this.file)
+		synchronized(commands) {
+			commands.forEach[c|this.execute(c)]
+			commands.clear
 		}
 	}
 
@@ -141,16 +113,14 @@ class TerraformSpecification extends FileSpecification {
 			)
 	}
 
-	def static deferImport(File specificationFile, TerraformImport ^import) {
-		if (!IMPORTS.containsKey(specificationFile))
-			IMPORTS.put(specificationFile, newArrayList)
-		TerraformSpecification.IMPORTS
-			.get(specificationFile)
-			.add(^import)
+	def static deferCommand(File specificationFile, String command) {
+		if (!COMMANDS.containsKey(specificationFile))
+			COMMANDS.put(specificationFile, newArrayList)
+		COMMANDS.get(specificationFile).add(command)
 	}
 
 	def String convertToString(InputStream is) {
-	    val s = new java.util.Scanner(is).useDelimiter("\\A")
+	    val s = new Scanner(is).useDelimiter("\\A")
 	    if (s.hasNext())
 	    	s.next
 	    else
