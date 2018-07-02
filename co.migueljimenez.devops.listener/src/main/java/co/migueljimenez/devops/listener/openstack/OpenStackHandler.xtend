@@ -185,7 +185,7 @@ class OpenStackHandler implements EventHandler {
 					)
 				)
 			}
-			case "keypair.remove.end": {
+			case "keypair.delete.end": {
 				this.models.execute(
 					modelId,
 					new Command(
