@@ -185,6 +185,16 @@ class OpenStackHandler implements EventHandler {
 					)
 				)
 			}
+			case "keypair.remove.end": {
+				this.models.execute(
+					modelId,
+					new Command(
+						InfrastructureModelOp.REMOVE_CREDENTIAL,
+						context,
+						event.payload.get("key_name").asText
+					)	
+				)
+			}
 			default:
 				println('''Unknown OpenStack event: «event.eventType»''')
 		}

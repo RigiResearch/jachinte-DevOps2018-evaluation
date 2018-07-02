@@ -38,6 +38,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.ToString
 import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformPreprocessor
 import com.rigiresearch.lcastane.framework.MART
+import co.migueljimenez.devops.mart.infrastructure.operations.RemoveResource
 
 /**
  * Represents an inventory of infrastructure resources.
@@ -84,6 +85,15 @@ class Infrastructure implements Artefact {
 				.addRule(
 					Rule.Type.PRE,
 					// Ecore objects serialized as XMI
+					new TypesValidation(String)
+				)
+		)
+		this.operations.put(
+			InfrastructureModelOp.REMOVE_CREDENTIAL,
+			new RemoveResource()
+				.addRule(
+					Rule.Type.PRE,
+					// The credential name
 					new TypesValidation(String)
 				)
 		)

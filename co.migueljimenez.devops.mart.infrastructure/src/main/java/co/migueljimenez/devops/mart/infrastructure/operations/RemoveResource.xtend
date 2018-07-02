@@ -19,27 +19,36 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package co.migueljimenez.devops.mart.infrastructure.operations;
+package co.migueljimenez.devops.mart.infrastructure.operations
 
-import com.rigiresearch.lcastane.framework.Operation.OperationType;
-
-import co.migueljimenez.devops.infrastructure.model.Credential;
+import co.migueljimenez.devops.mart.infrastructure.Infrastructure
+import com.rigiresearch.lcastane.framework.validation.ValidationException
+import org.eclipse.emf.ecore.util.EcoreUtil
 
 /**
- * The type of operations supported by the infrastructure model.
+ * Removes an existing resource from the {@link Infrastructure}.
  * @author Miguel Jimenez (miguel@uvic.ca)
- * @date 2018-05-30
+ * @date 2018-07-01
  * @version $Id$
  * @since 0.0.1
  */
-public enum InfrastructureModelOp implements OperationType {
-	/**
-	 * Adds a new {@link Credential} to the infrastructure model.
-	 */
-	ADD_CREDENTIAL,
+class RemoveResource extends AbstractOperation {
 
 	/**
-	 * Removes an existing {@link Credential} from the infrastructure model.
+	 * Default constructor.
 	 */
-	REMOVE_CREDENTIAL
+	new() {
+		super(InfrastructureModelOp.REMOVE_CREDENTIAL)
+	}
+
+	override protected applyOp(Infrastructure infrastructure,
+		Object... arguments) throws ValidationException {
+		// Arguments: the credential's name
+		val name = arguments.get(0) as String
+		val credential = infrastructure.model.credentials.findFirst[c|c.name.equals(name)]
+		if (credential !== null)
+			// Credentials may be associated with instances, however, OpenStack
+			// won't remove the credential if such link exists.
+			EcoreUtil.remove(credential)
+	}
 }
