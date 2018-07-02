@@ -167,24 +167,10 @@ class OpenStackHandler implements EventHandler {
 			"email" -> '''«event.user»@OpenStack'''
 		}
 		switch (event.eventType) {
-			case "keypair.create.end": {
-				val name = event.payload.get("key_name").asText
-				val keypair = client.compute.keypairs.get(name)
-				this.models.execute(
-					modelId,
-					new Command(
-						InfrastructureModelOp.ADD_CREDENTIAL,
-						context,
-						this.serializationParser.asXml(
-							this.i.credential(
-								name,
-								keypair.publicKey,
-								this.i.infrastructure
-							)
-						)
-					)
-				)
-			}
+			case "keypair.create.end":
+				this.newKeypair(client, modelId, context, event)
+			case "keypair.import.end":
+				this.newKeypair(client, modelId, context, event)
 			case "keypair.delete.end": {
 				this.models.execute(
 					modelId,
@@ -192,11 +178,31 @@ class OpenStackHandler implements EventHandler {
 						InfrastructureModelOp.REMOVE_CREDENTIAL,
 						context,
 						event.payload.get("key_name").asText
-					)	
+					)
 				)
 			}
 			default:
 				println('''Unknown OpenStack event: «event.eventType»''')
 		}
+	}
+
+	def private void newKeypair(OSClientV3 client, String modelId,
+		Map<String, Object> context, OpenStackEvent event) {
+		val name = event.payload.get("key_name").asText
+		val keypair = client.compute.keypairs.get(name)
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.ADD_CREDENTIAL,
+				context,
+				this.serializationParser.asXml(
+					this.i.credential(
+						name,
+						keypair.publicKey,
+						this.i.infrastructure
+					)
+				)
+			)
+		)
 	}
 }
