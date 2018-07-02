@@ -56,13 +56,18 @@ class RemoveResource extends AbstractOperation {
 			// won't remove the credential if such link exists.
 			EcoreUtil.remove(credential)
 			val spec = this.getFileSpec(infrastructure.parent.specification)
-			if (spec !== null)
+			if (spec !== null) {
 				// FIXME move this terraform-specific code somewhere else
 				// Defer the resource removal until the specification is updated
 				TerraformSpecification.deferCommand(
 					(spec as FileSpecification).file,
 					'''terraform state rm openstack_compute_keypair_v2.«name»'''
 				)
+				TerraformSpecification.deferCommand(
+					(spec as FileSpecification).file,
+					'''rm -f .keys/«name».pem'''
+				)	
+			}
 		}
 	}
 
