@@ -119,22 +119,22 @@ class OpenStackHandler implements EventHandler {
 			}
 			case "PROJECT-SCOPED": {
 				client = client.credentials(
-						osConf.getString("OS_USERNAME"),
-						osConf.getString("OS_PASSWORD"),
-						Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
-					)
-                    .scopeToProject(
-                    	Identifier.byId(osConf.getString("OS_PROJECT_ID"))
-                    )
+					osConf.getString("OS_USERNAME"),
+					osConf.getString("OS_PASSWORD"),
+					Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
+				)
+				.scopeToProject(
+                  	Identifier.byId(osConf.getString("OS_PROJECT_ID"))
+				)
 			}
 			case "DOMAIN-SCOPED": {
 				client = client.credentials(
-						osConf.getString("OS_USER_ID"),
-						osConf.getString("OS_PASSWORD")
-					)
-                    .scopeToDomain(
-                    	Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
-                    )
+					osConf.getString("OS_USER_ID"),
+					osConf.getString("OS_PASSWORD")
+				)
+				.scopeToDomain(
+                   	Identifier.byName(osConf.getString("OS_USER_DOMAIN_NAME"))
+				)
 			}
 			default:
 				throw new IllegalArgumentException('''Unknown value "«method»"''')
@@ -164,7 +164,7 @@ class OpenStackHandler implements EventHandler {
 		val client = OSFactory.clientFromToken(token)
 		val Map<String, Object> context = #{
 			"author" -> event.user,
-			"email" -> '''«event.user»@openstack'''
+			"email" -> '''«event.user»@OpenStack'''
 		}
 		switch (event.eventType) {
 			case "keypair.create.end": {
