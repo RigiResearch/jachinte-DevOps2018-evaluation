@@ -98,10 +98,10 @@ class Manager implements ManagerService {
 
 	override register(String modelIdentifier, MART<?, ?> model, URIish repository)
 		throws RemoteException {
-		var action = "registered"
+		var action = "updated"
 		if (repository !== null) {
 			this.cloneRepository(modelIdentifier, repository)
-			action = "updated"	
+			action = "registered"
 		}
 		val spec = model.specification
 		switch (spec) {
