@@ -23,6 +23,7 @@ package com.rigiresearch.lcastane.framework.impl;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -145,32 +147,14 @@ public class GithubSpecification implements Specification {
 	@Override
 	public void update(String contents, Map<String, Object> data) {
 		try(Git git = Git.open(this.origin.file().getParentFile())) {
-			InetAddress ia = InetAddress.getLocalHost();
 			git.pull()
 				.setStrategy(MergeStrategy.THEIRS)
 				.setCredentialsProvider(credentialsProvider)
 				.call();
 			this.origin.update(contents, data);
-			git.add()
-				.addFilepattern(".")
-				.call();
-			git.add()
-				.setUpdate(true)
-				.addFilepattern(".")
-				.call();
 			if (git.status().call().isClean())
 				return;
-			git.commit()
-				.setAuthor((String) data.get("author"), (String) data.get("email"))
-				.setCommitter("PrIMOr", String.format("primor@%s", ia.getHostName()))
-				.setMessage(
-					String.format(
-						"Update %s%s",
-						this.origin.file().getName(),
-						this.skipCi ? " [skip ci]" : ""
-					)
-				)
-				.call();
+			this.addAndCommit(git, data);
 			git.push()
 				.setCredentialsProvider(credentialsProvider)
 				.call();
@@ -178,6 +162,56 @@ public class GithubSpecification implements Specification {
 		} catch (IOException | GitAPIException e) {
 			e.printStackTrace();
 		}		
+	}
+
+	/**
+	 * Adds updated, removed and new files to the index and then commits the
+	 * changes.
+	 * @param git The git repository
+	 * @param data Additional information to commit
+	 * @throws NoFilepatternException See {@link Git#add()}
+	 * @throws GitAPIException See {@link Git}
+	 */
+	private void addAndCommit(final Git git, final Map<String, Object> data)
+		throws NoFilepatternException, GitAPIException {
+		for (String file : git.status().call().getModified()) {
+			git.add().addFilepattern(file).call();
+			this.commit(git, data, String.format("Update %s", file));
+		}
+		for (String file : git.status().call().getRemoved()) {
+			git.add().addFilepattern(file).call();
+			this.commit(git, data, String.format("Remove %s", file));
+		}
+		for (String file : git.status().call().getUntracked()) {
+			git.add().addFilepattern(file).call();
+			this.commit(git, data, String.format("Add %s", file));
+		}
+	}
+
+	/**
+	 * Commits already added changes.
+	 * @param git The git repository
+	 * @param data Additional information to commit
+	 * @param message The commit message
+	 * @throws GitAPIException See {@link Git}
+	 */
+	private void commit(final Git git, final Map<String, Object> data,
+		String message) throws GitAPIException {
+		String host = "Unknown";
+		try {
+			host = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {}
+		git.commit()
+			.setAuthor((String) data.get("author"), (String) data.get("email"))
+			.setCommitter("PrIMOr", String.format("PrIMoR@%s", host))
+			.setMessage(
+				String.format(
+					"%s%s",
+					message,
+					this.skipCi ? " [skip ci]" : ""
+				)
+			)
+			.call();
 	}
 
 	/*
