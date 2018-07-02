@@ -78,7 +78,6 @@ class OpenStackListener implements EventListener {
 	 * Default constructor.
 	 */
 	new(String exchange, String routingKey) {
-		this.logger.info("Initializing OpenStack listener")
 		this.configuration = new Configurations().properties(
             "rabbitmq.properties"
         )
@@ -102,22 +101,23 @@ class OpenStackListener implements EventListener {
 	}
 
 	override listen(Procedure1<Object> handler) {
-		this.logger.info("Declaring volatile queue and creating exchange binding")
 		val queue = this.channel.queueDeclare().queue
 		this.channel.queueBind(queue, this.exchange, this.routingKey)
+		this.logger.info('''Connection successful for exchange: "«this.exchange» using routing key: «this.routingKey»"''')
 		this.channel.basicConsume(
 			queue,
 			false,
-			"devops-consumer",
+			"openstack-consumer-" + System.nanoTime,
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
-					OpenStackListener.this.logger.info('''Handling OpenStack event''')
 					val mapper = new ObjectMapper()
 					val innerMessage = mapper.readTree(new String(body)).path("oslo.message").asText
 					val parser = mapper.readTree(innerMessage).traverse
 					parser.codec = mapper
-					handler.apply(parser.readValueAs(OpenStackEvent))
+					val e = parser.readValueAs(OpenStackEvent)
+					OpenStackListener.this.logger.info('''New event "«e.eventType»"''')
+					handler.apply(e)
 					channel.basicAck(envelope.getDeliveryTag(), false)
 				}
 			}
