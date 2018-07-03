@@ -22,16 +22,17 @@
 package co.migueljimenez.terraform.parsing
 
 import co.migueljimenez.terraform.TerraformStandaloneSetup
+import co.migueljimenez.terraform.terraform.Template
+import co.migueljimenez.terraform.terraform.TerraformFactory
 import com.google.inject.Injector
-import org.eclipse.xtext.resource.XtextResource
-import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.xtext.validation.IResourceValidator
 import java.io.ByteArrayInputStream
 import org.eclipse.emf.common.util.URI
-import org.eclipse.xtext.validation.CheckMode
-import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.diagnostics.Severity
-import co.migueljimenez.terraform.terraform.Template
+import org.eclipse.xtext.resource.XtextResource
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.xtext.validation.CheckMode
+import org.eclipse.xtext.validation.IResourceValidator
 
 /**
  * Parses Terraform-compliant code into the grammar model.
@@ -68,7 +69,9 @@ class TerraformParser {
 			issues.forEach[i|System.err.println(i)]
 			throw new Exception("The specification couldn't be parsed")
 		}
-		return resource.contents.get(0) as Template
+		if (!resource.contents.empty)
+			return resource.contents.get(0) as Template
+		return TerraformFactory.eINSTANCE.createTemplate
 	}
 
 	/**
