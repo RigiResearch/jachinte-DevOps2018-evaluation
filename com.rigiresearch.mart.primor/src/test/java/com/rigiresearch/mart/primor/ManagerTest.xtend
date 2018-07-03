@@ -62,7 +62,7 @@ class ManagerTest {
 		)
 		val manager = new Manager
 		// If it doesn't throw exception everything is fine
-		manager.update("model-id", model)
+		manager.register("model-id", model, null)
 	}
 
 	@Test
@@ -87,7 +87,7 @@ class ManagerTest {
 			InfrastructureMart.canonicalName
 		)
 		val manager = new Manager
-		manager.update(id, model)
+		manager.register(id, model, null)
 		// If it doesn't throw exception everything is fine
 		val mart = manager.model(id)
 		println(mart.specification.contents)
