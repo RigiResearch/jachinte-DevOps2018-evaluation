@@ -103,7 +103,7 @@ class OpenStackListener implements EventListener {
 	override listen(Procedure1<Object> handler) {
 		val queue = this.channel.queueDeclare().queue
 		this.channel.queueBind(queue, this.exchange, this.routingKey)
-		this.logger.info('''Connection successful for exchange: "«this.exchange» using routing key: «this.routingKey»"''')
+		this.logger.info('''Connection successful for exchange: "«this.exchange»" using routing key: "«this.routingKey»"''')
 		this.channel.basicConsume(
 			queue,
 			false,
