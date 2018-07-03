@@ -306,13 +306,21 @@ class Hcl2Infrastructure {
 	 * Creates an {@link Image} from the given resource.
 	 */
 	def protected createImage(Resource resource, VirtualInfrastructure project) {
+		val minDisk = if (resource.attr("min_disk_gb") !== null)
+				resource.attr("min_disk_gb").asBigInteger
+			else
+				BigInteger.valueOf(0L)
+		val minRam = if (resource.attr("min_ram_mb") !== null)
+				resource.attr("min_ram_mb").asBigInteger
+			else
+				BigInteger.valueOf(0L)
 		this.i.image(
 			resource.name,
 			ContainerFormat.get(resource.attr("container_format").toString),
 			DiskFormat.get(resource.attr("disk_format").toString),
 			resource.attr("image_source_url").toString,
-			gigabyte(resource.attr("min_disk_gb").asBigInteger),
-			megabyte(resource.attr("min_ram_mb").asBigInteger),
+			gigabyte(minDisk),
+			megabyte(minRam),
 			project
 		)
 	}
