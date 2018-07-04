@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.EObject
 import com.rigiresearch.lcastane.framework.impl.GithubSpecification
 import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
 import co.migueljimenez.devops.infrastructure.model.Image
 
 /**
@@ -77,6 +78,8 @@ class AddResource extends AbstractOperation {
 		switch (o) {
 			Credential:
 				infrastructure.add(o)
+			SecurityGroup:
+				infrastructure.add(o)
 			Image:
 				infrastructure.add(o)
 			default:
@@ -88,6 +91,16 @@ class AddResource extends AbstractOperation {
 	 * Add a {@link Credential} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Credential eObject) {
+		val spec = this.getFileSpec(infrastructure.parent.specification)
+		if (spec !== null)
+			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
+		eObject.project = infrastructure.model
+	}
+
+	/**
+	 * Adds a {@link SecurityGroup} to the given project.
+	 */
+	def private add(Infrastructure infrastructure, SecurityGroup eObject) {
 		val spec = this.getFileSpec(infrastructure.parent.specification)
 		if (spec !== null)
 			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)

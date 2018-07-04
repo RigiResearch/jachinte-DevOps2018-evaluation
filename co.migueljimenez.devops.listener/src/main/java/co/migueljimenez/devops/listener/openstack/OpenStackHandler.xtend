@@ -44,6 +44,7 @@ import de.xn__ho_hia.storage_unit.StorageUnits
 import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.infrastructure.model.Image
 import org.apache.commons.configuration2.PropertiesConfiguration
+import org.openstack4j.model.network.SecurityGroup
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -194,6 +195,9 @@ class OpenStackHandler implements EventHandler {
 				this.newKeypair(client, modelId, context, event)
 			case "keypair.delete.end":
 				this.deleteKeypair(modelId, context, event)
+			// Neutron
+			case "security_group.create.end":
+				this.newSecurityGroup(client, modelId, context, event)
 			// Glance
 			case "image.activate":
 				this.newImage(client, modelId, context, event)
@@ -243,6 +247,36 @@ class OpenStackHandler implements EventHandler {
 		)
 	}
 
+	/**
+	 * Requests adding a new security group to the infrastructure model.
+	 */
+	def private void newSecurityGroup(OSClientV3 client, String modelId,
+		Map<String, Object> context, OpenStackEvent event) {
+		val name = event.payload.path("security_group").get("name").asText
+		val groups = client.networking.securitygroup.list(#{"name" -> name})
+		var SecurityGroup group = null
+		if (groups.size == 1) {
+			group = groups.get(0)
+		} else {
+			this.logger.error('''Could not find security group "«name»"''')
+			return
+		}
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.ADD_RESOURCE,
+				context,
+				this.serializationParser.asXml(
+					this.i.securityGroup(
+						group.id,
+						name,
+						event.payload.path("security_group").get("description").asText,
+						this.i.infrastructure
+					)
+				)
+			)
+		)
+	}
 	/**
 	 * Requests deleting an existing image from the infrastructure model.
 	 */

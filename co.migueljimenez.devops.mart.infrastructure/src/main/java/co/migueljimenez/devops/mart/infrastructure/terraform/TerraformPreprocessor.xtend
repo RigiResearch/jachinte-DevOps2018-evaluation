@@ -27,6 +27,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.eclipse.emf.ecore.EObject
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
 import co.migueljimenez.devops.infrastructure.model.Image
 
 /**
@@ -44,6 +45,8 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 			Credential:
 				this.preprocess(element, specificationFile)
 			Image:
+				this.preprocess(element, specificationFile)
+			SecurityGroup:
 				this.preprocess(element, specificationFile)
 			default:
 				throw new UnsupportedOperationException('''Unsupported resource «element»''')
@@ -67,6 +70,14 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 		TerraformSpecification.deferCommand(
 			specificationFile,
 			'''terraform import openstack_images_image_v2.«element.name» «element.id»'''
+		)
+	}
+
+	def protected preprocess(SecurityGroup element, File specificationFile) {
+		// Defer the resource import until the specification is updated
+		TerraformSpecification.deferCommand(
+			specificationFile,
+			'''terraform import openstack_compute_secgroup_v2.«element.name» «element.id»'''
 		)
 	}
 }
