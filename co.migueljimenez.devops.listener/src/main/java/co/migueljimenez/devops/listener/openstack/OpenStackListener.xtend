@@ -111,11 +111,18 @@ class OpenStackListener implements EventListener {
 			new DefaultConsumer(this.channel) {
 				override handleDelivery(String consumerTag, Envelope envelope,
 					AMQP.BasicProperties properties, byte[] body) throws IOException {
+					val json = new String(body)
 					val mapper = new ObjectMapper()
-					val innerMessage = mapper.readTree(new String(body)).path("oslo.message").asText
-					val parser = mapper.readTree(innerMessage).traverse
-					parser.codec = mapper
-					val e = parser.readValueAs(OpenStackEvent)
+					var OpenStackEvent e = null
+					var innerMessage = mapper.readTree(json)
+					if (innerMessage.path("oslo.message") !== null) { // Nova, Glance
+						innerMessage = innerMessage.path("oslo.message")
+						val parser = mapper.readTree(innerMessage.asText).traverse
+						parser.codec = mapper
+						e = parser.readValueAs(OpenStackEvent)
+					} else {
+						e = mapper.readValue(json, OpenStackEvent)
+					}
 					OpenStackListener.this.logger.info('''New event "«e.eventType»"''')
 					handler.apply(e)
 					channel.basicAck(envelope.getDeliveryTag(), false)
