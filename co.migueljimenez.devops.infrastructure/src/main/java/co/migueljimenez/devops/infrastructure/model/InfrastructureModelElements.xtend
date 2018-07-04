@@ -46,9 +46,10 @@ class InfrastructureModelElements {
 		return ModelFactory.eINSTANCE.createVirtualInfrastructure
 	}
 
-	def flavor(String name, int vcpus, StorageUnit<?> disk, StorageUnit<?> ram,
+	def flavor(String id, String name, int vcpus, StorageUnit<?> disk, StorageUnit<?> ram,
 		VirtualInfrastructure project) {
 		val flavor = ModelFactory.eINSTANCE.createFlavor
+		flavor.id = id
 		flavor.name = name
 		flavor.vcpus = vcpus
 		flavor.disk = disk
@@ -57,10 +58,11 @@ class InfrastructureModelElements {
 		return flavor
 	}
 
-	def image(String name, ContainerFormat containerFormat, DiskFormat diskFormat,
+	def image(String id, String name, ContainerFormat containerFormat, DiskFormat diskFormat,
 			String imageSourceUrl, StorageUnit<?> minDisk, StorageUnit<?> minRam,
 			VirtualInfrastructure project) {
 		val image = ModelFactory.eINSTANCE.createImage
+		image.id = id
 		image.name = name
 		image.containerFormat = containerFormat
 		image.diskFormat = diskFormat
@@ -79,9 +81,10 @@ class InfrastructureModelElements {
 		return credential
 	}
 
-	def volume(String name,  String description, Image image,
+	def volume(String id, String name,  String description, Image image,
 		StorageUnit<?> size, VirtualInfrastructure project) {
 		val volume = ModelFactory.eINSTANCE.createVolume
+		volume.id = id
 		volume.name = name
 		volume.description = description
 		volume.image = image
@@ -90,8 +93,9 @@ class InfrastructureModelElements {
 		return volume
 	}
 
-	def network(String name, VirtualInfrastructure project) {
+	def network(String id, String name, VirtualInfrastructure project) {
 		val network = ModelFactory.eINSTANCE.createNetwork
+		network.id = id
 		network.name = name
 		network.project = project
 		return network
@@ -117,19 +121,21 @@ class InfrastructureModelElements {
 		return rule
 	}
 
-	def securityGroup(String name, String description,
+	def securityGroup(String id, String name, String description,
 		VirtualInfrastructure project) {
 		val group = ModelFactory.eINSTANCE.createSecurityGroup
+		group.id = id
 		group.name = name
 		group.description = description
 		group.project = project
 		return group
 	}
 
-	def instance(String name, Credential credential, Flavor flavor,
+	def instance(String id, String name, Credential credential, Flavor flavor,
 		List<Volume> volumes, List<Network> networks,
 			List<SecurityGroup> securityGroups, VirtualInfrastructure project) {
 		val server = ModelFactory.eINSTANCE.createInstance
+		server.id = id
 		server.name = name
 		server.credential = credential
 		server.flavor = flavor

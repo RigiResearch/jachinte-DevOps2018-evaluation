@@ -294,6 +294,7 @@ class Hcl2Infrastructure {
 	 */
 	def protected createFlavor(Resource resource, VirtualInfrastructure project) {
 		this.i.flavor(
+			null,
 			resource.name,
 			Integer.valueOf(resource.attr("vcpus").toString),
 			gigabyte(resource.attr("disk").asBigInteger),
@@ -315,6 +316,7 @@ class Hcl2Infrastructure {
 			else
 				BigInteger.valueOf(0L)
 		this.i.image(
+			null,
 			resource.name,
 			ContainerFormat.get(resource.attr("container_format").toString),
 			DiskFormat.get(resource.attr("disk_format").toString),
@@ -331,6 +333,7 @@ class Hcl2Infrastructure {
 	def protected createVolume(Resource resource, Image image,
 		VirtualInfrastructure project) {
 		this.i.volume(
+			null,
 			resource.name,
 			resource.attr("description")?.toString,
 			image,
@@ -345,6 +348,7 @@ class Hcl2Infrastructure {
 	def protected createSecurityGroup(Resource resource,
 		VirtualInfrastructure project) {
 		val securityGroup = this.i.securityGroup(
+			null,
 			resource.name,
 			resource.attr("description")?.toString,
 			project
@@ -369,7 +373,7 @@ class Hcl2Infrastructure {
 	 * Creates a {@link Network} from the given resource.
 	 */
 	def protected createNetwork(Resource resource, VirtualInfrastructure project) {
-		this.i.network(resource.name, project)
+		this.i.network(null, resource.name, project)
 	}
 
 	/**
@@ -395,6 +399,7 @@ class Hcl2Infrastructure {
 		// attachments
 		val volumes = #[]
 		this.i.instance(
+			null,
 			resource.name,
 			credential,
 			flavor,

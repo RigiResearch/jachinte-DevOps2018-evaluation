@@ -95,6 +95,7 @@ class Infrastructure2HclTest {
 		this.textTranslator = new Hcl2Text
 		this.project = this.i.infrastructure
 		this.flavor = this.i.flavor(
+			"flavor-id",
 			"small",
 			1,
 			StorageUnits.gigabyte(4),
@@ -102,6 +103,7 @@ class Infrastructure2HclTest {
 			this.project
 		)
 		this.image = this.i.image(
+			"image-id",
 			"rancher-os",
 			ContainerFormat.BARE,
 			DiskFormat.ARI,
@@ -111,6 +113,7 @@ class Infrastructure2HclTest {
 			this.project
 		)
 		this.volume = this.i.volume(
+			"volue-id",
 			"myvolume",
 			null,
 			this.image,
@@ -118,6 +121,7 @@ class Infrastructure2HclTest {
 			this.project
 		)
 		this.instance = this.i.instance(
+			"instance-id",
 			"basic",
 			this.i.credential(
 				"access",
