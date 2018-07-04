@@ -43,6 +43,8 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 		switch (element) {
 			Credential:
 				this.preprocess(element, specificationFile)
+			Image:
+				this.preprocess(element, specificationFile)
 			default:
 				throw new UnsupportedOperationException('''Unsupported resource «element»''')
 		}
