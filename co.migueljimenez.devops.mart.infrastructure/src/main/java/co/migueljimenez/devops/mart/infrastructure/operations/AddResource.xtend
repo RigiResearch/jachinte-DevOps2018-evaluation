@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.EObject
 import com.rigiresearch.lcastane.framework.impl.GithubSpecification
 import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
+import co.migueljimenez.devops.infrastructure.model.Image
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -54,7 +55,7 @@ class AddResource extends AbstractOperation {
 	 * Default constructor.
 	 */
 	new(SpecificationPreprocessor preprocessor) {
-		super(InfrastructureModelOp.ADD_CREDENTIAL)
+		super(InfrastructureModelOp.ADD_RESOURCE)
 		this.serializationParser = new SerializationParser
 		this.preprocessor = preprocessor
 	}
@@ -76,6 +77,8 @@ class AddResource extends AbstractOperation {
 		switch (o) {
 			Credential:
 				infrastructure.add(o)
+			Image:
+				infrastructure.add(o)
 			default:
 				infrastructure.add(o)
 		}
@@ -85,6 +88,16 @@ class AddResource extends AbstractOperation {
 	 * Add a {@link Credential} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Credential eObject) {
+		val spec = this.getFileSpec(infrastructure.parent.specification)
+		if (spec !== null)
+			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
+		eObject.project = infrastructure.model
+	}
+
+	/**
+	 * Adds an {@link Image} to the given project.
+	 */
+	def private add(Infrastructure infrastructure, Image eObject) {
 		val spec = this.getFileSpec(infrastructure.parent.specification)
 		if (spec !== null)
 			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)

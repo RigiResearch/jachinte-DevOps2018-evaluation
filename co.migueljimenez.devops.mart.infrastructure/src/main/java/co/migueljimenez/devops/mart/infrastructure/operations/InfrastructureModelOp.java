@@ -34,9 +34,9 @@ import co.migueljimenez.devops.infrastructure.model.Credential;
  */
 public enum InfrastructureModelOp implements OperationType {
 	/**
-	 * Adds a new {@link Credential} to the infrastructure model.
+	 * Adds a new resource to the infrastructure model.
 	 */
-	ADD_CREDENTIAL,
+	ADD_RESOURCE,
 
 	/**
 	 * Removes an existing {@link Credential} from the infrastructure model.

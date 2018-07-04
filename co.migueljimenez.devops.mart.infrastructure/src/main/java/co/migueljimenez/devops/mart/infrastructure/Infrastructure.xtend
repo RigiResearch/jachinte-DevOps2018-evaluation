@@ -80,7 +80,7 @@ class Infrastructure implements Artefact {
 		this.model = model
 		this.operations = <OperationType, Operation<Infrastructure>>newHashMap
 		this.operations.put(
-			InfrastructureModelOp.ADD_CREDENTIAL,
+			InfrastructureModelOp.ADD_RESOURCE,
 			new AddResource(new TerraformPreprocessor)
 				.addRule(
 					Rule.Type.PRE,

@@ -38,6 +38,9 @@ import org.openstack4j.model.common.Identifier
 import org.openstack4j.model.identity.v3.Token
 import org.openstack4j.openstack.OSFactory
 import org.slf4j.LoggerFactory
+import co.migueljimenez.devops.infrastructure.model.ContainerFormat
+import co.migueljimenez.devops.infrastructure.model.DiskFormat
+import de.xn__ho_hia.storage_unit.StorageUnits
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -167,6 +170,7 @@ class OpenStackHandler implements EventHandler {
 			"email" -> '''«event.user»@OpenStack'''
 		}
 		switch (event.eventType) {
+			// Nova
 			case "keypair.create.end":
 				this.newKeypair(client, modelId, context, event)
 			case "keypair.import.end":
@@ -178,6 +182,29 @@ class OpenStackHandler implements EventHandler {
 						InfrastructureModelOp.REMOVE_CREDENTIAL,
 						context,
 						event.payload.get("key_name").asText
+					)
+				)
+			}
+			// Glance
+			case "image.create": {
+				val image = client.images.get(event.payload.get("image_id").asText)
+				this.models.execute(
+					modelId,
+					new Command(
+						InfrastructureModelOp.ADD_RESOURCE,
+						context,
+						this.serializationParser.asXml(
+							this.i.image(
+								image.id,
+								image.name,
+								ContainerFormat.valueOf(image.containerFormat.value.toUpperCase),
+								DiskFormat.valueOf(image.diskFormat.value.toUpperCase),
+								image.location,
+								StorageUnits.megabyte(image.minDisk),
+								StorageUnits.megabyte(image.minRam),
+								this.i.infrastructure
+							)
+						)
 					)
 				)
 			}
@@ -193,7 +220,7 @@ class OpenStackHandler implements EventHandler {
 		this.models.execute(
 			modelId,
 			new Command(
-				InfrastructureModelOp.ADD_CREDENTIAL,
+				InfrastructureModelOp.ADD_RESOURCE,
 				context,
 				this.serializationParser.asXml(
 					this.i.credential(

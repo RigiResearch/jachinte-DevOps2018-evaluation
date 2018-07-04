@@ -27,6 +27,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.eclipse.emf.ecore.EObject
+import co.migueljimenez.devops.infrastructure.model.Image
 
 /**
  * Terraform-specific behavior to pre-process elements from the Infrastructure
@@ -56,6 +57,14 @@ class TerraformPreprocessor implements SpecificationPreprocessor {
 		TerraformSpecification.deferCommand(
 			specificationFile,
 			'''terraform import openstack_compute_keypair_v2.«element.name» «element.name»'''
+		)
+	}
+
+	def protected preprocess(Image element, File specificationFile) {
+		// Defer the resource import until the specification is updated
+		TerraformSpecification.deferCommand(
+			specificationFile,
+			'''terraform import openstack_images_image_v2.«element.name» «element.id»'''
 		)
 	}
 }
