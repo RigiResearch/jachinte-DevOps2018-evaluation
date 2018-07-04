@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
       - run: cd .circleci && java -jar co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar ..
-  deploy:
+  deploy_terraform:
     docker:
       - image: hashicorp/terraform
     steps:
