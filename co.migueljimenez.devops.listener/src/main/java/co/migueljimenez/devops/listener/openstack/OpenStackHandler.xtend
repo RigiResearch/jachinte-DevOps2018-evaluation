@@ -154,7 +154,7 @@ class OpenStackHandler implements EventHandler {
 
 	override handle(Object event) {
 		val e = event as OpenStackEvent
-		if (e.user.equals(this.ignoredUser)) {
+		if (!e.user.isNullOrEmpty && e.user.equals(this.ignoredUser)) {
 			this.logger.info('''Event "«e.eventType»" was ignored because its author («this.ignoredUser») is being ignored''')
 			return;
 		}
