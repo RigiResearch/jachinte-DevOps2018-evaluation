@@ -32,6 +32,7 @@ import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecificat
 import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.infrastructure.model.Image
 import org.eclipse.emf.ecore.EObject
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
 
 /**
  * Removes an existing resource from the {@link Infrastructure}.
@@ -68,6 +69,10 @@ class RemoveResource extends AbstractOperation {
 			case Image.canonicalName: {
 				eObject = infrastructure.model.images.findFirst[i|i.name.equals(name)]
 				commands.add('''terraform state rm openstack_images_image_v2.«name»''')
+			}
+			case SecurityGroup.canonicalName: {
+				eObject = infrastructure.model.securityGroups.findFirst[s|s.name.equals(name)]
+				commands.add('''terraform state rm openstack_compute_secgroup_v2.«name»''')
 			}
 			default:
 				throw new UnsupportedOperationException('''Resource not supported «type»''')

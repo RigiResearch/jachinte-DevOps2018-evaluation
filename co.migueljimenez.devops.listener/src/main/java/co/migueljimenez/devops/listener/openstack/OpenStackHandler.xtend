@@ -198,6 +198,8 @@ class OpenStackHandler implements EventHandler {
 			// Neutron
 			case "security_group.create.end":
 				this.newSecurityGroup(client, modelId, context, event)
+			case "security_group.delete.end":
+				this.deleteSecurityGroup(client, modelId, context, event)
 			// Glance
 			case "image.activate":
 				this.newImage(client, modelId, context, event)
@@ -277,6 +279,26 @@ class OpenStackHandler implements EventHandler {
 			)
 		)
 	}
+
+	/**
+	 * Requests deleting an existing image from the infrastructure model.
+	 */
+	def private void deleteSecurityGroup(OSClientV3 client, String modelId,
+		Map<String, Object> context, OpenStackEvent event) {
+		val group = client.networking.securitygroup.get(
+			event.payload.get("security_group_id").asText
+		)
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.REMOVE_RESOURCE,
+				context,
+				group.name,
+				co.migueljimenez.devops.infrastructure.model.SecurityGroup.canonicalName
+			)
+		)
+	}
+
 	/**
 	 * Requests deleting an existing image from the infrastructure model.
 	 */
