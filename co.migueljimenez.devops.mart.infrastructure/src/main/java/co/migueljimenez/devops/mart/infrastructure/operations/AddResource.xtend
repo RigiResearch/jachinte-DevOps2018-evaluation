@@ -22,16 +22,17 @@
 package co.migueljimenez.devops.mart.infrastructure.operations
 
 import co.migueljimenez.devops.infrastructure.model.Credential
+import co.migueljimenez.devops.infrastructure.model.Image
+import co.migueljimenez.devops.infrastructure.model.SecurityGroup
 import co.migueljimenez.devops.infrastructure.model.SerializationParser
 import co.migueljimenez.devops.mart.infrastructure.Infrastructure
+import com.rigiresearch.lcastane.framework.Specification
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
+import com.rigiresearch.lcastane.framework.impl.GithubSpecification
+import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 import com.rigiresearch.lcastane.framework.validation.ValidationException
 import org.eclipse.emf.ecore.EObject
-import com.rigiresearch.lcastane.framework.impl.GithubSpecification
-import com.rigiresearch.lcastane.framework.Specification
-import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
-import co.migueljimenez.devops.infrastructure.model.SecurityGroup
-import co.migueljimenez.devops.infrastructure.model.Image
+import org.slf4j.LoggerFactory
 
 /**
  * Adds a new resource to the {@link Infrastructure}.
@@ -41,6 +42,11 @@ import co.migueljimenez.devops.infrastructure.model.Image
  * @since 0.0.1
  */
 class AddResource extends AbstractOperation {
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(AddResource)
 
 	/**
 	 * A parser to serialize Ecore objects.
@@ -91,6 +97,10 @@ class AddResource extends AbstractOperation {
 	 * Add a {@link Credential} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Credential eObject) {
+		if (infrastructure.model.credentials.exists[c|c.name.equals(eObject.name)]) {
+			this.logger.info('''Credential "«eObject.name»" not added because it already exists''')
+			return
+		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
 		if (spec !== null)
 			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
@@ -101,6 +111,10 @@ class AddResource extends AbstractOperation {
 	 * Adds a {@link SecurityGroup} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, SecurityGroup eObject) {
+		if (infrastructure.model.securityGroups.exists[s|eObject.id.equals(s.id)]) {
+			this.logger.info('''Security Group "«eObject.name»" not added because it already exists''')
+			return
+		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
 		if (spec !== null)
 			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
@@ -111,6 +125,10 @@ class AddResource extends AbstractOperation {
 	 * Adds an {@link Image} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Image eObject) {
+		if (infrastructure.model.images.exists[i|eObject.id.equals(i.id)]) {
+			this.logger.info('''Image "«eObject.name»" not added because it already exists''')
+			return
+		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
 		if (spec !== null)
 			this.preprocessor.preprocess(eObject, (spec as FileSpecification).file)
