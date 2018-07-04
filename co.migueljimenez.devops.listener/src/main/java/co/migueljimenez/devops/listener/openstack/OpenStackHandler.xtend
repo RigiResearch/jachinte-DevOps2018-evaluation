@@ -187,7 +187,13 @@ class OpenStackHandler implements EventHandler {
 			}
 			// Glance
 			case "image.activate": {
+				// FIXME Create a GlanceEvent, to populate user data manually
 				val image = client.images.get(event.payload.get("id").asText)
+				if (event.user.isNullOrEmpty) {
+					val owner = client.identity.users.get(event.payload.get("owner").asText)
+					context.put("author", owner.name)
+					context.put("email", owner.email)
+				}
 				this.models.execute(
 					modelId,
 					new Command(
