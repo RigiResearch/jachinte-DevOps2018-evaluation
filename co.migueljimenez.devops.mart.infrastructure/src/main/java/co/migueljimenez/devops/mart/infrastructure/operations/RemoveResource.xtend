@@ -29,6 +29,9 @@ import com.rigiresearch.lcastane.framework.impl.ObservableSpecification
 import com.rigiresearch.lcastane.framework.impl.GithubSpecification
 import com.rigiresearch.lcastane.framework.impl.FileSpecification
 import co.migueljimenez.devops.mart.infrastructure.terraform.TerraformSpecification
+import co.migueljimenez.devops.infrastructure.model.Credential
+import co.migueljimenez.devops.infrastructure.model.Image
+import org.eclipse.emf.ecore.EObject
 
 /**
  * Removes an existing resource from the {@link Infrastructure}.
@@ -43,30 +46,40 @@ class RemoveResource extends AbstractOperation {
 	 * Default constructor.
 	 */
 	new() {
-		super(InfrastructureModelOp.REMOVE_CREDENTIAL)
+		super(InfrastructureModelOp.REMOVE_RESOURCE)
 	}
 
 	override protected applyOp(Infrastructure infrastructure,
 		Object... arguments) throws ValidationException {
-		// Arguments: the credential's name
+		// Arguments: the element's name, the element's type
 		val name = arguments.get(0) as String
-		val credential = infrastructure.model.credentials.findFirst[c|c.name.equals(name)]
-		if (credential !== null) {
-			// Credentials may be associated with instances, however, OpenStack
-			// won't remove the credential if such link exists.
-			EcoreUtil.remove(credential)
+		val type = arguments.get(1) as String
+		var EObject eObject = null
+		val commands = newArrayList
+		// FIXME move this terraform-specific code somewhere else
+		switch (type) {
+			case Credential.canonicalName: {
+				// Credentials may be associated with instances, however, OpenStack
+				// won't remove the credential if such link exists.
+				eObject = infrastructure.model.credentials.findFirst[c|c.name.equals(name)]
+				commands.add('''terraform state rm openstack_compute_keypair_v2.«name»''')
+				commands.add('''rm -f .keys/«name».pem''')
+			}
+			case Image.canonicalName: {
+				eObject = infrastructure.model.images.findFirst[i|i.name.equals(name)]
+				commands.add('''terraform state rm openstack_images_image_v2.«name»''')
+			}
+			default:
+				throw new UnsupportedOperationException('''Resource not supported «type»''')
+		}
+		if (eObject !== null) {
+			EcoreUtil.remove(eObject)
 			val spec = this.getFileSpec(infrastructure.parent.specification)
 			if (spec !== null) {
-				// FIXME move this terraform-specific code somewhere else
-				// Defer the resource removal until the specification is updated
-				TerraformSpecification.deferCommand(
-					(spec as FileSpecification).file,
-					'''terraform state rm openstack_compute_keypair_v2.«name»'''
-				)
-				TerraformSpecification.deferCommand(
-					(spec as FileSpecification).file,
-					'''rm -f .keys/«name».pem'''
-				)	
+				commands.forEach [ c |
+					val file = (spec as FileSpecification).file
+					TerraformSpecification.deferCommand(file, c)
+				]
 			}
 		}
 	}

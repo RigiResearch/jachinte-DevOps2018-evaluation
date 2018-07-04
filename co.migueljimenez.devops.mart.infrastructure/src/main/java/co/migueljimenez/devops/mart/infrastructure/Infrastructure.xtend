@@ -89,12 +89,12 @@ class Infrastructure implements Artefact {
 				)
 		)
 		this.operations.put(
-			InfrastructureModelOp.REMOVE_CREDENTIAL,
+			InfrastructureModelOp.REMOVE_RESOURCE,
 			new RemoveResource()
 				.addRule(
 					Rule.Type.PRE,
-					// The credential name
-					new TypesValidation(String)
+					// The element's name, the element's type
+					new TypesValidation(String, String)
 				)
 		)
 		this.serializationParser = new SerializationParser

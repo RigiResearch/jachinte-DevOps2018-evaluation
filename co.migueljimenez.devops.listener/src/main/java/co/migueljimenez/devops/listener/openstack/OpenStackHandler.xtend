@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory
 import co.migueljimenez.devops.infrastructure.model.ContainerFormat
 import co.migueljimenez.devops.infrastructure.model.DiskFormat
 import de.xn__ho_hia.storage_unit.StorageUnits
+import co.migueljimenez.devops.infrastructure.model.Credential
+import co.migueljimenez.devops.infrastructure.model.Image
 import org.apache.commons.configuration2.PropertiesConfiguration
 
 /**
@@ -194,9 +196,10 @@ class OpenStackHandler implements EventHandler {
 				this.models.execute(
 					modelId,
 					new Command(
-						InfrastructureModelOp.REMOVE_CREDENTIAL,
+						InfrastructureModelOp.REMOVE_RESOURCE,
 						context,
-						event.payload.get("key_name").asText
+						event.payload.get("key_name").asText,
+						Credential.canonicalName
 					)
 				)
 			}
@@ -223,6 +226,17 @@ class OpenStackHandler implements EventHandler {
 						)
 					)
 				)
+			}
+			case "image.delete": {
+				this.models.execute(
+					modelId,
+					new Command(
+						InfrastructureModelOp.REMOVE_RESOURCE,
+						context,
+						event.payload.get("name").asText,
+						Image.canonicalName
+					)
+				)				
 			}
 			default:
 				println('''Unknown OpenStack event: «event.eventType»''')
