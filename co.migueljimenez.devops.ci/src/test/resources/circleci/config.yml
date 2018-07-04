@@ -8,20 +8,10 @@ jobs:
       - run: "[ -z \"$(terraform fmt -write=false)\" ] || { terraform fmt -write=false -diff; exit 1; }"
   deploy_models:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: jachinte/openjdk-8-terraform
     steps:
       - checkout
-      - run: |
-          wget https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
-          unzip terraform_0.11.7_linux_amd64.zip
-          rm terraform_0.11.7_linux_amd64.zip
-          sudo mkdir /opt/terraform && sudo mkdir /opt/terraform/bin
-          sudo mv terraform /opt/terraform/bin
-          sudo chown -R root:root /opt/terraform
-          echo 'export PATH=$PATH:/opt/terraform/bin' | sudo tee -a /etc/profile
-          source /etc/profile;
-          cd .circleci;
-          java -jar co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar ..
+      - run: cd .circleci && java -jar co.migueljimenez.devops.ci-1.0.0-SNAPSHOT.jar ..
   deploy:
     docker:
       - image: hashicorp/terraform
@@ -37,10 +27,7 @@ workflows:
       - deploy_models:
           requires:
             - validate_terraform
-      - deploy:
+      - deploy_terraform:
           requires:
             - validate_terraform
             - deploy_models
-      - test:
-          requires:
-            - deploy
