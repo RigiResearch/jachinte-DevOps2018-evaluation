@@ -115,7 +115,7 @@ class OpenStackListener implements EventListener {
 					val mapper = new ObjectMapper()
 					var OpenStackEvent e = null
 					var innerMessage = mapper.readTree(json)
-					if (!innerMessage.path("oslo.message").nullOrEmpty) { // Nova, Glance
+					if (!innerMessage.path("oslo.message").isMissingNode) { // Nova, Glance
 						innerMessage = innerMessage.path("oslo.message")
 						val parser = mapper.readTree(innerMessage.asText).traverse
 						parser.codec = mapper

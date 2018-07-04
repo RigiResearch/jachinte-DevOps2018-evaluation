@@ -203,10 +203,16 @@ class OpenStackEventTest {
 			"oslo.version": "2.0"
 		}'''
 		val mapper = new ObjectMapper()
-		val innerMessage = mapper.readTree(input).path("oslo.message").asText
-		val parser = mapper.readTree(innerMessage).traverse
-		parser.codec = mapper
-		val event = parser.readValueAs(OpenStackEvent)
+		var OpenStackEvent event = null
+		var innerMessage = mapper.readTree(input)
+		if (!innerMessage.path("oslo.message").isMissingNode) { // Nova, Glance
+			innerMessage = innerMessage.path("oslo.message")
+			val parser = mapper.readTree(innerMessage.asText).traverse
+			parser.codec = mapper
+			event = parser.readValueAs(OpenStackEvent)
+		} else {
+			event = mapper.readValue(input, OpenStackEvent)
+		}
 		Assert.assertNotNull(event)
 	}
 }
