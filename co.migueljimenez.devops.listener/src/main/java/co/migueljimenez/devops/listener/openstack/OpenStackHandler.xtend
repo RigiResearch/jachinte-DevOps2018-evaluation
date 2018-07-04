@@ -177,7 +177,7 @@ class OpenStackHandler implements EventHandler {
 		val modelId = this.primorConfig.getString("model-id")
 		if (!this.models.modelRegistered(modelId)) {
 			this.logger.info(
-				'''OpenStack event was not further handled because the model "«modelId»" hasn't been registered yet'''
+				'''The event was not further handled because the model "«modelId»" hasn't been registered yet'''
 			)
 			return
 		}
@@ -192,57 +192,37 @@ class OpenStackHandler implements EventHandler {
 				this.newKeypair(client, modelId, context, event)
 			case "keypair.import.end":
 				this.newKeypair(client, modelId, context, event)
-			case "keypair.delete.end": {
-				this.models.execute(
-					modelId,
-					new Command(
-						InfrastructureModelOp.REMOVE_RESOURCE,
-						context,
-						event.payload.get("key_name").asText,
-						Credential.canonicalName
-					)
-				)
-			}
+			case "keypair.delete.end":
+				this.deleteKeypair(modelId, context, event)
 			// Glance
-			case "image.activate": {
-				val image = client.images.get(event.payload.get("id").asText)
-				this.models.execute(
-					modelId,
-					new Command(
-						InfrastructureModelOp.ADD_RESOURCE,
-						context,
-						this.serializationParser.asXml(
-							this.i.image(
-								event.payload.get("id").asText,
-								event.payload.get("name").asText,
-								ContainerFormat.valueOf(event.payload.get("container_format").asText.toUpperCase),
-								DiskFormat.valueOf(event.payload.get("disk_format").asText.toUpperCase),
-								// TODO use the location from the event
-								image.location,
-								StorageUnits.gigabyte(Long.valueOf(event.payload.get("min_disk").asText)),
-								StorageUnits.megabyte(Long.valueOf(event.payload.get("min_ram").asText)),
-								this.i.infrastructure
-							)
-						)
-					)
-				)
-			}
-			case "image.delete": {
-				this.models.execute(
-					modelId,
-					new Command(
-						InfrastructureModelOp.REMOVE_RESOURCE,
-						context,
-						event.payload.get("name").asText,
-						Image.canonicalName
-					)
-				)				
-			}
+			case "image.activate":
+				this.newImage(client, modelId, context, event)
+			case "image.delete":
+				this.deleteImage(modelId, context, event)
 			default:
 				println('''Unknown OpenStack event: «event.eventType»''')
 		}
 	}
 
+	/**
+	 * Requests deleting an existing keypair from the infrastructure model.
+	 */
+	def private void deleteKeypair(String modelId, Map<String, Object> context,
+		OpenStackEvent event) {
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.REMOVE_RESOURCE,
+				context,
+				event.payload.get("key_name").asText,
+				Credential.canonicalName
+			)
+		)
+	}
+
+	/**
+	 * Requests adding a new keypair to the infrastructure model.
+	 */
 	def private void newKeypair(OSClientV3 client, String modelId,
 		Map<String, Object> context, OpenStackEvent event) {
 		val name = event.payload.get("key_name").asText
@@ -256,6 +236,50 @@ class OpenStackHandler implements EventHandler {
 					this.i.credential(
 						name,
 						keypair.publicKey,
+						this.i.infrastructure
+					)
+				)
+			)
+		)
+	}
+
+	/**
+	 * Requests deleting an existing image from the infrastructure model.
+	 */
+	def private void deleteImage(String modelId, Map<String, Object> context,
+		OpenStackEvent event) {
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.REMOVE_RESOURCE,
+				context,
+				event.payload.get("name").asText,
+				Image.canonicalName
+			)
+		)
+	}
+
+	/**
+	 * Requests adding a new image to the infrastructure model.
+	 */
+	def private void newImage(OSClientV3 client, String modelId,
+		Map<String, Object> context, OpenStackEvent event) {
+		val image = client.images.get(event.payload.get("id").asText)
+		this.models.execute(
+			modelId,
+			new Command(
+				InfrastructureModelOp.ADD_RESOURCE,
+				context,
+				this.serializationParser.asXml(
+					this.i.image(
+						event.payload.get("id").asText,
+						event.payload.get("name").asText,
+						ContainerFormat.valueOf(event.payload.get("container_format").asText.toUpperCase),
+						DiskFormat.valueOf(event.payload.get("disk_format").asText.toUpperCase),
+						// TODO use the location from the event
+						image.location,
+						StorageUnits.gigabyte(Long.valueOf(event.payload.get("min_disk").asText)),
+						StorageUnits.megabyte(Long.valueOf(event.payload.get("min_ram").asText)),
 						this.i.infrastructure
 					)
 				)
