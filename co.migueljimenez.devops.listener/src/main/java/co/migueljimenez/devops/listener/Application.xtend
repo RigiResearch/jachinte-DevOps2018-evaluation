@@ -81,7 +81,11 @@ class Application {
 
 	def static void main(String[] args) {
 		new Application(
-			#[new OpenStackListener("nova", "notifications.info")],
+			#[
+				new OpenStackListener("glance", "notifications.info"),
+				new OpenStackListener("neutron", "notifications.info"),
+				new OpenStackListener("nova", "notifications.info")
+			],
 			#[new OpenStackHandler]
 		).start()
 	}
