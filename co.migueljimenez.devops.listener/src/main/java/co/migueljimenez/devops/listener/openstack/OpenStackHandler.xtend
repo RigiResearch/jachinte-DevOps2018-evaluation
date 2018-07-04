@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory
 import co.migueljimenez.devops.infrastructure.model.ContainerFormat
 import co.migueljimenez.devops.infrastructure.model.DiskFormat
 import de.xn__ho_hia.storage_unit.StorageUnits
+import org.apache.commons.configuration2.PropertiesConfiguration
 
 /**
  * An OpenStack event handler that executes {@link Command}s on PrIMoR.
@@ -60,6 +61,11 @@ class OpenStackHandler implements EventHandler {
 	 * The OpenStack client.
 	 */
 	val OSClientV3 client
+
+	/**
+	 * Events from this user are ignored.
+	 */
+	val String ignoredUser
 
 	/**
 	 * Properties configuration for PrIMoR.
@@ -91,7 +97,9 @@ class OpenStackHandler implements EventHandler {
 	 */
 	new() {
 		this.primorConfig = new Configurations().properties("primor.properties")
-		this.client = this.openStackClient
+		val osConf = new Configurations().properties("openstack.properties")
+		this.ignoredUser = osConf.getString("ignored-user")
+		this.client = this.openStackClient(osConf)
 		this.registry = LocateRegistry.getRegistry(
 			this.primorConfig.getString("manager-host"),
 			this.primorConfig.getInt("manager-port")
@@ -107,8 +115,7 @@ class OpenStackHandler implements EventHandler {
 	 * <a href="http://www.openstack4j.com/learn/getting-started/#authenticate">OpenStack4j</a>
 	 * documentation
 	 */
-	def private openStackClient() {
-		val osConf = new Configurations().properties("openstack.properties")
+	def private openStackClient(PropertiesConfiguration osConf) {
 		val method = osConf.getString("authentication-method")
 		var client = OSFactory.builderV3()
 			.endpoint(osConf.getString("OS_AUTH_URL"))
@@ -146,7 +153,15 @@ class OpenStackHandler implements EventHandler {
 	}
 
 	override handle(Object event) {
-		(event as OpenStackEvent).handle(this.client.token)
+		val e = event as OpenStackEvent
+		if (e.user.equals(this.ignoredUser)) {
+			this.logger.info('''Event "«e.eventType»" was ignored because its author («this.ignoredUser») is being ignored''')
+			return;
+		}
+		// FIXME Dig into this Glance issue
+		if (e.user.isNullOrEmpty)
+			e.user = "unknown"
+		this.handle(e, this.client.token)
 	}
 
 	override handledType() {
