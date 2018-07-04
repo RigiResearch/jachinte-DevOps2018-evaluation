@@ -106,6 +106,7 @@ class Network {
 }
 
 class SecurityRule {
+	id String ^id
 	int from
 	int to
 	String protocol

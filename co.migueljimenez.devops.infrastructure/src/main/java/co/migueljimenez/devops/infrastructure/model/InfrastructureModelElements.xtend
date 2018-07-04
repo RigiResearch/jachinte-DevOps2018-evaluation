@@ -110,9 +110,10 @@ class InfrastructureModelElements {
 		return subnet
 	}
 
-	def securityRule(int portFrom, int portTo, String cidr, String protocol,
+	def securityRule(String id, int portFrom, int portTo, String cidr, String protocol,
 		SecurityGroup parent) {
 		val rule = ModelFactory.eINSTANCE.createSecurityRule
+		rule.id = id
 		rule.from = portFrom
 		rule.to = portTo
 		rule.cidr = cidr
