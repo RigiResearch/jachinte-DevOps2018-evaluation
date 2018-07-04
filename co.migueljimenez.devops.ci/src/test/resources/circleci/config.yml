@@ -16,9 +16,17 @@ jobs:
     docker:
       - image: hashicorp/terraform
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SO:ME:FIN:G:ER:PR:IN:T"
       - checkout
       - run: terraform init -input=false
       - run: terraform apply -input=false -auto-approve
+      - run: |
+          git config user.email "container@circleci"
+          git config user.name "circleci"
+          git commit -am 'Update the Terraform state [skip ci]' || true
+          git push
 workflows:
   version: 2
   deploy:
