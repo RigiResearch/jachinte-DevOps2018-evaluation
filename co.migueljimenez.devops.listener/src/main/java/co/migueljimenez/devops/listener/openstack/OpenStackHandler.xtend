@@ -186,8 +186,8 @@ class OpenStackHandler implements EventHandler {
 				)
 			}
 			// Glance
-			case "image.create": {
-				val image = client.images.get(event.payload.get("image_id").asText)
+			case "image.activate": {
+				val image = client.images.get(event.payload.get("id").asText)
 				this.models.execute(
 					modelId,
 					new Command(
@@ -195,13 +195,14 @@ class OpenStackHandler implements EventHandler {
 						context,
 						this.serializationParser.asXml(
 							this.i.image(
-								image.id,
-								image.name,
-								ContainerFormat.valueOf(image.containerFormat.value.toUpperCase),
-								DiskFormat.valueOf(image.diskFormat.value.toUpperCase),
+								event.payload.get("id").asText,
+								event.payload.get("name").asText,
+								ContainerFormat.valueOf(event.payload.get("container_format").asText.toUpperCase),
+								DiskFormat.valueOf(event.payload.get("disk_format").asText.toUpperCase),
+								// TODO use the location from the event
 								image.location,
-								StorageUnits.megabyte(image.minDisk),
-								StorageUnits.megabyte(image.minRam),
+								StorageUnits.gigabyte(Long.valueOf(event.payload.get("min_disk").asText)),
+								StorageUnits.megabyte(Long.valueOf(event.payload.get("min_ram").asText)),
 								this.i.infrastructure
 							)
 						)
