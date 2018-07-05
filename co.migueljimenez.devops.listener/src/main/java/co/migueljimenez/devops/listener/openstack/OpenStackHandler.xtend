@@ -269,7 +269,7 @@ class OpenStackHandler implements EventHandler {
 			event.payload.path("security_group").get("description").asText,
 			this.i.infrastructure
 		)
-		group.rules.forEach [ r |
+		group.rules?.forEach [ r |
 			newGroup.rules.add(
 				this.i.securityRule(
 					r.id,
