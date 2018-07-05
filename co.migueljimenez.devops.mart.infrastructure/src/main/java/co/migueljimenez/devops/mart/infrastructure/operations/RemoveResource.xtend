@@ -71,8 +71,10 @@ class RemoveResource extends AbstractOperation {
 				commands.add('''terraform state rm openstack_images_image_v2.«name»''')
 			}
 			case SecurityGroup.canonicalName: {
-				eObject = infrastructure.model.securityGroups.findFirst[s|s.name.equals(name)]
-				commands.add('''terraform state rm openstack_compute_secgroup_v2.«name»''')
+				// We have to use the id to find the group, as the name is not available anymore
+				// i.e., name is actually the id
+				eObject = infrastructure.model.securityGroups.findFirst[s|s.id.equals(name)]
+				commands.add('''terraform state rm openstack_compute_secgroup_v2.«(eObject as SecurityGroup).name»''')
 			}
 			default:
 				throw new UnsupportedOperationException('''Resource not supported «type»''')
