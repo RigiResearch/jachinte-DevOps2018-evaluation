@@ -263,19 +263,30 @@ class OpenStackHandler implements EventHandler {
 			this.logger.error('''Could not find security group "«name»"''')
 			return
 		}
+		val newGroup = this.i.securityGroup(
+			group.id,
+			name,
+			event.payload.path("security_group").get("description").asText,
+			this.i.infrastructure
+		)
+		group.rules.forEach [ r |
+			newGroup.rules.add(
+				this.i.securityRule(
+					r.id,
+					r.portRangeMin,
+					r.portRangeMax,
+					r.remoteIpPrefix,
+					r.protocol,
+					newGroup
+				)
+			)
+		]
 		this.models.execute(
 			modelId,
 			new Command(
 				InfrastructureModelOp.ADD_RESOURCE,
 				context,
-				this.serializationParser.asXml(
-					this.i.securityGroup(
-						group.id,
-						name,
-						event.payload.path("security_group").get("description").asText,
-						this.i.infrastructure
-					)
-				)
+				this.serializationParser.asXml(newGroup)
 			)
 		)
 	}
