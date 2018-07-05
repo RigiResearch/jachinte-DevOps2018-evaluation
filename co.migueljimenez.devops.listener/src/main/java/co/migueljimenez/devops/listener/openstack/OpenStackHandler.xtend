@@ -270,9 +270,9 @@ class OpenStackHandler implements EventHandler {
 			this.i.infrastructure
 		)
 		group.rules?.forEach [ r |
-			newGroup.rules.add(
-				// FIXME Create external rules instead (additional resources)
-				if (r.portRangeMin !== null && r.portRangeMax !== null) {
+			if (r.portRangeMin !== null && r.portRangeMax !== null) {
+				newGroup.rules.add(
+					// FIXME Create external rules instead (additional resources)
 					this.i.securityRule(
 						r.id,
 						r.portRangeMin,
@@ -281,8 +281,8 @@ class OpenStackHandler implements EventHandler {
 						r.protocol,
 						newGroup
 					)
-				}
-			)
+				)
+			}
 		]
 		this.models.execute(
 			modelId,
