@@ -271,14 +271,17 @@ class OpenStackHandler implements EventHandler {
 		)
 		group.rules?.forEach [ r |
 			newGroup.rules.add(
-				this.i.securityRule(
-					r.id,
-					r.portRangeMin,
-					r.portRangeMax,
-					r.remoteIpPrefix,
-					r.protocol,
-					newGroup
-				)
+				// FIXME Create external rules instead (additional resources)
+				if (r.portRangeMin !== null && r.portRangeMax !== null) {
+					this.i.securityRule(
+						r.id,
+						r.portRangeMin,
+						r.portRangeMax,
+						r.remoteIpPrefix,
+						r.protocol,
+						newGroup
+					)
+				}
 			)
 		]
 		this.models.execute(
