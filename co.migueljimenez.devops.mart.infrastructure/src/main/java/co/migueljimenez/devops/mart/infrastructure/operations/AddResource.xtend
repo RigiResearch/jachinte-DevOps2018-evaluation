@@ -111,7 +111,7 @@ class AddResource extends AbstractOperation {
 	 * Adds a {@link SecurityGroup} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, SecurityGroup eObject) {
-		if (infrastructure.model.securityGroups.exists[s|eObject.id.equals(s.id)]) {
+		if (infrastructure.model.securityGroups.exists[s|eObject.name.equals(s.name)]) {
 			this.logger.info('''Security Group "«eObject.name»" not added because it already exists''')
 			return
 		}
@@ -125,7 +125,7 @@ class AddResource extends AbstractOperation {
 	 * Adds an {@link Image} to the given project.
 	 */
 	def private add(Infrastructure infrastructure, Image eObject) {
-		if (infrastructure.model.images.exists[i|eObject.id.equals(i.id)]) {
+		if (infrastructure.model.images.exists[i|eObject.name.equals(i.name)]) {
 			this.logger.info('''Image "«eObject.name»" not added because it already exists''')
 			return
 		}
