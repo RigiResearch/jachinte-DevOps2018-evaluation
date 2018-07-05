@@ -201,7 +201,7 @@ class OpenStackHandler implements EventHandler {
 			case "security_group.delete.end":
 				this.deleteSecurityGroup(modelId, context, event)
 			// Glance
-			case "image.activate":
+			case "image.create":
 				this.newImage(client, modelId, context, event)
 			case "image.delete":
 				this.deleteImage(modelId, context, event)
