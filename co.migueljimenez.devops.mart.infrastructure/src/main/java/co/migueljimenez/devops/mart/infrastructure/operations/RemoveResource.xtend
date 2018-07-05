@@ -33,6 +33,7 @@ import co.migueljimenez.devops.infrastructure.model.Credential
 import co.migueljimenez.devops.infrastructure.model.Image
 import org.eclipse.emf.ecore.EObject
 import co.migueljimenez.devops.infrastructure.model.SecurityGroup
+import org.slf4j.LoggerFactory
 
 /**
  * Removes an existing resource from the {@link Infrastructure}.
@@ -42,6 +43,11 @@ import co.migueljimenez.devops.infrastructure.model.SecurityGroup
  * @since 0.0.1
  */
 class RemoveResource extends AbstractOperation {
+
+	/**
+	 * The logger.
+	 */
+	val logger = LoggerFactory.getLogger(RemoveResource)
 
 	/**
 	 * Default constructor.
@@ -62,18 +68,18 @@ class RemoveResource extends AbstractOperation {
 			case Credential.canonicalName: {
 				// Credentials may be associated with instances, however, OpenStack
 				// won't remove the credential if such link exists.
-				eObject = infrastructure.model.credentials.findFirst[c|c.name.equals(name)]
+				eObject = infrastructure.model.credentials.findFirst[c|name.equals(c.name)]
 				commands.add('''terraform state rm openstack_compute_keypair_v2.«name»''')
 				commands.add('''rm -f .keys/«name».pem''')
 			}
 			case Image.canonicalName: {
-				eObject = infrastructure.model.images.findFirst[i|i.name.equals(name)]
+				eObject = infrastructure.model.images.findFirst[i|name.equals(i.name)]
 				commands.add('''terraform state rm openstack_images_image_v2.«name»''')
 			}
 			case SecurityGroup.canonicalName: {
 				// We have to use the id to find the group, as the name is not available anymore
 				// i.e., name is actually the id
-				eObject = infrastructure.model.securityGroups.findFirst[s|s.id.equals(name)]
+				eObject = infrastructure.model.securityGroups.findFirst[s|name.equals(s.id)]
 				commands.add('''terraform state rm openstack_compute_secgroup_v2.«(eObject as SecurityGroup).name»''')
 			}
 			default:
@@ -88,6 +94,8 @@ class RemoveResource extends AbstractOperation {
 					TerraformSpecification.deferCommand(file, c)
 				]
 			}
+		} else {
+			this.logger.error('''Resource «name» could not be deleted because it was not found''')
 		}
 	}
 
