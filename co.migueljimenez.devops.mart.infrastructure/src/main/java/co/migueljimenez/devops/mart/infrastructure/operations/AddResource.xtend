@@ -98,7 +98,7 @@ class AddResource extends AbstractOperation {
 	 */
 	def private add(Infrastructure infrastructure, Credential eObject) {
 		if (infrastructure.model.credentials.exists[c|c.name.equals(eObject.name)]) {
-			this.logger.info('''Credential "«eObject.name»" not added because it already exists''')
+			this.logger.error('''Credential "«eObject.name»" not added because it already exists''')
 			return
 		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
@@ -112,7 +112,7 @@ class AddResource extends AbstractOperation {
 	 */
 	def private add(Infrastructure infrastructure, SecurityGroup eObject) {
 		if (infrastructure.model.securityGroups.exists[s|eObject.name.equals(s.name)]) {
-			this.logger.info('''Security Group "«eObject.name»" not added because it already exists''')
+			this.logger.error('''Security Group "«eObject.name»" not added because it already exists''')
 			return
 		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
@@ -126,7 +126,7 @@ class AddResource extends AbstractOperation {
 	 */
 	def private add(Infrastructure infrastructure, Image eObject) {
 		if (infrastructure.model.images.exists[i|eObject.name.equals(i.name)]) {
-			this.logger.info('''Image "«eObject.name»" not added because it already exists''')
+			this.logger.error('''Image "«eObject.name»" not added because it already exists''')
 			return
 		}
 		val spec = this.getFileSpec(infrastructure.parent.specification)
